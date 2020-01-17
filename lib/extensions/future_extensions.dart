@@ -76,6 +76,13 @@ extension FutureOrExts<T> on FutureOr<T> {
     return other;
   }
 
+  FutureOr<T> also(void consumer(T input)) {
+    return this.thenOr((t) {
+      consumer(t);
+      return t;
+    }).unbox();
+  }
+
   Future<T> asFuture() => (this is Future) ? this as Future<T> : Future.value(this as T);
 
   FutureOr<R> thenOr<R>(R after(T resolved)) =>

@@ -271,6 +271,10 @@ class ValueStreamController<T> {
   dispose() {
     _controller.close();
   }
+
+  close() {
+    _controller.close();
+  }
 }
 
 class FuturesStream {
