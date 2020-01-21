@@ -323,6 +323,9 @@ extension ComparableIterableExtension<T extends Comparable> on Iterable<T> {
 }
 
 extension IterableExtension<T> on Iterable<T> {
+  List<T> freeze() {
+    return List.unmodifiable(this);
+  }
   List<R> mapIndexed<R>(R mapper(T item, int index)) {
     int i = 0;
     return [...this.map((T item) => mapper(item, i++))];
