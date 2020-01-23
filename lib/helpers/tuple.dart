@@ -6,7 +6,7 @@ import 'safe_completer.dart';
 abstract class Resolvable<T> {
   T resolveOrNull();
   bool get isResolved;
-  Future<T> asFuture();
+  Future<T> futureValue();
 }
 
 abstract class Tuple<A, B> extends Resolvable<Tuple<A, B>> {
@@ -54,7 +54,7 @@ class _Tuple<A, B> implements Tuple<A, B> {
   Tuple<A, B> resolveOrNull() => this;
 
   @override
-  Future<Tuple<A, B>> asFuture() => Future.value(this);
+  Future<Tuple<A, B>> futureValue() => Future.value(this);
 }
 
 class _FutureTuple<A, B> implements Tuple<A, B> {
@@ -75,7 +75,7 @@ class _FutureTuple<A, B> implements Tuple<A, B> {
 
   @override
   Tuple<A, B> resolveOrNull() => this;
-  Future<Tuple<A, B>> asFuture() async => await _completer.future;
+  Future<Tuple<A, B>> futureValue() async => await _completer.future;
 
   @override
   bool get isResolved => _completer.isCompleted;

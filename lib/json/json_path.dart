@@ -15,15 +15,13 @@ class JsonPath<T> extends MLiteral<String> {
 
   const JsonPath.root() : this._(const [], "/");
 
-  JsonPath.segments(List<String> segments)
-      : this._(List.unmodifiable(segments), _toPathName(segments));
+  JsonPath.segments(List<String> segments) : this._(List.unmodifiable(segments), _toPathName(segments));
 
   factory JsonPath.fromJson(json) => JsonPath<T>.parsed("$json");
 
   factory JsonPath.parsed(String value, {JsonPath relativeTo}) {
     final _segments = _parsePath(value);
-    final path =
-        JsonPath<T>._(List.unmodifiable(_segments), _toPathName(_segments));
+    final path = JsonPath<T>._(List.unmodifiable(_segments), _toPathName(_segments));
     if (relativeTo != null) {
       return path.relativize<T>(relativeTo);
     } else {
@@ -60,6 +58,10 @@ class JsonPath<T> extends MLiteral<String> {
   JsonPath get chop => JsonPath.segments(chopList(segments));
 
   JsonPath operator +(JsonPath path) {
+    return this.plus(path);
+  }
+
+  JsonPath plus(JsonPath path) {
     if (this.isEmpty) {
       return path;
     }

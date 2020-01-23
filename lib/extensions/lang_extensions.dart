@@ -49,8 +49,7 @@ const _titles = {'dōTERRA'};
 extension TypeExtensions on Type {
   String get name => "$this"
       .trimAround("_")
-      .replaceAllMapped(
-          typeParameters, (match) => "[${match.group(1).uncapitalize()}]")
+      .replaceAllMapped(typeParameters, (match) => "[${match.group(1).uncapitalize()}]")
       .uncapitalize();
 
   String get simpleName => "$this".removeAll(typeParameters).uncapitalize();
@@ -89,8 +88,7 @@ extension NumExt on num {
   }
 
   int toIntSafe() {
-    final i =
-        this ?? nullPointer("Null receiver.  Attempting to call toIntSafe");
+    final i = this ?? nullPointer("Null receiver.  Attempting to call toIntSafe");
     if (i is int) {
       return i;
     } else if (i.isIntegral) {
@@ -119,6 +117,8 @@ extension StringBufferExt on StringBuffer {
     return this;
   }
 }
+
+const _pluralStopWords = {"info", "information"};
 
 extension StringExt on String {
   String ifThen(String ifString, String thenString) {
@@ -183,6 +183,9 @@ extension StringExt on String {
   }
 
   String pluralizeIf(bool condition) {
+    if (_pluralStopWords.any((s) => this?.toLowerCase()?.endsWith(s) == true)) {
+      return this;
+    }
     return condition ? inflection.pluralize(this) : this;
   }
 
@@ -199,10 +202,7 @@ extension StringExt on String {
     return null;
   }
 
-  String trimAround(dynamic characters,
-      {bool trimStart = true,
-      bool trimEnd = true,
-      bool trimWhitespace = true}) {
+  String trimAround(dynamic characters, {bool trimStart = true, bool trimEnd = true, bool trimWhitespace = true}) {
     final target = this;
     var manipulated = target;
     if (trimWhitespace) {
@@ -280,11 +280,9 @@ extension StringExt on String {
   }
 }
 
-List<String> tokenizeString(String input,
-    {bool splitAll = false, Pattern splitOn}) {
+List<String> tokenizeString(String input, {bool splitAll = false, Pattern splitOn}) {
   if (input == null) return [];
-  splitOn ??=
-      (splitAll == true) ? aggresiveTokenizerPattern : spaceTokenizerPattern;
+  splitOn ??= (splitAll == true) ? aggresiveTokenizerPattern : spaceTokenizerPattern;
   return input.toSnakeCase().split(splitOn).whereNotBlank();
 }
 
@@ -326,12 +324,18 @@ extension IterableExtension<T> on Iterable<T> {
   List<T> freeze() {
     return List.unmodifiable(this);
   }
+
   List<R> mapIndexed<R>(R mapper(T item, int index)) {
     int i = 0;
     return [...this.map((T item) => mapper(item, i++))];
   }
 
+  @deprecated
   List<T> sorted([Comparator<T> compare]) {
+    return sortedBy(compare);
+  }
+
+  List<T> sortedBy([Comparator<T> compare]) {
     final buffer = [...?this];
     buffer.sort(compare);
     return buffer;
@@ -372,6 +376,8 @@ extension IterableExtension<T> on Iterable<T> {
   }
 
   T lastOrNull() => this.lastWhere((_) => true, orElse: () => null);
+
+  T firstOr([T ifEmpty]) => this.firstWhere((_) => true, orElse: () => ifEmpty);
 }
 
 extension IterableIterableExtension<T> on Iterable<Iterable<T>> {
@@ -392,10 +398,25 @@ extension CoreListExtension<T> on List<T> {
   }
 }
 
+class ListIndex<T> {
+  final int index;
+  final T value;
+
+  const ListIndex(this.index, this.value);
+}
+
 extension ListExtension<T> on List<T> {
   T tryGet(int index) {
     if (length > index) {
       return this[index];
+    } else {
+      return null;
+    }
+  }
+
+  T tryRemove(int index) {
+    if (length > index) {
+      return this.removeAt(index);
     } else {
       return null;
     }
@@ -413,6 +434,18 @@ extension ListExtension<T> on List<T> {
       list = list?.where(filter);
     }
     return list?.isNotEmpty == true ? list.first : null;
+  }
+
+  Iterable<ListIndex<T>> indexed() {
+    return this.mapIndexed((item, idx) => ListIndex<T>(idx, item));
+  }
+
+  Iterable<ListIndex<T>> whereIndexed([bool filter(T item)]) {
+    var indexed = this?.indexed() ?? [];
+    if (filter != null) {
+      indexed = indexed?.where((li) => filter(li.value));
+    }
+    return indexed;
   }
 
   T lastOrNull({bool filter(T item)}) {
@@ -454,8 +487,7 @@ extension BoolExtension on bool {
 }
 
 extension DateTimeExtensions on DateTime {
-  DateTime withoutTime() =>
-      DateTime(this.year, this.month, this.day, 0, 0, 0, 0, 0);
+  DateTime withoutTime() => DateTime(this.year, this.month, this.day, 0, 0, 0, 0, 0);
 
   Duration sinceNow() => -(this.difference(DateTime.now()));
 
@@ -471,11 +503,7 @@ extension DateTimeExtensions on DateTime {
 
   int get daysApart => sinceNow().inDays;
 
-  bool get hasTime =>
-      this.second != 0 ||
-      this.minute != 0 ||
-      this.hour != 0 ||
-      this.millisecond != 0;
+  bool get hasTime => this.second != 0 || this.minute != 0 || this.hour != 0 || this.millisecond != 0;
 
   DateTime plusTimeSpan(TimeSpan span) {
     final duration = span.toDuration(this);
@@ -555,8 +583,8 @@ extension MapDebug on Map {
 
   Map<String, String> toDebugMap() {
     return map((k, v) {
-      return MapEntry((k ?? '-').toString().truncate(20).removeNewlines(),
-          (v ?? '-').toString().truncate(20).removeNewlines());
+      return MapEntry(
+          (k ?? '-').toString().truncate(20).removeNewlines(), (v ?? '-').toString().truncate(20).removeNewlines());
     });
   }
 }

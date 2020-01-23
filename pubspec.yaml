@@ -10,7 +10,7 @@ dependencies:
   flutter_native_timezone: any
   inflection2: any
   intl: any
-  logging: any
+  logging: ^0.11.3+2
   recase: any
   stream_transform: any
   timezone: any

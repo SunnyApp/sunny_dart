@@ -18,7 +18,7 @@ extension FutureOrIterableExt<T> on Iterable<FutureOr<T>> {
   }
 
   Future<List<T>> awaitAll() {
-    return Future.wait(this.map((v) => v.asFuture()));
+    return Future.wait(this.map((v) => v.futureValue()));
   }
 }
 
@@ -83,10 +83,10 @@ extension FutureOrExts<T> on FutureOr<T> {
     }).unbox();
   }
 
-  Future<T> asFuture() => (this is Future) ? this as Future<T> : Future.value(this as T);
+  Future<T> futureValue() => (this is Future) ? this as Future<T> : Future.value(this as T);
 
   FutureOr<R> thenOr<R>(R after(T resolved)) =>
-      (this is Future<T>) ? asFuture().then(after) as FutureOr<R> : after(this as T) as FutureOr<R>;
+      (this is Future<T>) ? futureValue().then(after) as FutureOr<R> : after(this as T) as FutureOr<R>;
 }
 
 extension StreamTxrExtensions<X> on Stream<X> {
