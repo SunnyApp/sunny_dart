@@ -558,6 +558,10 @@ extension DurationExt on Duration {
     }
     return "${inMilliseconds}ms";
   }
+
+  Duration operator /(double amount) {
+    return Duration(microseconds: this.inMicroseconds ~/ amount);
+  }
 }
 
 extension LoggerExtensions on Logger {
