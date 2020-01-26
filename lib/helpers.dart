@@ -7,6 +7,7 @@ export 'helpers/functions.dart';
 export 'helpers/ints.dart';
 export 'helpers/lists.dart';
 export 'helpers/maps.dart';
+export 'helpers/phone_numbers.dart';
 export 'helpers/safe_completer.dart';
 export 'helpers/strings.dart';
 export 'helpers/tuple.dart';

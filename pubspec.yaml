@@ -11,6 +11,7 @@ dependencies:
   inflection2: any
   intl: any
   logging: ^0.11.3+2
+  libphonenumber: ^1.0.1
   recase: any
   stream_transform: any
   timezone: any
