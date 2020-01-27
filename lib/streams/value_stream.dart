@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:logging/logging.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:sunny_dart/helpers/disposable.dart';
@@ -28,8 +29,7 @@ abstract class ValueStream<T> {
   /// Basics of converting something over
   ValueStream<R> map<R>(R mapper(T input));
 
-  factory ValueStream.of(FutureOr<T> first,
-      [Stream<T> after, String debugName]) {
+  factory ValueStream.of(FutureOr<T> first, [Stream<T> after, String debugName]) {
     after ??= Stream.empty();
     if (first is Future<T>) {
       return FStream.ofFuture(first, after, debugName);
@@ -42,14 +42,11 @@ abstract class ValueStream<T> {
     return HStream.static(null);
   }
 
-  static ValueStreamController<X> controller<X>(String debugLabel,
-      {X initialValue, bool isUnique = true}) {
-    return ValueStreamController(debugLabel,
-        initialValue: initialValue, isUnique: isUnique);
+  static ValueStreamController<X> controller<X>(String debugLabel, {X initialValue, bool isUnique = true}) {
+    return ValueStreamController(debugLabel, initialValue: initialValue, isUnique: isUnique);
   }
 
-  static ValueStream<X> singleValue<X>(
-      {String debugLabel, FutureOr<X> initialValue}) {
+  static ValueStream<X> singleValue<X>({String debugLabel, FutureOr<X> initialValue}) {
     return ValueStream.of(initialValue);
   }
 }
@@ -78,8 +75,7 @@ class HStream<T> implements ValueStream<T> {
 
   T get() => first;
 
-  HStream<Iterable<R>> expandFrom<R, O>(
-      HStream<O> other, Iterable<R> expander(T input, O other)) {
+  HStream<Iterable<R>> expandFrom<R, O>(HStream<O> other, Iterable<R> expander(T input, O other)) {
     return HStream<Iterable<R>>(
         expander(this.first, other.first),
         after.combineLatest(other.after, (ours, O theirs) {
@@ -88,8 +84,7 @@ class HStream<T> implements ValueStream<T> {
   }
 
   HStream<Iterable<R>> expand<R>(Iterable<R> expander(T input)) {
-    return HStream<Iterable<R>>(
-        expander(first), after.map((T item) => expander(item)));
+    return HStream<Iterable<R>>(expander(first), after.map((T item) => expander(item)));
   }
 
   StreamSubscription listen(void onEach(T each), {bool cancelOnError = false}) {
@@ -126,9 +121,7 @@ class FStream<T> implements ValueStream<T> {
   @override
   bool get isFirstResolved => _isResolved;
 
-  T get first => isFirstResolved
-      ? _first
-      : nullPointer("Initial value not resolved.  Use future");
+  T get first => isFirstResolved ? _first : nullPointer("Initial value not resolved.  Use future");
 
   ValueStream<R> map<R>(R mapper(T input)) {
     return _isResolved
@@ -142,45 +135,38 @@ class FStream<T> implements ValueStream<T> {
   FutureOr<T> get() => (_isResolved ? _first : _firstFuture) as FutureOr<T>;
 }
 
-/// Looking at this - I'm not sure why we need this class (vs HStream)
+/// The SyncStream is used to control (and potentially debounce) updates to a single value, that are then dispatched
+/// as a single stream of updates
 class SyncStream<T> with Disposable implements ValueStream<T> {
-  SyncStream._(
-      {final FutureOr<T> current,
-      this.debugName,
-      this.onChange,
-      Stream<T> source})
+  SyncStream._({final FutureOr<T> current, this.debugName, this.onChange, Stream<T> source})
       : _after = StreamController.broadcast() {
     registerDisposer(_after.close);
-    source ??= Stream.empty();
-    current?.thenOr((_) {
-      this._resolved = true;
-      this.current = _;
-    });
 
-    registerDisposer(source.listen((newValue) {
-      this.current = newValue;
-      onChange?.call(newValue);
-      _after.add(newValue);
-    }).cancel);
+    if (current is Future<T>) {
+      source ??= Stream.empty();
+      source = Stream.fromFuture(current).merge(source);
+    } else if (current != null) {
+      /// We don't want to notify on initial values if they aren't a future.
+      this._resolved = true;
+      this._current = current;
+    }
+
+    if (source != null) {
+      registerDisposer(source.listen(update, cancelOnError: false).cancel);
+    }
   }
+
+  /// This stream doesn't subscribe to an upstream branch for updates, but can still be updated.
+  SyncStream.controller({FutureOr<T> initialValue, @required String debugName, Consumer<T> onChange})
+      : this._(current: initialValue, debugName: debugName, onChange: onChange);
 
   SyncStream.empty() : this._(debugName: "empty");
 
-  SyncStream.fromVStream(ValueStream<T> source,
-      [Consumer<T> onChange, String debugName])
-      : this._(
-            debugName: debugName,
-            onChange: onChange,
-            current: source.get(),
-            source: source.after);
+  SyncStream.fromVStream(ValueStream<T> source, [Consumer<T> onChange, String debugName])
+      : this._(debugName: debugName, onChange: onChange, current: source.get(), source: source.after);
 
-  SyncStream.fromStream(Stream<T> after,
-      [T current, Consumer<T> onChange, String debugName])
-      : this._(
-            current: current,
-            onChange: onChange,
-            debugName: debugName,
-            source: after);
+  SyncStream.fromStream(Stream<T> after, [T current, Consumer<T> onChange, String debugName])
+      : this._(current: current, onChange: onChange, debugName: debugName, source: after);
 
   T _current;
   final String debugName;
@@ -196,9 +182,19 @@ class SyncStream<T> with Disposable implements ValueStream<T> {
   T get current => _current;
 
   set current(T current) {
+    update(current);
+  }
+
+  /// Like [StreamController.add]
+  void update(T current) {
     _current = current;
     _resolved = true;
     _after.add(current);
+    onChange?.call(current);
+  }
+
+  toVStream() {
+    return HStream(current, after);
   }
 
   @override
@@ -209,10 +205,6 @@ class SyncStream<T> with Disposable implements ValueStream<T> {
 
   @override
   FutureOr<T> get() => current;
-
-  toVStream() {
-    return HStream(current, after);
-  }
 
   @override
   ValueStream<R> map<R>(R mapper(T input)) {
@@ -226,6 +218,8 @@ class SyncStream<T> with Disposable implements ValueStream<T> {
     _resolved = false;
     _current = null;
   }
+
+  void dispose() => disposeAll();
 }
 
 class HeadedEntryStream<K, V> {
@@ -240,15 +234,13 @@ class HeadedEntryStream<K, V> {
 }
 
 /// A class that tracks a single value as a stream, but can also provide the latest value;
-///
 class ValueStreamController<T> {
   T _currentValue;
   final bool isUnique;
   final String debugLabel;
   StreamController<T> _controller;
 
-  ValueStreamController(this.debugLabel,
-      {T initialValue, this.isUnique = true}) {
+  ValueStreamController(this.debugLabel, {T initialValue, this.isUnique = true}) {
     _controller = StreamController.broadcast();
     if (initialValue != null) {
       add(initialValue);

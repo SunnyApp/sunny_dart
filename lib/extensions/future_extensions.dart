@@ -11,6 +11,14 @@ extension FutureIterableExt<T> on Iterable<Future<T>> {
   }
 }
 
+extension IterableFutureExt<T> on FutureOr<Iterable<T>> {
+  FutureOr<Iterable<R>> thenMap<R>(R mapper(T input)) {
+    return this.thenOr((_) {
+      return _.map(mapper);
+    });
+  }
+}
+
 extension FutureOrIterableExt<T> on Iterable<FutureOr<T>> {
   List<T> completed() {
     if (this == null) return [];
@@ -38,8 +46,12 @@ extension NestedFutureOr<T> on FutureOr<FutureOr<T>> {
   }
 }
 
-extension FutureExt<T> on Future<T> {
+extension FutureExtensions<T> on Future<T> {
   void ignore() {}
+
+  Future<bool> safe() {
+    return this ?? Future.value(false);
+  }
 
   FutureOr<Tuple<T, R>> to<R>(FutureOr<R> mapper(T input)) {
     final other = thenOr((T resolved) {

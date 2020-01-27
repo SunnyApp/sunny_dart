@@ -10,6 +10,7 @@ dependencies:
   flutter_native_timezone: any
   inflection2: any
   intl: any
+  equatable: any
   logging: ^0.11.3+2
   libphonenumber: ^1.0.1
   recase: any
