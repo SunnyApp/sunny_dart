@@ -10,6 +10,12 @@ bool isPhone(String input) {
   return input.contains(RegExp("^[0-9\-\s\+\(\)]+\$")) && input.replaceAll(RegExp("[^0-9]+"), "").length > 6;
 }
 
+final upToLastDot = RegExp('.*\.');
+
+String extension(value) {
+  return value?.toString()?.replaceAll(upToLastDot, '');
+}
+
 String buildString(void builder(StringBuffer buffer)) {
   final buffer = StringBuffer();
   builder(buffer);

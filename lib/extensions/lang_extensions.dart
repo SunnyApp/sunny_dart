@@ -7,6 +7,7 @@ import 'package:inflection2/inflection2.dart' as inflection;
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:recase/recase.dart';
+import 'package:sunny_dart/json/json_path.dart';
 import 'package:sunny_dart/time/time_span.dart';
 import 'package:timezone/timezone.dart';
 
@@ -40,6 +41,15 @@ extension AnyExtensions<T> on T {
       return null;
     } else {
       return block(this);
+    }
+  }
+
+  T apply(dynamic block(T self)) {
+    if (this == null) {
+      return null;
+    } else {
+      block(this);
+      return this;
     }
   }
 }
@@ -119,14 +129,31 @@ extension StringBufferExt on StringBuffer {
 }
 
 const _pluralStopWords = {"info", "information"};
+final wordSeparator = RegExp('[\.\;\, ]');
+final isLetters = RegExp(r"^[A-Za-z]*$");
 
-extension StringExt on String {
+extension StringExtensions on String {
+  String toPathName() {
+    if (this == null) return null;
+    if (!this.startsWith("/")) {
+      return "/$this";
+    } else {
+      return this;
+    }
+  }
+
+  JsonPath toJsonPath() {
+    return JsonPath.of(this.toPathName());
+  }
+
   String ifThen(String ifString, String thenString) {
     if (this == null || this == ifString) return thenString;
     return this;
   }
 
   Color toColor() => colorFromHex(this);
+
+  Uri toUri() => this == null ? null : Uri.parse(this);
 
   String nullIfBlank() {
     if (isNullOrBlank) return null;
@@ -165,6 +192,19 @@ extension StringExt on String {
       default:
         return false;
     }
+  }
+
+  List<String> get words {
+    if (this == null) return const [];
+    return [
+      for (final word in this.split(wordSeparator)) if (word.trim().isNotNullOrBlank) word,
+    ];
+  }
+
+  /// Whether the string contains only letters
+  bool get isLettersOnly {
+    if (this.isNullOrBlank) return false;
+    return isLetters.hasMatch(this);
   }
 
   bool get isNumeric => num.tryParse(this) != null;
@@ -339,6 +379,15 @@ extension IterableExtension<T> on Iterable<T> {
     final buffer = [...?this];
     buffer.sort(compare);
     return buffer;
+  }
+
+  Iterable<T> uniqueBy(dynamic uniqueProp(T item)) {
+    final mapping = <dynamic, T>{};
+    for (final t in this.orEmpty()) {
+      final unique = uniqueProp(t);
+      mapping[unique] = t;
+    }
+    return mapping.values;
   }
 
   Stream<T> toStream() {
@@ -557,6 +606,15 @@ extension DurationExt on Duration {
       return "${micro}ns";
     }
     return "${inMilliseconds}ms";
+  }
+
+  Future<R> then<R>(R block()) async {
+    await Future.delayed(this);
+    return block?.call();
+  }
+
+  Future<R> delay<R>([R block()]) async {
+    return await then(block);
   }
 
   Duration operator /(double amount) {

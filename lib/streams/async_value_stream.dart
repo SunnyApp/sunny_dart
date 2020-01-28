@@ -146,7 +146,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
 
   /// Waits until the next update completes
   Future<T> get nextUpdate {
-    return after.first;
+    return after.firstWhere((_) => true, orElse: () => null);
   }
 
   @override
