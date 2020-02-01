@@ -92,7 +92,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
     }).autodispose(this);
 
     if (initialValue != null) {
-      this.current = initialValue;
+      this.syncUpdate(initialValue);
     }
   }
 
@@ -100,34 +100,45 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
 
   /// When setting a value in this way, we can assume that this update is the latest, and should cancel out any
   /// other in-flight requests
-  set current(T current) {
+  Future<T> syncUpdate(T current) {
     final requestId = _requestId++;
+    final future = nextUpdate;
     switch (mode) {
       case ClearingHouseMode.AllowSynchronousValues:
         // Cancel any in-flight update, then update (after the cancellation completes)
+
         if (_inflight != null) {
           _inflight.cancel().then((_) => _internalUpdate(requestId, current));
         } else {
           _internalUpdate(requestId, current);
         }
-
-        break;
+        return future;
       default:
-        _queue(() => current);
+        if (_queue(() => current, debugLabel: "sync: $current")) {
+          return future;
+        } else {
+          return Future.value(_current);
+        }
         break;
     }
   }
 
-  Future<T> update(Producer<T> current) {
+  Future<T> update(Producer<T> current, {String debugLabel}) {
     assert(current != null);
-    _queue(current);
-    return nextUpdate;
+    final future = nextUpdate;
+    bool isQueued = _queue(current, debugLabel: debugLabel);
+    return isQueued ? future : Future.value(this._current);
   }
 
-  _queue(Producer<T> producer) {
+  bool _queue(Producer<T> producer, {String debugLabel}) {
     final requestId = _requestId++;
     log.fine("Queued request: $requestId");
-    _requests.add(UpdateRequest(producer, requestId, log));
+    if (!_requests.isClosed) {
+      _requests.add(UpdateRequest(producer, requestId, log, debugLabel: debugLabel));
+      return true;
+    } else {
+      return false;
+    }
   }
 
   /// Updates the internal values and notifies listeners
@@ -137,16 +148,19 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
       return;
     }
     _accepted = requestId;
-    if (isUnique != true || _current != current) {
+//    if (isUnique != true || _current != current) {
       _current = current;
       _after.add(current);
-    }
+//    }
     _isResolved = true;
   }
 
   /// Waits until the next update completes
   Future<T> get nextUpdate {
-    return after.firstWhere((_) => true, orElse: () => null);
+    return after.firstWhere((_) => true, orElse: () => null).timeout(2.second, onTimeout: () {
+      log.warning("Timeout on update - sending current value: $_current");
+      return _current;
+    });
   }
 
   @override
@@ -190,8 +204,9 @@ class UpdateRequest<T> with EquatableMixin implements Comparable<UpdateRequest> 
   final Logger log;
   CancelableOperation<UpdateResult<T>> operation;
   bool _isCancelled = false;
+  String debugLabel;
 
-  UpdateRequest(this.producer, this.requestId, this.log);
+  UpdateRequest(this.producer, this.requestId, this.log, {this.debugLabel});
 
   CancelableOperation<UpdateResult<T>> start() {
     if (_isCancelled) return null;
@@ -205,7 +220,7 @@ class UpdateRequest<T> with EquatableMixin implements Comparable<UpdateRequest> 
   }
 
   cancel() async {
-    log.info("Cancelling request $requestId");
+    log.info("Cancelling request $requestId: (${debugLabel ?? 'no details'}}");
     await operation?.cancel();
     _isCancelled = true;
   }

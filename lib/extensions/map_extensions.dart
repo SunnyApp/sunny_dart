@@ -1,6 +1,7 @@
 import 'package:sunny_dart/json/json_path.dart';
 
 import '../helpers.dart';
+import '../typedefs.dart';
 import 'lang_extensions.dart';
 
 extension MapExtensions<K, V> on Map<K, V> {
@@ -61,9 +62,9 @@ extension MapExtensions<K, V> on Map<K, V> {
 }
 
 extension IterableExtensions<V> on Iterable<V> {
-  Iterable<V> ifEmpty(Iterable<V> other) {
+  Iterable<V> ifEmpty(Getter<Iterable<V>> other) {
     if (this.isNullOrEmpty) {
-      return other;
+      return other();
     } else {
       return this;
     }

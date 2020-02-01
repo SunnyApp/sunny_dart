@@ -142,6 +142,14 @@ extension StringExtensions on String {
     }
   }
 
+  List<String> toStringList() {
+    if (this.isNotNullOrBlank) {
+      return [this];
+    } else {
+      return const [];
+    }
+  }
+
   JsonPath toJsonPath() {
     return JsonPath.of(this.toPathName());
   }
@@ -361,6 +369,22 @@ extension ComparableIterableExtension<T extends Comparable> on Iterable<T> {
 }
 
 extension IterableExtension<T> on Iterable<T> {
+  /// No way to override the + operator for an iterable, so I use a downcast to iterable
+  Iterable<T> operator +(item) {
+    final self = this as List<T>;
+
+    if (item is List<T>) {
+      self.addAll(item);
+    } else if (item is T) {
+      self.add(item);
+    } else if (item == null) {
+      self.add(null);
+    } else {
+      throw "Invalid input - must be null, $T, List<$T>";
+    }
+    return this;
+  }
+
   List<T> freeze() {
     return List.unmodifiable(this);
   }
@@ -445,6 +469,23 @@ extension CoreListExtension<T> on List<T> {
       return null;
     }
   }
+
+  /// The existing List + operator only works for lists, so *= is the best we can do
+  ///
+  ///
+  List<T> operator *(item) {
+    if (item is List<T>) {
+      this.addAll(item);
+    } else if (item is T) {
+      this.add(item);
+    } else if (item == null) {
+      /// we don't add nulls, may regret this some day
+      return this;
+    } else {
+      throw "Invalid input - must be null, $T, List<$T>";
+    }
+    return this;
+  }
 }
 
 class ListIndex<T> {
@@ -455,6 +496,8 @@ class ListIndex<T> {
 }
 
 extension ListExtension<T> on List<T> {
+  Iterable<T> get iterable => this as Iterable<T>;
+
   T tryGet(int index) {
     if (length > index) {
       return this[index];

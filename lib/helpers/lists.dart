@@ -3,6 +3,7 @@ import 'package:logging/logging.dart';
 
 import '../typedefs.dart';
 import 'functions.dart';
+
 final _log = Logger("Lists");
 
 class Lists {
@@ -194,6 +195,9 @@ Map<K, V> filterValues<K, V>(Map<K, V> source, bool filter(V value)) =>
     source.entries.where((e) => filter(e.value)).toList().asMap().map((_, e) => e);
 
 T badArgument<T>({value, String name, String message}) => throw ArgumentError.value(value, name, message);
+
+T wrongType<T>(String name, value, List<Type> accepted) =>
+    throw ArgumentError.value(value, name, "Wrong type (${value?.runtimeType}) - expected one of $accepted");
 
 Widget widgetIf(bool condition, Factory<Widget> factory) => condition ? factory() : Container();
 

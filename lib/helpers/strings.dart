@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart' as crypto;
@@ -132,6 +133,17 @@ R withString<R>(Iterable<String> strings, R Function(String string) handler) {
 
 String uuid() {
   return _uuid.v4();
+}
+
+const chars = "abcdefghijklmnopqrstuvwxyz";
+
+String randomString(int length) {
+  final rnd = Random(new DateTime.now().millisecondsSinceEpoch);
+  String result = "";
+  for (var i = 0; i < length; i++) {
+    result += chars[rnd.nextInt(chars.length)];
+  }
+  return result;
 }
 
 final _uuid = Uuid();

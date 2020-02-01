@@ -12,8 +12,9 @@ class JsonPath<T> extends MLiteral<String> {
   const JsonPath._(this.segments, this.path) : super(path);
 
   const JsonPath.internal(this.segments, this.path) : super(path);
+  static const Root = JsonPath._(const [], "/");
 
-  const JsonPath.root() : this._(const [], "/");
+  factory JsonPath.root() => Root;
 
   JsonPath.segments(List<String> segments) : this._(List.unmodifiable(segments), _toPathName(segments));
 
@@ -46,8 +47,6 @@ class JsonPath<T> extends MLiteral<String> {
   /// The last segment in the path
   String get last => segments.last;
 
-  /// Whether this path is empty, eg "/"
-  bool get isEmpty => segments.isEmpty;
 
   /// Whether this path starts with another [JsonPath] instance.
   bool startsWith(JsonPath otherPath) {
@@ -56,20 +55,6 @@ class JsonPath<T> extends MLiteral<String> {
 
   /// Returns an immutable copy of this path, with the last path segment removed
   JsonPath get chop => JsonPath.segments(chopList(segments));
-
-  JsonPath operator +(JsonPath path) {
-    return this.plus(path);
-  }
-
-  JsonPath plus(JsonPath path) {
-    if (this.isEmpty) {
-      return path;
-    }
-    if (path.isEmpty) {
-      return this;
-    }
-    return JsonPath._(this.segments + path.segments, this.path + path.path);
-  }
 
   JsonPath<TT> relativize<TT>(JsonPath<dynamic> other) {
     final segments = <String>[];
@@ -112,3 +97,28 @@ List<String> _parsePath(String path) {
 }
 
 String _toPathName(Iterable<String> segments) => "/" + segments.join("/");
+
+extension JsonPathOperatorExtensions<T> on JsonPath<T> {
+  JsonPath operator +(JsonPath path) {
+    return self.plus(path.self);
+  }
+
+  /// Whether this path is empty, eg "/"
+  bool get isEmpty => segments?.isNotEmpty != true;
+
+  JsonPath<T> get self => this ?? JsonPath.Root;
+
+  JsonPath<T> get verifyNotRoot => isNotRoot ? this : illegalState("Expected ${this} to not be root");
+  bool get isNotRoot => self.segments.isNotEmpty;
+  bool get isNullOrRoot => this == null || this.segments.isEmpty;
+
+  JsonPath<TT> plus<TT>(JsonPath<TT> path) {
+    if (self.isEmpty) {
+      return path;
+    }
+    if (path.self.isEmpty) {
+      return this.cast();
+    }
+    return JsonPath<TT>._(this.self.segments + path.self.segments, this.self.path + path.self.path);
+  }
+}
