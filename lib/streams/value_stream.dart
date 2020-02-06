@@ -140,8 +140,6 @@ class FStream<T> implements ValueStream<T> {
 class SyncStream<T> with Disposable implements ValueStream<T> {
   SyncStream._({final FutureOr<T> current, this.debugName, this.onChange, Stream<T> source})
       : _after = StreamController.broadcast() {
-    registerDisposer(_after.close);
-
     if (current is Future<T>) {
       source ??= Stream.empty();
       source = Stream.fromFuture(current).merge(source);
@@ -154,6 +152,7 @@ class SyncStream<T> with Disposable implements ValueStream<T> {
     if (source != null) {
       registerDisposer(source.listen(update, cancelOnError: false).cancel);
     }
+    registerDisposer(_after.close);
   }
 
   /// This stream doesn't subscribe to an upstream branch for updates, but can still be updated.

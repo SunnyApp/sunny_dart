@@ -8,6 +8,9 @@ T assertNotNull<T>(T value) => value ?? nullPointer("Expected not-null value of 
 
 T illegalState<T>([String message]) => throw Exception(message ?? "Illegal state");
 
+T illegalArg<T>(String prop, [String message]) =>
+    throw Exception(message ?? "Illegal argument $prop: ${message ?? 'No message'}");
+
 T notImplemented<T>() => throw Exception("Not implemented");
 
 class ErrorStack {

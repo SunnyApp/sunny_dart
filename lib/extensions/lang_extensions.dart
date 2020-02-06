@@ -339,7 +339,12 @@ final aggresiveTokenizerPattern = RegExp(aggresiveTokenizer);
 
 const spaceTokenizer = "(\s)";
 final spaceTokenizerPattern = RegExp(spaceTokenizer);
+enum IterationPosition { first, middle, last }
 
+extension IterationPositionExtensions on IterationPosition {
+  bool get isLast => this == IterationPosition.last;
+  bool get isFirst => this == IterationPosition.first;
+}
 extension ComparableIterableExtension<T extends Comparable> on Iterable<T> {
   T max([T ifNull]) {
     T _max;
@@ -446,6 +451,38 @@ extension IterableExtension<T> on Iterable<T> {
     return [
       ...map(mapper).where(notNull()),
     ];
+  }
+
+  Iterable<R> mapPositioned<R>(R mapper(T item, IterationPosition pos)) {
+    int i = 0;
+    final length = this.length;
+    return [
+      ...this.map((T item) {
+        final _i = i;
+        i++;
+        return mapper(
+          item, _i == 0 ? IterationPosition.first : _i == length - 1 ? IterationPosition.last : IterationPosition.middle);
+      })
+    ];
+  }
+
+  String joinWithAnd() {
+    if (length < 3) {
+      return this.join(" and ");
+    } else {
+      return mapPositioned((item, pos) {
+        switch (pos) {
+          case IterationPosition.first:
+            return "$item";
+          case IterationPosition.middle:
+            return ", $item";
+          case IterationPosition.last:
+            return " and $item";
+          default:
+            return ", $item";
+        }
+      }).join("");
+    }
   }
 
   T lastOrNull() => this.lastWhere((_) => true, orElse: () => null);
