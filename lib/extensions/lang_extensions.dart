@@ -345,6 +345,7 @@ extension IterationPositionExtensions on IterationPosition {
   bool get isLast => this == IterationPosition.last;
   bool get isFirst => this == IterationPosition.first;
 }
+
 extension ComparableIterableExtension<T extends Comparable> on Iterable<T> {
   T max([T ifNull]) {
     T _max;
@@ -397,6 +398,11 @@ extension IterableExtension<T> on Iterable<T> {
   List<R> mapIndexed<R>(R mapper(T item, int index)) {
     int i = 0;
     return [...this.map((T item) => mapper(item, i++))];
+  }
+
+  List<R> expandIndexed<R>(Iterable<R> mapper(T item, int index)) {
+    int i = 0;
+    return [...this.expand((T item) => mapper(item, i++))];
   }
 
   @deprecated
@@ -460,8 +466,8 @@ extension IterableExtension<T> on Iterable<T> {
       ...this.map((T item) {
         final _i = i;
         i++;
-        return mapper(
-          item, _i == 0 ? IterationPosition.first : _i == length - 1 ? IterationPosition.last : IterationPosition.middle);
+        return mapper(item,
+            _i == 0 ? IterationPosition.first : _i == length - 1 ? IterationPosition.last : IterationPosition.middle);
       })
     ];
   }
