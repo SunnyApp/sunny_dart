@@ -1,6 +1,6 @@
 import 'package:logging/logging.dart';
 import 'package:recase/recase.dart';
-import 'package:sunny_dart/sunny_dart.dart';
+import 'package:sunny_dart/extensions.dart';
 
 mixin LoggingMixin {
   String get loggerName => runtimeType.name;

@@ -35,6 +35,8 @@ class JsonPath<T> extends MLiteral<String> {
       return from.relativize(relativeTo).cast<T>();
     } else if (from is JsonPath<T> && relativeTo == null) {
       return from.cast<T>();
+    } else if (from == null) {
+      return JsonPath.root();
     } else {
       return JsonPath.parsed("$from", relativeTo: relativeTo);
     }
@@ -46,7 +48,6 @@ class JsonPath<T> extends MLiteral<String> {
 
   /// The last segment in the path
   String get last => segments.last;
-
 
   /// Whether this path starts with another [JsonPath] instance.
   bool startsWith(JsonPath otherPath) {
@@ -113,6 +114,7 @@ extension JsonPathOperatorExtensions<T> on JsonPath<T> {
   bool get isNullOrRoot => this == null || this.segments.isEmpty;
 
   JsonPath<TT> plus<TT>(JsonPath<TT> path) {
+    final self = this.self;
     if (self.isEmpty) {
       return path;
     }

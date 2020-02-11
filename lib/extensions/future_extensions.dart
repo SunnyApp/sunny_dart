@@ -25,8 +25,16 @@ extension FutureOrIterableExt<T> on Iterable<FutureOr<T>> {
     return <T>[...this.whereType()];
   }
 
-  Future<List<T>> awaitAll() {
-    return Future.wait(this.map((v) => v.futureValue()));
+  Future<List<T>> awaitAll({bool eagerError = true}) {
+    return Future.wait(this.map((v) => v.futureValue()), eagerError: eagerError);
+  }
+
+  FutureOr<List<T>> awaitOr() {
+    if (this.any((_) => _ is Future)) {
+      return Future.wait(this.map((v) => v.futureValue()));
+    } else {
+      return this.toList().cast<T>();
+    }
   }
 }
 
