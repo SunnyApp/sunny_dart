@@ -59,6 +59,10 @@ extension MapExtensions<K, V> on Map<K, V> {
       return "${e.key}=${e.value.toString().removeNewlines().truncate(40)}";
     }).join("; ");
   }
+
+  Map<K, V> orEmpty() {
+    return this ?? {};
+  }
 }
 
 extension IterableExtensions<V> on Iterable<V> {

@@ -103,7 +103,7 @@ extension FutureOrExts<T> on FutureOr<T> {
     }).unbox();
   }
 
-  Future<T> futureValue() => (this is Future) ? this as Future<T> : Future.value(this as T);
+  Future<T> futureValue() => (this is Future<T>) ? this : Future.value(this as T);
 
   FutureOr<R> thenOr<R>(R after(T resolved)) =>
       (this is Future<T>) ? futureValue().then(after) as FutureOr<R> : after(this as T) as FutureOr<R>;

@@ -213,12 +213,19 @@ class SyncStream<T> with Disposable implements ValueStream<T> {
   @override
   bool get isFirstResolved => _resolved;
 
+  /// Forwards a stream to this one
+  void forward(Stream<T> from) {
+    registerDisposer(from.listen((data) {
+      this.update(data);
+    }, cancelOnError: false).cancel);
+  }
+
   void reset() {
     _resolved = false;
     _current = null;
   }
 
-  void dispose() => disposeAll();
+  Future dispose() async => await disposeAll();
 }
 
 class HeadedEntryStream<K, V> {

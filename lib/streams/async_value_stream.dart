@@ -5,6 +5,7 @@ import 'package:equatable/equatable.dart';
 import 'package:logging/logging.dart';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:sunny_dart/extensions.dart';
+import 'package:sunny_dart/helpers.dart';
 import 'package:sunny_dart/helpers/disposable.dart';
 
 import '../typedefs.dart';
@@ -52,6 +53,9 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
 
   Stream<T> get after => _after.stream;
 
+  /// This returns the next calculated value.  It's reset each time
+  final SafeCompleter<T> _nextFrame = SafeCompleter<T>();
+
   AsyncValueStream(
       {String debugName,
       T initialValue,
@@ -67,27 +71,40 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
       final latestRequest = this._inflight = requests.max();
 
       /// Cancel any requests that aren't the latest
-      requests.where((req) => req != latestRequest).forEach((req) => req.cancel());
+      await requests.where((req) => req != latestRequest).map((req) => req.cancel()).awaitAll();
 
       if (latestRequest.requestId < _accepted) {
         log.warning("Skipping ${latestRequest.requestId} because it was too stale");
-        return;
-      }
 
-      /// Start that request
-      final cancellable = latestRequest.start();
-      try {
-        /// And wait for either completion or cancellation
-        final result = await cancellable?.valueOrCancellation(const UpdateResult.cancelled());
-        if (result?.isCompleted != true) {
-          log.info("Ignoring cancelled request ${latestRequest.requestId}");
-        } else {
-          _inflight = null;
-          log.info("Request ${latestRequest.requestId} completed with ${result?.value}");
-          _internalUpdate(latestRequest.requestId, result?.value);
+        _nextFrame
+          ..start()
+          ..complete(_current)
+          ..reset();
+        return;
+      } else {
+        /// Start that request
+        final cancellable = latestRequest.start();
+        try {
+          /// And wait for either completion or cancellation
+          final result = await cancellable?.valueOrCancellation(const UpdateResult.cancelled());
+          if (result?.isCompleted != true) {
+            log.info("Ignoring cancelled request ${latestRequest.requestId}");
+          } else {
+            _inflight = null;
+            log.info("Request ${latestRequest.requestId} completed with ${result?.value}");
+            _internalUpdate(latestRequest.requestId, result?.value);
+          }
+          _nextFrame
+            ..start()
+            ..complete(current)
+            ..reset();
+        } catch (e, stack) {
+          log.severe("Error updating result: $e", e, stack);
+          _nextFrame
+            ..start()
+            ..complete(current)
+            ..reset();
         }
-      } catch (e, stack) {
-        log.severe("Error updating result: $e", e, stack);
       }
     }).autodispose(this);
 
@@ -102,12 +119,12 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
   /// other in-flight requests
   Future<T> syncUpdate(T current) {
     final requestId = _requestId++;
-    final future = nextUpdate;
     switch (mode) {
       case ClearingHouseMode.AllowSynchronousValues:
         // Cancel any in-flight update, then update (after the cancellation completes)
 
         if (_inflight != null) {
+          log.info("Cancelling inflight update");
           _inflight.cancel().then((_) => _internalUpdate(requestId, current));
         } else {
           _internalUpdate(requestId, current);
@@ -125,9 +142,8 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
 
   Future<T> update(Producer<T> current, {String debugLabel}) {
     assert(current != null);
-    final future = nextUpdate;
     bool isQueued = _queue(current, debugLabel: debugLabel);
-    return isQueued ? future : Future.value(this._current);
+    return isQueued ? nextUpdate : Future.value(this._current);
   }
 
   bool _queue(Producer<T> producer, {String debugLabel}) {
@@ -135,6 +151,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
     log.fine("Queued request: $requestId");
     if (!_requests.isClosed) {
       _requests.add(UpdateRequest(producer, requestId, log, debugLabel: debugLabel));
+      _nextFrame.start();
       return true;
     } else {
       return false;
@@ -146,25 +163,30 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
     if (_accepted >= requestId) {
       log.info('Update $requestId completed, but was older than $_accepted => value = $current');
       return;
-    }
-    _accepted = requestId;
-//    if (isUnique != true || _current != current) {
+    } else {
+      _accepted = requestId;
       _current = current;
-      _after.add(current);
-//    }
+    }
+    _after.add(current);
     _isResolved = true;
   }
 
   /// Waits until the next update completes
   Future<T> get nextUpdate {
-    return after.firstWhere((_) => true, orElse: () => null).timeout(2.second, onTimeout: () {
-      log.warning("Timeout on update - sending current value: $_current");
-      return _current;
-    });
+    return _nextFrame.isActive
+        ? _nextFrame.future.timeout(5.second, onTimeout: () {
+            log.warning("Timeout on update - sending current value: $_current");
+            _nextFrame
+              ..start()
+              ..complete(_current)
+              ..reset();
+            return _current;
+          })
+        : _current;
   }
 
   @override
-  Future<T> get future => current != null ? Future.value(current) : after.first;
+  Future<T> get future => _nextFrame.isActive ? _nextFrame.future : Future.value(_current);
 
   @override
   T resolve([T ifAbsent]) => current ?? ifAbsent;
@@ -214,12 +236,14 @@ class UpdateRequest<T> with EquatableMixin implements Comparable<UpdateRequest> 
     return operation ??= CancelableOperation<UpdateResult<T>>.fromFuture(
         producer().futureValue().then((_) {
           return UpdateResult.value(_);
+        }).catchError((err, StackTrace stack) {
+          log.severe("Error $err", err, stack);
         }), onCancel: () {
       _isCancelled = true;
     });
   }
 
-  cancel() async {
+  Future cancel() async {
     log.info("Cancelling request $requestId: (${debugLabel ?? 'no details'}}");
     await operation?.cancel();
     _isCancelled = true;

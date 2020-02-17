@@ -22,6 +22,11 @@ extension StringListExtension on List<String> {
   }
 }
 
+extension ObjectToListExtension<T> on T {
+  List<T> asList() {
+    return [if(this != null) this];
+  }
+}
 final typeParameters = RegExp("<(.*)>");
 final newLinesPattern = RegExp("\\n");
 
@@ -405,6 +410,26 @@ extension IterableExtension<T> on Iterable<T> {
     return [...this.expand((T item) => mapper(item, i++))];
   }
 
+  T maxBy<R extends Comparable<R>>(R by(T item), [T ifNull]) {
+    T _max;
+    for (final t in this.orEmpty()) {
+      if (_max == null || (by(t)?.compareTo(by(_max)) ?? 0) > 0) {
+        _max = t;
+      }
+    }
+    return _max ?? ifNull;
+  }
+
+  T minBy<R extends Comparable<R>>(R by(T item), [T ifNull]) {
+    T _min;
+    for (final t in this.orEmpty()) {
+      if (_min == null || (by(t)?.compareTo(by(_min)) ?? 0) < 0) {
+        _min = t;
+      }
+    }
+    return _min ?? ifNull;
+  }
+
   @deprecated
   List<T> sorted([Comparator<T> compare]) {
     return sortedBy(compare);
@@ -472,20 +497,22 @@ extension IterableExtension<T> on Iterable<T> {
     ];
   }
 
-  String joinWithAnd() {
+  String joinWithAnd([String formatter(T input)]) {
+    formatter ??= (item)=>item?.toString();
     if (length < 3) {
       return this.join(" and ");
     } else {
       return mapPositioned((item, pos) {
+        String formatted = formatter(item);
         switch (pos) {
           case IterationPosition.first:
-            return "$item";
+            return formatted;
           case IterationPosition.middle:
-            return ", $item";
+            return ", $formatted";
           case IterationPosition.last:
-            return " and $item";
+            return ", and $formatted";
           default:
-            return ", $item";
+            return ", $formatted";
         }
       }).join("");
     }
@@ -643,6 +670,11 @@ extension DateTimeExtensions on DateTime {
   DateTime plusTimeSpan(TimeSpan span) {
     final duration = span.toDuration(this);
     return this.add(duration);
+  }
+
+  DateTime minusTimeSpan(TimeSpan span) {
+    final duration = span.toDuration(this);
+    return this.add(-duration);
   }
 
   bool get isFuture => this != null && this.isAfter(DateTime.now());
