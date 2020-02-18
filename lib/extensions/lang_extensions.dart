@@ -24,9 +24,10 @@ extension StringListExtension on List<String> {
 
 extension ObjectToListExtension<T> on T {
   List<T> asList() {
-    return [if(this != null) this];
+    return [if (this != null) this];
   }
 }
+
 final typeParameters = RegExp("<(.*)>");
 final newLinesPattern = RegExp("\\n");
 
@@ -348,6 +349,7 @@ enum IterationPosition { first, middle, last }
 
 extension IterationPositionExtensions on IterationPosition {
   bool get isLast => this == IterationPosition.last;
+
   bool get isFirst => this == IterationPosition.first;
 }
 
@@ -498,7 +500,7 @@ extension IterableExtension<T> on Iterable<T> {
   }
 
   String joinWithAnd([String formatter(T input)]) {
-    formatter ??= (item)=>item?.toString();
+    formatter ??= (item) => item?.toString();
     if (length < 3) {
       return this.join(" and ");
     } else {
@@ -581,6 +583,23 @@ extension ListExtension<T> on List<T> {
       return this.removeAt(index);
     } else {
       return null;
+    }
+  }
+
+  bool removeLastWhere({bool removeIf(T item), T removeItem}) {
+    assert(removeIf != null || removeItem != null);
+    assert(removeIf == null || removeItem == null);
+
+    if (this == null) return false;
+    int lastIndex = this.lastIndexWhere((item) {
+      return removeItem != null ? removeItem == item : removeIf(item);
+    });
+
+    if (lastIndex >= 0) {
+      this.removeAt(lastIndex);
+      return true;
+    } else {
+      return false;
     }
   }
 
@@ -732,6 +751,10 @@ extension DurationExt on Duration {
   }
 
   Future<R> delay<R>([R block()]) async {
+    return await then(block);
+  }
+
+  Future<R> pause<R>([R block()]) async {
     return await then(block);
   }
 
