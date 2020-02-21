@@ -12,10 +12,11 @@ import '../typedefs.dart';
 import 'value_stream.dart';
 
 /// The AsyncValueStream is used as a clearing house when more than one consumer need to update a single value, but
-/// you want to control the lifecycle around that value.
+/// you want to control the lifecycle around updates, so that older updates that take longer to calculate don't clobber
+/// newer values.
 ///
-/// This allows for synchronous or asynchronous updates, but the latest update in line will always "win", even if
-/// if finishes after another later one.
+/// This allows for synchronous or asynchronous updates, but the last update to start will always "win", even if
+/// if finishes before another update that started before it.
 ///
 /// Updates may be asynchronous, so they are queued up, and then processed in order.  The current
 /// value is tracked as [current]
@@ -140,10 +141,17 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
     }
   }
 
-  Future<T> update(Producer<T> current, {String debugLabel}) {
+  Future<T> update(Producer<T> current, {String debugLabel, Duration timeout, bool fallbackToCurrent}) {
     assert(current != null);
     bool isQueued = _queue(current, debugLabel: debugLabel);
-    return isQueued ? nextUpdate : Future.value(this._current);
+
+    final value = isQueued ? nextUpdate : Future.value(this._current);
+    return timeout == null
+        ? value
+        : value.timeout(
+            timeout,
+            onTimeout: fallbackToCurrent == true ? (() => this._current) : null,
+          );
   }
 
   bool _queue(Producer<T> producer, {String debugLabel}) {
