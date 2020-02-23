@@ -136,12 +136,14 @@ String uuid() {
 }
 
 const chars = "abcdefghijklmnopqrstuvwxyz";
+const numbers = "0123456789";
 
-String randomString(int length) {
-  final rnd = Random(new DateTime.now().millisecondsSinceEpoch);
+String randomString(int length, {bool numbersOnly, Random rnd}) {
+  rnd ??= Random(DateTime.now().millisecondsSinceEpoch);
   String result = "";
+  final source = numbersOnly == true ? numbers : chars;
   for (var i = 0; i < length; i++) {
-    result += chars[rnd.nextInt(chars.length)];
+    result += source[rnd.nextInt(source.length)];
   }
   return result;
 }
