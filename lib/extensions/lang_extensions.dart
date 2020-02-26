@@ -796,4 +796,12 @@ extension MapListDebug<K, V> on Map<K, List<V>> {
   Map<K, int> counts() {
     return {...?this.map((k, v) => MapEntry(k, v.length))};
   }
+
+  Map<K, List<V>> mergeWith(Map<K, List<V>> other) {
+    final newMap = <K, List<V>>{...?this};
+    other?.forEach((key, valueList) {
+      newMap.putIfAbsent(key, () => <V>[]).addAll([...?valueList]);
+    });
+    return newMap;
+  }
 }
