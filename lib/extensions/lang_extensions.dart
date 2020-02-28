@@ -353,6 +353,28 @@ extension IterationPositionExtensions on IterationPosition {
   bool get isFirst => this == IterationPosition.first;
 }
 
+extension IterableOfIntExtensions on Iterable<int> {
+  int sum() {
+    if (this == null) return 0;
+    var i = 0;
+    for (final x in this) {
+      i += x;
+    }
+    return i;
+  }
+}
+
+extension IterableOfDoubleExtensions on Iterable<double> {
+  double sum() {
+    if (this == null) return 0;
+    var i = 0.0;
+    for (final x in this) {
+      i += x;
+    }
+    return i;
+  }
+}
+
 extension ComparableIterableExtension<T extends Comparable> on Iterable<T> {
   T max([T ifNull]) {
     T _max;
@@ -396,6 +418,11 @@ extension IterableExtension<T> on Iterable<T> {
       throw "Invalid input - must be null, $T, List<$T>";
     }
     return this;
+  }
+
+  double sumBy(double toDouble(T t)) {
+    if (this == null) return 0.0;
+    return this.map(toDouble).sum();
   }
 
   List<T> freeze() {
