@@ -33,4 +33,3 @@ extension StreamToVStreamExtensions<X> on Stream<X> {
   SyncStream<X> toSyncStream([X initial, Consumer<X> onChange, String name]) =>
       SyncStream.fromStream(this, initial, onChange, name);
 }
-
