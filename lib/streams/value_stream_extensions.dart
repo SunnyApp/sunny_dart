@@ -33,14 +33,22 @@ extension ValueStreamOfMapExtensions<K, V> on ValueStream<Map<K, V>> {
 extension ValueStreamExtensions<T> on ValueStream<T> {
   ValueStream<T> debounced([Duration duration]) => ValueStream.of(get(), after.debounce(duration ?? 300.ms));
 
-  Stream<T> flatten([T initialValue]) {
+  Stream<T> flatten([T initialValue, bool filterNotNull = true]) {
     final initial = get();
 
     Stream<T> base = (initial is Future<T>)
         ? Stream.fromIterable([initialValue]).merge(Stream.fromFuture(initial))
         : Stream.fromIterable([initial as T]);
 
-    return base.merge(after).where(notNull());
+    return filterNotNull
+        ? base.followedBy(after).where((_) {
+            if (_ == null) {
+              print("Not sending null value for $T stream");
+              return true;
+            }
+            return true;
+          })
+        : base.followedBy(after);
   }
 
   /// Combines another stream.
