@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:stream_transform/stream_transform.dart';
-import 'package:sunny_dart/extensions.dart';
 
+import '../extensions/future_extensions.dart';
+import '../extensions/lang_extensions.dart';
+import '../extensions/map_extensions.dart';
 import '../helpers.dart';
 import 'value_stream.dart';
 

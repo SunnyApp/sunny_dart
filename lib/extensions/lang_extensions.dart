@@ -739,6 +739,22 @@ extension Multiples on int {
   int get thousand => this * 1000;
 }
 
+extension TimeSpanExtensions on TimeSpan {
+  DateTime get fromNow {
+    if (this == null) return DateTime.now();
+    return DateTime.now().plusTimeSpan(this.abs());
+  }
+
+  TimeSpan abs() {
+    return this;
+  }
+
+  DateTime get ago {
+    if (this == null) return DateTime.now();
+    return DateTime.now().minusTimeSpan(this.abs());
+  }
+}
+
 extension DurationExtensions on int {
   Duration get seconds => Duration(seconds: this);
 
@@ -761,6 +777,18 @@ extension DurationExtensions on int {
   Duration get milliseconds => Duration(milliseconds: this);
 
   Duration get ms => Duration(milliseconds: this);
+
+  TimeSpan get weeks => TimeSpan(weeks: this);
+
+  TimeSpan get week => weeks;
+
+  TimeSpan get months => TimeSpan(months: this);
+
+  TimeSpan get month => months;
+
+  TimeSpan get years => TimeSpan(years: this);
+
+  TimeSpan get year => years;
 }
 
 extension DurationExt on Duration {
