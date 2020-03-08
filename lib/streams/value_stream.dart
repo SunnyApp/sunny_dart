@@ -150,7 +150,15 @@ class SyncStream<T> with Disposable implements ValueStream<T> {
     }
 
     if (source != null) {
-      registerDisposer(source.listen(update, cancelOnError: false).cancel);
+      registerDisposer(source.listen((_) {
+        try {
+          update(_);
+        } catch (e, stack) {
+          print("Error with $debugName");
+          print(e);
+          print(stack);
+        }
+      }, cancelOnError: false).cancel);
     }
     registerDisposer(_after.close);
   }
