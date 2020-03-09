@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:logging/logging.dart';
 import 'package:stream_transform/stream_transform.dart';
 
 import '../extensions/future_extensions.dart';
@@ -32,6 +33,8 @@ extension ValueStreamOfMapExtensions<K, V> on ValueStream<Map<K, V>> {
   ValueStream<Iterable<K>> get keys => this.map((map) => map.keys);
 }
 
+final _log = Logger("valueStream");
+
 extension ValueStreamExtensions<T> on ValueStream<T> {
   ValueStream<T> debounced([Duration duration]) => ValueStream.of(get(), after.debounce(duration ?? 300.ms));
 
@@ -45,7 +48,7 @@ extension ValueStreamExtensions<T> on ValueStream<T> {
     return filterNotNull
         ? base.followedBy(after).where((_) {
             if (_ == null) {
-              print("Not sending null value for $T stream");
+              _log.fine("Not sending null value for $T stream");
               return true;
             }
             return true;

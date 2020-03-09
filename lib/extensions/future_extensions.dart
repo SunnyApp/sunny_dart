@@ -1,9 +1,9 @@
 import 'dart:async';
 
 import 'package:stream_transform/stream_transform.dart';
-
 import '../helpers.dart';
 import '../streams.dart';
+export 'package:stream_transform/stream_transform.dart';
 
 extension FutureIterableExt<T> on Iterable<Future<T>> {
   Future<List<T>> waitAll({bool eagerError = true}) async {

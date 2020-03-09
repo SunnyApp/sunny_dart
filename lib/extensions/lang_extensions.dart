@@ -470,6 +470,14 @@ extension IterableExtension<T> on Iterable<T> {
     return buffer;
   }
 
+  List<T> sortedUsing(Comparable getter(T item)) {
+    return [...?this].sortedBy((a, b) {
+      final f1 = getter(a);
+      final f2 = getter(b);
+      return f1?.compareTo(f2) ?? -1;
+    });
+  }
+
   Iterable<T> uniqueBy(dynamic uniqueProp(T item)) {
     final mapping = <dynamic, T>{};
     for (final t in this.orEmpty()) {

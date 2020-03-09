@@ -274,12 +274,12 @@ class ValueStreamController<T> {
 
   ValueStream<T> get stream => ValueStream.of(currentValue, _controller.stream);
 
-  dispose() {
-    _controller.close();
+  Future dispose() {
+    return _controller.close();
   }
 
-  close() {
-    _controller.close();
+  Future close() {
+    return _controller.close();
   }
 }
 
