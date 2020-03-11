@@ -403,6 +403,15 @@ extension ComparableIterableExtension<T extends Comparable> on Iterable<T> {
   }
 }
 
+extension SetExtension<T> on Set<T> {
+  bool containsAny(Iterable<T> toCompare) {
+    return toCompare?.any((item) {
+          return this.contains(item);
+        }) ??
+        false;
+  }
+}
+
 extension IterableExtension<T> on Iterable<T> {
   /// No way to override the + operator for an iterable, so I use a downcast to iterable
   Iterable<T> operator +(item) {
@@ -603,6 +612,7 @@ class ListIndex<T> {
 }
 
 extension ListExtension<T> on List<T> {
+  // ignore: unnecessary_cast
   Iterable<T> get iterable => this as Iterable<T>;
 
   T tryGet(int index) {
