@@ -190,7 +190,7 @@ extension ValueStreamIterableExtensions<X> on ValueStream<Iterable<X>> {
   }
 
   ValueStream<Iterable<R>> mapEach<R>(R mapper(X input)) {
-    return this.map((items) => items.map(mapper));
+    return this.map((items) => items.orEmpty().map(mapper));
   }
 
   ValueStream<Iterable<X>> followedBy(ValueStream<Iterable<X>> other) {
