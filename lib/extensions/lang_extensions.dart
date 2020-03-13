@@ -299,6 +299,7 @@ extension StringExtensions on String {
   double toDoubleOrNull() => double.tryParse(this);
 
   String toSnakeCase() => ReCase(this).snakeCase.toLowerCase();
+  String toCamelCase() => ReCase(this).camelCase.uncapitalize();
 
   String toTitleCase() {
     if (_titles.contains(this)) return this;
