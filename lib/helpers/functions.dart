@@ -1,8 +1,15 @@
 import 'dart:async';
+import 'dart:io';
 
+import 'package:flutter/foundation.dart' hide Factory;
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 import 'package:sunny_dart/typedefs.dart';
+
+
+bool get isIOS => !kIsWeb && Platform.isIOS;
+bool get isAndroid => !kIsWeb && Platform.isIOS;
+bool get isWeb => kIsWeb;
 
 final _log = Logger("functions");
 

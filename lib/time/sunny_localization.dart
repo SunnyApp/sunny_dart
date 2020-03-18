@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:logging/logging.dart';
@@ -43,8 +44,13 @@ class SunnyLocalization {
     }
   }
 
+  static Future<String> getNativeTimeZone() async {
+    if (kIsWeb) return "America/Chicago";
+    return await FlutterNativeTimezone.getLocalTimezone();
+  }
+
   static Future<Location> get userLocationAsync async {
-    final timeZoneName = await FlutterNativeTimezone.getLocalTimezone();
+    final timeZoneName = await getNativeTimeZone();
     return userLocation = await SunnyLocalization.getLocAsync(timeZoneName);
   }
 
@@ -70,9 +76,7 @@ class SunnyLocalization {
 
   static Future _loadTimeZoneData() {
     if (!_loaded) {
-      return rootBundle
-          .load('packages/timezone/data/latest.tzf')
-          .then((byteData) {
+      return rootBundle.load('packages/timezone/data/latest.tzf').then((byteData) {
         final rawData = byteData.buffer.asUint8List();
         initializeDatabase(rawData);
         _loaded = true;
@@ -92,9 +96,7 @@ class SunnyLocalization {
 
   static FutureOr<Location> getLocAsync(String name) {
     if (!_loaded) {
-      return rootBundle
-          .load('packages/timezone/data/latest.tzf')
-          .then((byteData) {
+      return rootBundle.load('packages/timezone/data/latest.tzf').then((byteData) {
         final rawData = byteData.buffer.asUint8List();
         initializeDatabase(rawData);
         _loaded = true;
@@ -126,7 +128,7 @@ class SunnyLocalization {
   }
 
   static Future initialize() {
-    return FlutterNativeTimezone.getLocalTimezone().then((timezone) {
+    return getNativeTimeZone().then((timezone) {
       if (_userLocation == null) {
         SunnyLocalization.userLocationAsync.then((_) {});
       }
