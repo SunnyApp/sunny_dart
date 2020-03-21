@@ -5,11 +5,15 @@ class SafeCompleter<T> implements Completer<T> {
   Completer<T> _delegate = Completer<T>();
 
   SafeCompleter() : _isStarted = true;
+
   SafeCompleter.stopped() : _isStarted = false;
 
   bool get isNotStarted => !_isStarted;
+
   bool get isStarted => _isStarted;
+
   bool get isActive => _isStarted && isNotComplete;
+
   bool get isNotComplete => !isCompleted;
 
   @override
@@ -42,5 +46,13 @@ class SafeCompleter<T> implements Completer<T> {
 
   void start() {
     _isStarted = true;
+  }
+
+  FutureOr<R> after<R>(R exec()) {
+    if (isCompleted) {
+      return exec();
+    } else {
+      return future.then((_) => exec());
+    }
   }
 }

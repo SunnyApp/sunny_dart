@@ -28,6 +28,13 @@ extension ObjectToListExtension<T> on T {
   }
 }
 
+extension EnumValueExtensions on Object {
+  String get enumValue {
+    if (this == null) return null;
+    return "$this".extension;
+  }
+}
+
 final typeParameters = RegExp("<(.*)>");
 final newLinesPattern = RegExp("\\n");
 
@@ -333,6 +340,11 @@ extension StringExtensions on String {
   List<String> tokenize({bool splitAll = false, Pattern splitOn}) {
     return tokenizeString(this, splitAll: splitAll, splitOn: splitOn);
   }
+
+  String get extension {
+    if (this == null) return null;
+    return "$this".replaceAll(upToLastDot, '');
+  }
 }
 
 List<String> tokenizeString(String input, {bool splitAll = false, Pattern splitOn}) {
@@ -341,6 +353,7 @@ List<String> tokenizeString(String input, {bool splitAll = false, Pattern splitO
   return input.toSnakeCase().split(splitOn).whereNotBlank();
 }
 
+final upToLastDot = RegExp('.*\\.');
 const aggresiveTokenizer = "(,|\\/|_|\\.|-|\\s)";
 final aggresiveTokenizerPattern = RegExp(aggresiveTokenizer);
 
@@ -748,7 +761,7 @@ extension DateTimeExtensions on DateTime {
 
   TZDateTime withTimeZone([Location location]) {
     assert(location != null);
-    return TZDateTime.from(this, location ?? SunnyLocalization.userLocation);
+    return TZDateTime.from(this, location ?? SunnyLocalization.userLocationOrNull);
   }
 }
 

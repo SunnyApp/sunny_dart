@@ -123,16 +123,13 @@ extension ValueStreamExtensions<T> on ValueStream<T> {
 
 extension ValueStreamFutureExtensions<X> on ValueStream<Future<X>> {
   ValueStream<Future<R>> thenMap<R>(R mapper(X input)) {
-    return this.map((item) async {
-      final resolved = await item;
-      return mapper(resolved);
+    return this.map((item) {
+      return item.then(mapper);
     });
   }
 
   ValueStream<X> sampled() {
-    return FStream<X>.ofFuture(get() as Future<X>, after.asyncMapSample((future) async {
-      return await future;
-    }));
+    return FStream<X>.ofFuture(get() as Future<X>, after.asyncMapSample((future) => future));
   }
 }
 
@@ -142,8 +139,8 @@ extension ValueStreamIterableFutureExtensions<X> on ValueStream<Iterable<Future<
   }
 
   ValueStream<Future<Iterable<X>>> awaitEach() {
-    return this.map((iterables) async {
-      return await Future.wait(iterables, eagerError: true);
+    return this.map((iterables) {
+      return Future.wait(iterables, eagerError: true);
     });
   }
 }

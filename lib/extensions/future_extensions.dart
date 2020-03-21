@@ -1,8 +1,10 @@
 import 'dart:async';
 
 import 'package:stream_transform/stream_transform.dart';
+
 import '../helpers.dart';
 import '../streams.dart';
+
 export 'package:stream_transform/stream_transform.dart';
 
 extension FutureIterableExt<T> on Iterable<Future<T>> {
@@ -45,11 +47,6 @@ Future<Tuple<A, B>> awaitBoth<A, B>(FutureOr<A> a, FutureOr<B> b) async {
 extension NestedFutureOr<T> on FutureOr<FutureOr<T>> {
   /// Unboxes a Future/FutureOr
   FutureOr<T> unbox() {
-    final self = this;
-    if (self is Future<T>) return self;
-    if (self is Future<Future<T>>) return self.then((_) => _);
-    if (self is Future<FutureOr<T>>) return self.then((_) async => await _);
-    if (this is T) return this as T;
     return this as FutureOr<T>;
   }
 }
@@ -66,7 +63,7 @@ extension FutureExtensions<T> on Future<T> {
       return mapper(resolved).thenOr((second) {
         return Tuple<T, R>(resolved, second);
       });
-    }).unbox();
+    });
     return other;
   }
 }

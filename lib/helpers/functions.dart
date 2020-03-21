@@ -1,15 +1,9 @@
 import 'dart:async';
-import 'dart:io';
+import '../platform/platform_interface.dart' if (dart.library.io) '../platform/platform_native.dart' if (dart.library.html) '../platform/platform_web.dart';
 
-import 'package:flutter/foundation.dart' hide Factory;
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 import 'package:sunny_dart/typedefs.dart';
-
-
-bool get isIOS => !kIsWeb && Platform.isIOS;
-bool get isAndroid => !kIsWeb && Platform.isIOS;
-bool get isWeb => kIsWeb;
 
 final _log = Logger("functions");
 
@@ -84,3 +78,22 @@ Future<R> timedAsync<R>(FutureOr<R> block(), {dynamic result(R result, Duration 
   final handled = result(r, duration);
   return handled is R ? handled : r;
 }
+
+
+bool get isIOS => isPlatformIOS;
+
+bool get isAndroid => isPlatformAndroid;
+
+bool get isMacOS => isPlatformMacOS;
+
+bool get isWindows => isPlatformWindows;
+
+bool get isLinux => isPlatformLinux;
+
+bool get isWeb => isPlatformWeb;
+
+String get operatingSystem => platformName;
+
+Map<String, String> get environment => platformEnvironment;
+
+bool get canReadFiles => canPlatformReadFiles;
