@@ -1,4 +1,7 @@
+import 'dart:async';
 import 'dart:typed_data';
+
+import 'package:sunny_dart/platform/device_info.dart';
 
 /// Since dart:io doesn't work on the web, this library creates an abstraction of the most common access point in io,
 /// and causes them to silently fail on the web
@@ -33,3 +36,5 @@ abstract class File {
   String get path;
   void writeAsBytesSync(List<int> bytes, {bool flush: false});
 }
+
+Future<DeviceInfo> loadPlatformInfo() => throw "Not implemented";

@@ -12,10 +12,13 @@ dependencies:
   intl: any
   equatable: any
   logging: ^0.11.3+2
+  devicelocale: ^0.2.2
   libphonenumber: ^1.0.1
   recase: any
   stream_transform: any
   timezone: any
+  platform_detect: ^1.4.0
+  device_info: ^0.4.2+1
   uri: ^0.11.3+1
   uuid: any
   flutter:

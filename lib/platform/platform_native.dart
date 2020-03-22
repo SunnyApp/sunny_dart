@@ -1,4 +1,12 @@
+import 'dart:async';
 import 'dart:io';
+
+import 'package:device_info/device_info.dart';
+import 'package:devicelocale/devicelocale.dart';
+import 'package:flutter/services.dart';
+import 'package:sunny_dart/platform/device_info.dart';
+
+import '../extensions.dart';
 
 export 'dart:io';
 
@@ -12,3 +20,52 @@ String get platformName => Platform.operatingSystem;
 Map<String, String> get platformEnvironment => Platform.environment;
 
 bool get canPlatformReadFiles => true;
+
+Future<DeviceInfo> loadPlatformInfo() async {
+  final DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
+  AndroidDeviceInfo android;
+  IosDeviceInfo ios;
+  try {
+    android = await deviceInfo.androidInfo;
+  } on MissingPluginException {
+    // Doesn't exist
+  }
+  try {
+    ios = await deviceInfo.iosInfo;
+  } on MissingPluginException {
+    // Doesn't exist
+  }
+  final languages = (await Devicelocale.preferredLanguages).map((language) => language?.toString()).whereNotNull();
+  String locale = await Devicelocale.currentLocale;
+  if (android != null) {
+    return DeviceInfo(
+      isSimulator: android.isPhysicalDevice != true,
+      deviceId: android.androidId,
+      locale: locale,
+      language: languages?.firstOrNull?.toString(),
+      deviceModel: android.device,
+      deviceBrand: android.brand,
+      softwareVersion: "${android.version}",
+      deviceType: "android",
+      software: android.version.baseOS,
+    );
+  } else if (ios != null) {
+    return DeviceInfo(
+      isSimulator: ios.isPhysicalDevice != true,
+      deviceId: ios.identifierForVendor,
+      deviceModel: ios.model,
+      locale: locale,
+      language: languages?.firstOrNull,
+      deviceBrand: "Apple",
+      softwareVersion: "${ios.systemVersion}",
+      deviceType: "iOS",
+      software: "iOS",
+    );
+  } else {
+    return DeviceInfo.unknown(
+      isSimulator: false,
+      locale: locale,
+      language: languages?.firstOrNull?.toString(),
+    );
+  }
+}

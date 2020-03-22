@@ -30,6 +30,10 @@ extension MapExtensions<K, V> on Map<K, V> {
     return entries.where((entry) => entry.key != null).toMap();
   }
 
+  Map<K, V> whereValuesNotNull() {
+    return entries.where((entry) => entry.value != null).toMap();
+  }
+
   void setByPath(JsonPath path, value) {
     Maps.setByPath(this, path, value);
   }
