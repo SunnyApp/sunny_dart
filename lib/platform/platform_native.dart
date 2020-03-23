@@ -35,7 +35,9 @@ Future<DeviceInfo> loadPlatformInfo() async {
   } on MissingPluginException {
     // Doesn't exist
   }
-  final languages = (await Devicelocale.preferredLanguages).map((language) => language?.toString()).whereNotNull();
+  final languages = (await Devicelocale.preferredLanguages)
+      .map((language) => language?.toString())
+      .whereNotNull();
   String locale = await Devicelocale.currentLocale;
   if (android != null) {
     return DeviceInfo(

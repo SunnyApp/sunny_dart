@@ -29,7 +29,8 @@ class Maps {
     for (var segment in parents.segments) {
       var child = container[segment];
       if (child == null && container is! Map) {
-        throw Exception("Missing container in heirarchy.  Full path: $path.  Error found at segment $segment");
+        throw Exception(
+            "Missing container in heirarchy.  Full path: $path.  Error found at segment $segment");
       } else if (child == null) {
         child = <String, dynamic>{};
         container[segment] = child;
@@ -68,7 +69,9 @@ dynamic deepClone(final _in) {
 
 /// This assumes that the data coming in is a map, list, or primitive (json).
 Map<String, dynamic> deepCloneMap(final Map _in) {
-  return <String, dynamic>{..._in.map((key, value) => MapEntry("$key", deepClone(value)))};
+  return <String, dynamic>{
+    ..._in.map((key, value) => MapEntry("$key", deepClone(value)))
+  };
 }
 
 /// This assumes that the data coming in is a map, list, or primitive (json).

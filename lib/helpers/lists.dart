@@ -41,13 +41,17 @@ class Lists {
     }
   }
 
-  static List<T> listIf<T>(bool condition, ListFactory<T> factory) => condition ? factory() : [];
+  static List<T> listIf<T>(bool condition, ListFactory<T> factory) =>
+      condition ? factory() : [];
 
-  static T createIf<T>(bool condition, Factory<T> factory) => condition ? factory() : null;
+  static T createIf<T>(bool condition, Factory<T> factory) =>
+      condition ? factory() : null;
 
-  static List<T> compact<T>(Iterable<T> list) => list?.where((item) => item != null)?.toList() ?? <T>[];
+  static List<T> compact<T>(Iterable<T> list) =>
+      list?.where((item) => item != null)?.toList() ?? <T>[];
 
-  static List<String> compactEmpty(Iterable<String> list) => [...?list.where((item) => item?.isNotEmpty == true)];
+  static List<String> compactEmpty(Iterable<String> list) =>
+      [...?list.where((item) => item?.isNotEmpty == true)];
 
   static T firstOrNull<T>(Iterable<T> list, {bool filter(T input)}) {
     if (filter != null) {
@@ -71,9 +75,11 @@ class Lists {
 
 const List emptyList = [];
 
-List<T> compact<T>(Iterable<T> list) => list?.where((item) => item != null)?.toList() ?? <T>[];
+List<T> compact<T>(Iterable<T> list) =>
+    list?.where((item) => item != null)?.toList() ?? <T>[];
 
-T createIf<T>(bool condition, Factory<T> factory) => condition ? factory() : null;
+T createIf<T>(bool condition, Factory<T> factory) =>
+    condition ? factory() : null;
 
 List<T> chopList<T>(Iterable<T> items) {
   final list = [...items];
@@ -182,24 +188,40 @@ T find<T>(Map<String, T> container, String id) {
   if (id == null) return null;
   final item = container[id];
   if (item == null) {
-    final current = StackTrace.current.toString().split("\n").take(5).map((frame) => "\t$frame").join("\n");
+    final current = StackTrace.current
+        .toString()
+        .split("\n")
+        .take(5)
+        .map((frame) => "\t$frame")
+        .join("\n");
     _log.warning("WARN: Item with id $id not found: $current");
   }
   return item;
 }
 
 Map<K, V> filterKeys<K, V>(Map<K, V> source, bool filter(K key)) =>
-    source.entries.where((e) => filter(e.key)).toList().asMap().map((_, e) => e);
+    source.entries
+        .where((e) => filter(e.key))
+        .toList()
+        .asMap()
+        .map((_, e) => e);
 
 Map<K, V> filterValues<K, V>(Map<K, V> source, bool filter(V value)) =>
-    source.entries.where((e) => filter(e.value)).toList().asMap().map((_, e) => e);
+    source.entries
+        .where((e) => filter(e.value))
+        .toList()
+        .asMap()
+        .map((_, e) => e);
 
-T badArgument<T>({value, String name, String message}) => throw ArgumentError.value(value, name, message);
+T badArgument<T>({value, String name, String message}) =>
+    throw ArgumentError.value(value, name, message);
 
 T wrongType<T>(String name, value, List<Type> accepted) =>
-    throw ArgumentError.value(value, name, "Wrong type (${value?.runtimeType}) - expected one of $accepted");
+    throw ArgumentError.value(value, name,
+        "Wrong type (${value?.runtimeType}) - expected one of $accepted");
 
-Widget widgetIf(bool condition, Factory<Widget> factory) => condition ? factory() : Container();
+Widget widgetIf(bool condition, Factory<Widget> factory) =>
+    condition ? factory() : Container();
 
 List<T> removeElement<T>(Iterable<T> elements, T toRemove) =>
     elements?.where((item) => item != toRemove)?.toList() ?? [];

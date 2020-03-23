@@ -4,7 +4,8 @@ abstract class MLiteral<T> {
   const MLiteral(this.value);
 
   @override
-  bool operator ==(Object other) => identical(this, other) || other is MLiteral && value == other.value;
+  bool operator ==(Object other) =>
+      identical(this, other) || other is MLiteral && value == other.value;
 
   @override
   int get hashCode => value.hashCode;

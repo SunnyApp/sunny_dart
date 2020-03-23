@@ -18,13 +18,15 @@ class SafeCompleter<T> implements Completer<T> {
 
   @override
   void complete([FutureOr<T> value]) {
-    assert(_isStarted == true, "Completing a future that hasn't been started...");
+    assert(
+        _isStarted == true, "Completing a future that hasn't been started...");
     if (!_delegate.isCompleted) _delegate.complete(value);
   }
 
   @override
   void completeError(Object error, [StackTrace stackTrace]) {
-    assert(_isStarted == true, "Completing a future that hasn't been started...");
+    assert(
+        _isStarted == true, "Completing a future that hasn't been started...");
     if (!_delegate.isCompleted) _delegate.completeError(error, stackTrace);
   }
 

@@ -133,6 +133,8 @@
 
 import 'package:libphonenumber/libphonenumber.dart';
 
-Future<String> formatPhoneNumber(String phoneNumber, {String isoCode: ''}) async {
-  return (await PhoneNumberUtil.formatAsYouType(phoneNumber: phoneNumber, isoCode: ''));
+Future<String> formatPhoneNumber(String phoneNumber,
+    {String isoCode: ''}) async {
+  return (await PhoneNumberUtil.formatAsYouType(
+      phoneNumber: phoneNumber, isoCode: ''));
 }

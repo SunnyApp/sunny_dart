@@ -9,7 +9,8 @@ import '../extensions/map_extensions.dart';
 import '../helpers.dart';
 import 'value_stream.dart';
 
-extension ValueStreamIterableMapEntryExtensions<K, V> on ValueStream<Iterable<MapEntry<K, V>>> {
+extension ValueStreamIterableMapEntryExtensions<K, V>
+    on ValueStream<Iterable<MapEntry<K, V>>> {
   ValueStream<Map<K, V>> toMap() {
     return this.map((entries) => Map.fromEntries(entries));
   }
@@ -36,7 +37,8 @@ extension ValueStreamOfMapExtensions<K, V> on ValueStream<Map<K, V>> {
 final _log = Logger("valueStream");
 
 extension ValueStreamExtensions<T> on ValueStream<T> {
-  ValueStream<T> debounced([Duration duration]) => ValueStream.of(get(), after.debounce(duration ?? 300.ms));
+  ValueStream<T> debounced([Duration duration]) =>
+      ValueStream.of(get(), after.debounce(duration ?? 300.ms));
 
   Stream<T> flatten([T initialValue, bool filterNotNull = true]) {
     final initial = get();
@@ -57,7 +59,8 @@ extension ValueStreamExtensions<T> on ValueStream<T> {
   }
 
   /// Combines another stream.
-  ValueStream<R> combined<R, O>(ValueStream<O> other, R combiner(T self, O other)) {
+  ValueStream<R> combined<R, O>(
+      ValueStream<O> other, R combiner(T self, O other)) {
     final FutureOr<FutureOr<R>> startCombined = this.get().thenOr((first) {
       return other.get().thenOr((otherFirst) {
         return combiner(first, otherFirst);
@@ -69,23 +72,29 @@ extension ValueStreamExtensions<T> on ValueStream<T> {
 
     /// THe combine transformation requires both stream to publish at least once, so we'll force the current value
     /// to be republished.
-    return ValueStream<R>.of(startCombined.unbox(), _self.combineLatest(_other, combiner));
+    return ValueStream<R>.of(
+        startCombined.unbox(), _self.combineLatest(_other, combiner));
   }
 
   /// Combines another stream, passing unresolved Futures
-  ValueStream<R> combinedUnresolved<R, O>(
-      ValueStream<O> other, Resolvable<R> combiner(FutureOr<T> self, FutureOr<O> other)) {
+  ValueStream<R> combinedUnresolved<R, O>(ValueStream<O> other,
+      Resolvable<R> combiner(FutureOr<T> self, FutureOr<O> other)) {
     final Resolvable<R> startCombined = combiner(this.get(), other.get());
-    Stream<R> startingStream = startCombined.isResolved ? Stream.empty() : startCombined.futureValue().asStream();
+    Stream<R> startingStream = startCombined.isResolved
+        ? Stream.empty()
+        : startCombined.futureValue().asStream();
     Stream<R> afterTxr = this.after.combineLatest(other.after, (T t, O o) {
       final Resolvable<R> resolved = combiner(t, o);
       return resolved.resolveOrNull();
     });
-    return ValueStream<R>.of(startCombined.resolveOrNull(), startingStream.combine(afterTxr));
+    return ValueStream<R>.of(
+        startCombined.resolveOrNull(), startingStream.combine(afterTxr));
   }
 
-  ValueStream<Tuple<T, O>> tuple<O>(ValueStream<O> other, {bool waitForBoth = true}) {
-    final ValueStream<Tuple<T, O>> stream = combinedUnresolved(other, (FutureOr<T> self, FutureOr<O> other) {
+  ValueStream<Tuple<T, O>> tuple<O>(ValueStream<O> other,
+      {bool waitForBoth = true}) {
+    final ValueStream<Tuple<T, O>> stream =
+        combinedUnresolved(other, (FutureOr<T> self, FutureOr<O> other) {
       return Tuple.ofFuture(self, other);
     });
     return waitForBoth != true
@@ -116,9 +125,11 @@ extension ValueStreamExtensions<T> on ValueStream<T> {
     return ValueStream.of(first, this.after.where(predicate));
   }
 
-  ValueStream<T> whereNotNull() => ValueStream.of(get(), after.where(notNull()));
+  ValueStream<T> whereNotNull() =>
+      ValueStream.of(get(), after.where(notNull()));
 
-  SyncStream<T> toSyncStream([void onChange(T value), String name]) => SyncStream.fromVStream(this, onChange, name);
+  SyncStream<T> toSyncStream([void onChange(T value), String name]) =>
+      SyncStream.fromVStream(this, onChange, name);
 }
 
 extension ValueStreamFutureExtensions<X> on ValueStream<Future<X>> {
@@ -129,11 +140,13 @@ extension ValueStreamFutureExtensions<X> on ValueStream<Future<X>> {
   }
 
   ValueStream<X> sampled() {
-    return FStream<X>.ofFuture(get() as Future<X>, after.asyncMapSample((future) => future));
+    return FStream<X>.ofFuture(
+        get() as Future<X>, after.asyncMapSample((future) => future));
   }
 }
 
-extension ValueStreamIterableFutureExtensions<X> on ValueStream<Iterable<Future<X>>> {
+extension ValueStreamIterableFutureExtensions<X>
+    on ValueStream<Iterable<Future<X>>> {
   ValueStream<Iterable<Future<R>>> thenMapEach<R>(R mapper(X input)) {
     return this.mapEach((future) => future.then(mapper));
   }
@@ -161,13 +174,16 @@ extension ValueStreamIterableExtensions<X> on ValueStream<Iterable<X>> {
 
   /// Filters this stream using a result of another stream.  This allows us to apply the filter when either the
   /// filtering source changes or the original list changes.
-  ValueStream<Iterable<X>> filteredBy<R>(ValueStream<R> other, bool filter(X item, R other)) {
+  ValueStream<Iterable<X>> filteredBy<R>(
+      ValueStream<R> other, bool filter(X item, R other)) {
     final FutureOr<Iterable<X>> first = get();
     final FutureOr<R> otherFirst = other.get();
 
     /// When combining, we need to ensure at least one emission.
-    final withOtherFirst = Future.value(otherFirst).asStream().followedBy(other.after);
-    final afterTransform = after.combineLatest(withOtherFirst, (items, R filters) {
+    final withOtherFirst =
+        Future.value(otherFirst).asStream().followedBy(other.after);
+    final afterTransform =
+        after.combineLatest(withOtherFirst, (items, R filters) {
       return items.where((item) => filter(item, filters));
     });
 
@@ -182,7 +198,8 @@ extension ValueStreamIterableExtensions<X> on ValueStream<Iterable<X>> {
     } else {
       final _first = first as Iterable<X>;
       final _otherFirst = otherFirst as R;
-      return HStream(_first.where((item) => filter(item, _otherFirst)), afterTransform);
+      return HStream(
+          _first.where((item) => filter(item, _otherFirst)), afterTransform);
     }
   }
 
@@ -195,16 +212,21 @@ extension ValueStreamIterableExtensions<X> on ValueStream<Iterable<X>> {
       ...this.resolve([]),
       ...other.resolve([]),
     ];
-    return ValueStream<Iterable<X>>.of(first, this.after.followedBy(other.after));
+    return ValueStream<Iterable<X>>.of(
+        first, this.after.followedBy(other.after));
   }
 
-  ValueStream<Iterable<X>> combineWith(Iterable<ValueStream<Iterable<X>>> others, [String debugName]) {
+  ValueStream<Iterable<X>> combineWith(
+      Iterable<ValueStream<Iterable<X>>> others,
+      [String debugName]) {
     /// Ensures that the ValueStream emits
     Stream<X> flatten<X>(ValueStream<X> input) {
       return Stream.fromFuture(Future.value(input.get())).merge(input.after);
     }
 
-    Stream<Iterable<X>> stream = flatten(this).combineLatestAll(others.map((o) => flatten(o))).map((all) {
+    Stream<Iterable<X>> stream = flatten(this)
+        .combineLatestAll(others.map((o) => flatten(o)))
+        .map((all) {
       return [
         ...all.expand((_) => _),
       ];

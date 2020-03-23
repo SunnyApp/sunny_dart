@@ -29,7 +29,8 @@ class TimeSpan {
           days.toDouble(),
           hours.toDouble(),
           minutes.toDouble(),
-          _secondsDecimal(seconds: seconds, millis: millis, micros: micros).toDouble(),
+          _secondsDecimal(seconds: seconds, millis: millis, micros: micros)
+              .toDouble(),
         ], negated: negated);
 
   factory TimeSpan.fromJson(value) {
@@ -41,7 +42,8 @@ class TimeSpan {
   }
 
   factory TimeSpan.ofSingleField(dynamic field, num value) {
-    final unit = timeSpanUnitOf(field) ?? illegalState("Invalid time span $field");
+    final unit =
+        timeSpanUnitOf(field) ?? illegalState("Invalid time span $field");
     return unit.toTimeSpan(value);
   }
 
@@ -61,7 +63,8 @@ class TimeSpan {
     for (var g = 2; g < 9; g++) {
       final matchGroup = match.group(g);
       if (matchGroup == null) continue;
-      parts[g - 2] = matchGroup.toDoubleOrNull() ?? illegalState("Unable to parse $matchGroup");
+      parts[g - 2] = matchGroup.toDoubleOrNull() ??
+          illegalState("Unable to parse $matchGroup");
     }
 
     return TimeSpan.ofParts(parts, negated: negated);
@@ -104,14 +107,16 @@ class TimeSpan {
 
   num get secondsDouble => _values[6];
 
-  double get _millisDouble => (_values[6].toDouble().fractional * Duration.millisecondsPerSecond);
+  double get _millisDouble =>
+      (_values[6].toDouble().fractional * Duration.millisecondsPerSecond);
 
   int get millis {
     return _millisDouble.truncate();
   }
 
   int get micros {
-    return (_millisDouble.fractional * Duration.microsecondsPerMillisecond).truncate();
+    return (_millisDouble.fractional * Duration.microsecondsPerMillisecond)
+        .truncate();
   }
 
   @override
@@ -130,8 +135,11 @@ class TimeSpan {
     }).join(" ");
   }
 
-  String formatCondensed([String separator = " "]) =>
-      format(labels: shortLabels, separator: separator, pluralize: false, separateLabel: false);
+  String formatCondensed([String separator = " "]) => format(
+      labels: shortLabels,
+      separator: separator,
+      pluralize: false,
+      separateLabel: false);
 
   String toIso8601String() {
     var str = "";
@@ -236,7 +244,8 @@ List<TimeSpanUnit> tryParseTimeSpanUnit(input) {
 
   return [
     ...TimeSpanUnit.values.where((unit) {
-      return unit.index < 7 && (unit.label.startsWith(lc) || unit.shortLabel.startsWith(lc));
+      return unit.index < 7 &&
+          (unit.label.startsWith(lc) || unit.shortLabel.startsWith(lc));
     })
   ];
 }
@@ -277,7 +286,8 @@ DateTime cloneDate(
   );
 }
 
-final Map<TimeSpanUnit, String> defaultLabels = Map.fromEntries(TimeSpanUnit.values.map((v) => MapEntry(v, v.label)));
+final Map<TimeSpanUnit, String> defaultLabels =
+    Map.fromEntries(TimeSpanUnit.values.map((v) => MapEntry(v, v.label)));
 final Map<TimeSpanUnit, String> shortLabels =
     Map.fromEntries(TimeSpanUnit.values.map((v) => MapEntry(v, v.shortLabel)));
 
@@ -303,7 +313,9 @@ extension TimeSpanUnitExt on TimeSpanUnit {
     if (isVirtual) return "";
     final value = self._values[this.index];
     if (value.isZero || isVirtual) return "";
-    String numFormat = this == TimeSpanUnit.second ? value.formatNumber(fixed: 6) : value.formatNumber();
+    String numFormat = this == TimeSpanUnit.second
+        ? value.formatNumber(fixed: 6)
+        : value.formatNumber();
     return "$numFormat$marker";
   }
 
@@ -342,13 +354,16 @@ extension TimeSpanUnitExt on TimeSpanUnit {
       case TimeSpanUnit.minute:
         return TimeSpan(minutes: amount.toIntSafe());
       case TimeSpanUnit.second:
-        return TimeSpan.ofParts(_newTimeSpanList(TimeSpanUnit.second, amount.toDouble()));
+        return TimeSpan.ofParts(
+            _newTimeSpanList(TimeSpanUnit.second, amount.toDouble()));
       case TimeSpanUnit.millisecond:
         final amt = _secondsDecimal(millis: amount);
-        return TimeSpan.ofParts(_newTimeSpanList(TimeSpanUnit.second, amt.toDouble()));
+        return TimeSpan.ofParts(
+            _newTimeSpanList(TimeSpanUnit.second, amt.toDouble()));
       case TimeSpanUnit.microsecond:
         final amt = _secondsDecimal(micros: amount);
-        return TimeSpan.ofParts(_newTimeSpanList(TimeSpanUnit.second, amt.toDouble()));
+        return TimeSpan.ofParts(
+            _newTimeSpanList(TimeSpanUnit.second, amt.toDouble()));
       default:
         return illegalState("Invalid time span unit: ${this}");
     }
@@ -391,7 +406,8 @@ List<double> _newTimeSpanList([index, double value]) {
 
 const numberPattern = "?:([-+]?[0-9]+(?:[.,][0-9]{0,9})?)";
 const spanPattern = "($numberPattern)([a-z]+)";
-final durationPattern = "([-+]?)P${dateUnits.map(_unitRegex).join()}(?:T${timeUnits.map(_unitRegex).join()})?";
+final durationPattern =
+    "([-+]?)P${dateUnits.map(_unitRegex).join()}(?:T${timeUnits.map(_unitRegex).join()})?";
 final durationRegex = RegExp(durationPattern);
 
 /// Not used for the ISO parsing, but this helps us in our parsing to find tokens like "3y"

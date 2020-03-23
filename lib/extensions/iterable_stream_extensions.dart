@@ -12,7 +12,8 @@ extension StreamIterableExtension<X> on Stream<Iterable<X>> {
 
   /// Filters this stream using a result of another stream.  This allows us to apply the filter when either the
   /// filtering source changes or the original list changes.
-  Stream<Iterable<X>> filteredBy<R>(Stream<R> other, bool filter(X item, R other)) {
+  Stream<Iterable<X>> filteredBy<R>(
+      Stream<R> other, bool filter(X item, R other)) {
     return this.combineLatest(other, (Iterable<X> items, R other) {
       return items.where((item) => filter(item, other));
     });

@@ -6,7 +6,10 @@ import 'lang_extensions.dart';
 
 extension MapExtensions<K, V> on Map<K, V> {
   String join([String entrySeparator = "; ", String keyValueSeparator = "="]) {
-    return this.entries.map((e) => "${e.key}$keyValueSeparator${e.value}").join(entrySeparator);
+    return this
+        .entries
+        .map((e) => "${e.key}$keyValueSeparator${e.value}")
+        .join(entrySeparator);
   }
 
   Map<K, V> filterEntries(bool predicate(K k, V v)) {
@@ -80,7 +83,8 @@ extension IterableExtensions<V> on Iterable<V> {
 
   Iterable<V> whereNotNull() => this?.where(notNull()) ?? <V>[];
 
-  Iterable<String> mapToString() => this?.map((_) => _?.toString()) ?? <String>[];
+  Iterable<String> mapToString() =>
+      this?.map((_) => _?.toString()) ?? <String>[];
 
   bool get isNullOrEmpty => this?.isNotEmpty != true;
   bool get isNotNullOrEmpty => this?.isNotEmpty == true;
@@ -93,7 +97,8 @@ extension IterableExtensions<V> on Iterable<V> {
     return result;
   }
 
-  Map<K, V> keyed<K>(K keyOf(V value)) => this?.map((v) => MapEntry<K, V>(keyOf(v), v))?.toMap() ?? <K, V>{};
+  Map<K, V> keyed<K>(K keyOf(V value)) =>
+      this?.map((v) => MapEntry<K, V>(keyOf(v), v))?.toMap() ?? <K, V>{};
 
   Map<Type, List<V>> groupByType() {
     return groupBy((_) => _.runtimeType);
@@ -112,5 +117,6 @@ extension IterableEntryExtensions<K, V> on Iterable<MapEntry<K, V>> {
   }
 
   Map<K, V> toMap() => Map.fromEntries(this);
-  Iterable<MapEntry<K, V>> whereValuesNotNull() => this.where((entry) => entry.value != null);
+  Iterable<MapEntry<K, V>> whereValuesNotNull() =>
+      this.where((entry) => entry.value != null);
 }

@@ -39,14 +39,17 @@ Future<SunnyLocalization> get sunnyLocalizationFuture {
 
 SunnyLocalization _sunnyLocalization;
 SunnyLocalization get sunnyLocalization {
-  assert(_sunnyLocalization != null, "Sunny localization has not been initialized yet");
+  assert(_sunnyLocalization != null,
+      "Sunny localization has not been initialized yet");
   return _sunnyLocalization;
 }
 
 Future<SunnyLocalization> _loadSunnyLocalization() async {
   _sunnyLocalizationCompleter ??= Completer<SunnyLocalization>();
   if (_sunnyLocalization != null) return _sunnyLocalization;
-  final userTimeZoneName = (kIsWeb) ? "America/Chicago" : await FlutterNativeTimezone.getLocalTimezone();
+  final userTimeZoneName = (kIsWeb)
+      ? "America/Chicago"
+      : await FlutterNativeTimezone.getLocalTimezone();
   final byteData = await rootBundle.load('packages/timezone/data/latest.tzf');
   final rawData = byteData.buffer.asUint8List();
   initializeDatabase(rawData);
