@@ -22,5 +22,5 @@ abstract class MLiteral<T> {
 
   int get equalityHashCode => diffSource.hashCode;
 
-  int get identityHashCode => diffKey.hashCode;
+  int get diffHashCode => diffKey.hashCode;
 }
