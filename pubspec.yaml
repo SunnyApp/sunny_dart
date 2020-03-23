@@ -11,7 +11,7 @@ dependencies:
   flutter_native_timezone: ^1.0.4
   inflection2: ^0.4.3
   intl:  ^0.16.1
-  equatable: <1.0.3
+  equatable: ">=1.0.2 <1.0.3"
   logging: ^0.11.4
   devicelocale: ^0.2.2
   crypto: ^2.1.3
