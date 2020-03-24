@@ -8,8 +8,7 @@ import 'package:uuid/uuid.dart';
 import 'lists.dart';
 
 bool isPhone(String input) {
-  return input.contains(RegExp("^[0-9\-\s\+\(\)]+\$")) &&
-      input.replaceAll(RegExp("[^0-9]+"), "").length > 6;
+  return input.contains(RegExp("^[0-9\-\s\+\(\)]+\$")) && input.replaceAll(RegExp("[^0-9]+"), "").length > 6;
 }
 
 String buildString(void builder(StringBuffer buffer)) {
@@ -67,8 +66,7 @@ bool startsWith(String first, String second, {bool ignoreCase = true}) {
   return first?.startsWith(second) == true;
 }
 
-bool anyMatch(String subject, List<String> potentials,
-    {bool caseSensitive = true}) {
+bool anyMatch(String subject, List<String> potentials, {bool caseSensitive = true}) {
   if (subject == null) return false;
   if (caseSensitive != true) {
     subject = subject.toLowerCase();
@@ -101,11 +99,9 @@ String uncapitalize(String source) {
 
 String splitSnakeCase(String source) => source?.replaceAll("_", " ");
 
-String properCase(String source) =>
-    source?.split(" ")?.map(capitalize)?.join(" ");
+String properCase(String source) => source?.split(" ")?.map(capitalize)?.join(" ");
 
-String defaultIfEmpty(String primary, String ifBlank) =>
-    (primary?.trim()?.isNotEmpty == true) ? primary : ifBlank;
+String defaultIfEmpty(String primary, String ifBlank) => (primary?.trim()?.isNotEmpty == true) ? primary : ifBlank;
 
 bool isNullOrBlank(String input) {
   return input == null || input.trim().isEmpty == true;
@@ -153,20 +149,15 @@ final Pattern notLetterOrNumber = RegExp("[^A-Za-z0-9]+");
 String initials(from, {int max = 2}) {
   Iterable<String> _sanitize(source) {
     if (source == null) return [];
-    if (source is Iterable)
+    if (source is Iterable) {
       return Lists.compact(source.expand((item) => _sanitize(item)));
+    }
 
-    return source
-        .toString()
-        .split(" ")
-        .map((word) => word.replaceAll(notLetterOrNumber, ""));
+    return source.toString().split(" ").map((word) => word.replaceAll(notLetterOrNumber, ""));
   }
 
-  final initials = _sanitize(from)
-      .where((word) => word?.isNotEmpty == true)
-      .take(max)
-      .map((word) => word[0].toUpperCase())
-      .join("");
+  final initials =
+      _sanitize(from).where((word) => word?.isNotEmpty == true).take(max).map((word) => word[0].toUpperCase()).join("");
   if (initials.isEmpty) {
     return null;
   } else {
@@ -174,9 +165,8 @@ String initials(from, {int max = 2}) {
   }
 }
 
-String findInitials(List<dynamic> sources) => sources
-    ?.map(initials)
-    ?.firstWhere((initials) => initials?.isNotEmpty == true);
+String findInitials(List<dynamic> sources) =>
+    sources?.map(initials)?.firstWhere((initials) => initials?.isNotEmpty == true);
 
 class WordBuilder {
   final int lineLength;
@@ -184,16 +174,9 @@ class WordBuilder {
   String _currentLine = "";
   final List<String> _results = [];
 
-  WordBuilder({@required this.lineLength})
-      : assert(lineLength != null && lineLength > 0);
+  WordBuilder({@required this.lineLength}) : assert(lineLength != null && lineLength > 0);
 
-  void addAll(
-      [String line1,
-      String line2,
-      String line3,
-      String line4,
-      String line5,
-      String line6]) {
+  void addAll([String line1, String line2, String line3, String line4, String line5, String line6]) {
     if (line1?.isNotEmpty == true) {}
   }
 
@@ -204,8 +187,7 @@ class WordBuilder {
 
   void addLine(String single, {String separator}) {
     if (single == null || single == "") return;
-    if (_currentLine.length + single.length + (separator?.length ?? 0) >
-        lineLength) {
+    if (_currentLine.length + single.length + (separator?.length ?? 0) > lineLength) {
       if (_currentLine.isNotEmpty) _results.add(_currentLine);
       _currentLine = single;
     } else {
@@ -224,8 +206,7 @@ class WordBuilder {
 final Pattern phoneNumberSplitCharacters = RegExp("[\\s\-\(\)\+]");
 
 Iterable<String> tokenizePhoneNumber(String phoneNumber) {
-  final split =
-      Lists.compactEmpty(phoneNumber?.split(phoneNumberSplitCharacters));
+  final split = Lists.compactEmpty(phoneNumber?.split(phoneNumberSplitCharacters));
   split.remove("1");
   final joined = split.join("");
   return [if (joined.isNotEmpty) joined, ...split];

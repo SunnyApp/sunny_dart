@@ -25,7 +25,7 @@ Map<String, String> get platformEnvironment => throw "Not implemented";
 bool get canPlatformReadFiles => throw "Not implemented";
 
 abstract class File {
-  factory File(String path) => throw "Not implemented";
+  factory File(String path) => throw "Not implemented: $path";
   File get absolute;
   bool existsSync();
   String readAsStringSync();
@@ -34,7 +34,7 @@ abstract class File {
   int lengthSync();
   Stream<List<int>> openRead();
   String get path;
-  void writeAsBytesSync(List<int> bytes, {bool flush: false});
+  void writeAsBytesSync(List<int> bytes, {bool flush = false});
 }
 
 Future<DeviceInfo> loadPlatformInfo() => throw "Not implemented";

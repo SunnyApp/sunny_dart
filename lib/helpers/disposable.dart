@@ -1,29 +1,31 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+typedef Disposer = FutureOr Function();
 
 mixin Disposable {
-  List<VoidCallback> _disposers;
+  List<Disposer> _disposers;
 
-  registerSubscription(StreamSubscription subscription) {
+  void registerSubscription(StreamSubscription subscription) {
     if (subscription != null) {
       registerDisposer(subscription.cancel);
     }
   }
 
-  registerStream(Stream stream) {
+  void registerStream(Stream stream) {
     if (stream != null) {
       registerDisposer(stream.listen((_) {}, cancelOnError: false).cancel);
     }
   }
 
-  registerDisposer(VoidCallback callback) {
-    _disposers ??= [];
+  void registerDisposer(Disposer callback) {
+    _disposers ??= <Disposer>[];
     _disposers.add(callback);
   }
 
-  disposeAll() {
-    _disposers?.forEach((fn) => fn?.call());
+  Future disposeAll() async {
+    for (final disposer in _disposers) {
+      await disposer?.call();
+    }
     _disposers?.clear();
   }
 }

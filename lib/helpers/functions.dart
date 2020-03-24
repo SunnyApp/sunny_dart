@@ -1,11 +1,12 @@
 import 'dart:async';
-import '../platform/platform_interface.dart'
-    if (dart.library.io) '../platform/platform_native.dart'
-    if (dart.library.html) '../platform/platform_web.dart';
 
 import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 import 'package:sunny_dart/typedefs.dart';
+
+import '../platform/platform_interface.dart'
+    if (dart.library.io) '../platform/platform_native.dart'
+    if (dart.library.html) '../platform/platform_web.dart';
 
 final _log = Logger("functions");
 
@@ -36,25 +37,22 @@ bool alwaysFalse<T>(T input) => false;
 
 T create<T>(Factory<T> factory) => (factory ?? returnNull())();
 
-delay([Duration duration = const Duration(milliseconds: 300)]) async {
+Future delay([Duration duration = const Duration(milliseconds: 300)]) async {
   await Future.delayed(duration);
 }
 
-Mapping<I, O> catching<I, O>(O execute(I input),
-    {String debugLabel, Logger logger}) {
+Mapping<I, O> catching<I, O>(O execute(I input), {String debugLabel, Logger logger}) {
   return (I input) {
     try {
       final result = execute(input);
       if (result is Future) {
         result.catchError((e, StackTrace stack) {
-          (logger ?? _log)
-              .severe((debugLabel ?? "Error catching") + ": $e", e, stack);
+          (logger ?? _log).severe((debugLabel ?? "Error catching") + ": $e", e, stack);
         });
       }
       return result;
     } catch (e, stack) {
-      (logger ?? _log)
-          .severe((debugLabel ?? "Error catching") + ": $e", e, stack);
+      (logger ?? _log).severe((debugLabel ?? "Error catching") + ": $e", e, stack);
       return null;
     }
   };
@@ -72,8 +70,7 @@ R timed<R>(R block(), {dynamic result(R result, Duration time)}) {
   return handled is R ? handled : r;
 }
 
-Future<R> timedAsync<R>(FutureOr<R> block(),
-    {dynamic result(R result, Duration time)}) async {
+Future<R> timedAsync<R>(FutureOr<R> block(), {dynamic result(R result, Duration time)}) async {
   result ??= (R result, Duration time) {
     print("Duration: $time");
   };

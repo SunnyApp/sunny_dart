@@ -23,8 +23,7 @@ class DateComponents with EquatableMixin {
 
   factory DateComponents.fromDateTime(DateTime dateTime) {
     if (dateTime == null) return null;
-    return DateComponents(
-        day: dateTime?.day, month: dateTime?.month, year: dateTime?.year);
+    return DateComponents(day: dateTime?.day, month: dateTime?.month, year: dateTime?.year);
   }
 
   factory DateComponents.now() => DateComponents.fromDateTime(DateTime.now());
@@ -115,7 +114,7 @@ class DateComponents with EquatableMixin {
     return DateComponents.from(json);
   }
 
-  toJson() {
+  dynamic toJson() {
     return "$this";
   }
 
@@ -138,17 +137,13 @@ class DateComponents with EquatableMixin {
   bool get hasDay => day != null;
 
   @override
-  String toString() => Lists.compact([year, month, day])
-      .map((part) => part < 10 ? "0$part" : "$part")
-      .join("-");
+  String toString() => Lists.compact([year, month, day]).map((part) => part < 10 ? "0$part" : "$part").join("-");
 
   DateTime toDateTime() => DateTime(year ?? 1971, month ?? 1, day ?? 1);
 
-  DateComponents withoutDay() =>
-      DateComponents(day: null, month: month, year: year);
+  DateComponents withoutDay() => DateComponents(day: null, month: month, year: year);
 
-  DateComponents withoutYear() =>
-      DateComponents(day: day, month: month, year: null);
+  DateComponents withoutYear() => DateComponents(day: day, month: month, year: null);
 
   @override
   List<Object> get props => [year, month, day];

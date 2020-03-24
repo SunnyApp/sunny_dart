@@ -4,9 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sunny_dart/helpers/strings.dart';
 
 import '../extensions.dart';
-import 'platform_interface.dart'
-    if (dart.library.io) 'platform_native.dart'
-    if (dart.library.html) 'platform_web.dart';
+import 'platform_interface.dart' if (dart.library.io) 'platform_native.dart' if (dart.library.html) 'platform_web.dart';
 
 enum BuildMode { release, profile, debug }
 
@@ -32,10 +30,7 @@ class DeviceInfo {
       @required this.language,
       @required this.softwareVersion});
 
-  DeviceInfo.unknown(
-      {@required this.language,
-      @required this.locale,
-      @required this.isSimulator})
+  DeviceInfo.unknown({@required this.language, @required this.locale, @required this.isSimulator})
       : deviceBrand = null,
         deviceType = "Unknown",
         deviceModel = null,
@@ -98,6 +93,5 @@ extension PlatformInfoFuture on FutureOr<DeviceInfo> {
   Future<String> get softwareVersion async => (await this).softwareVersion;
 }
 
-const buildMode = const bool.fromEnvironment('dart.vm.product')
-    ? BuildMode.release
-    : kDebugMode ? BuildMode.debug : BuildMode.profile;
+const buildMode =
+    bool.fromEnvironment('dart.vm.product') ? BuildMode.release : kDebugMode ? BuildMode.debug : BuildMode.profile;

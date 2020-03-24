@@ -21,8 +21,7 @@ import 'value_stream.dart';
 /// Updates may be asynchronous, so they are queued up, and then processed in order.  The current
 /// value is tracked as [current]
 class AsyncValueStream<T> with Disposable implements ValueStream<T> {
-  final StreamController<UpdateRequest<T>> _requests =
-      StreamController(sync: true);
+  final StreamController<UpdateRequest<T>> _requests = StreamController(sync: true);
 
   /// The current incremented count;
   int _requestId = 1;
@@ -34,6 +33,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
   T _current;
 
   /// The debug name for this stream
+  @override
   final String debugName;
 
   /// The update stream where we send all the updates
@@ -53,19 +53,18 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
   /// How updates are locked.
   final ClearingHouseMode mode;
 
+  @override
   Stream<T> get after => _after.stream;
 
   /// This returns the next calculated value.  It's reset each time
   final SafeCompleter<T> _nextFrame = SafeCompleter<T>();
 
-  AsyncValueStream(
-      {String debugName,
-      T initialValue,
-      this.isUnique = true,
-      this.mode = ClearingHouseMode.AllowSynchronousValues,
-      // Allows us to transform the request stream, add debouncing, etc.
-      Stream<UpdateRequest<T>> transform(Stream<UpdateRequest<T>> input)})
-      : debugName = debugName ?? "asyncValueStream.$T",
+  AsyncValueStream({
+    String debugName,
+    T initialValue,
+    this.isUnique = true,
+    this.mode = ClearingHouseMode.AllowSynchronousValues,
+  })  : debugName = debugName ?? "asyncValueStream.$T",
         log = Logger(debugName ?? "asyncValueStream.$T"),
         _after = StreamController.broadcast() {
     /// Listen to requests stream but process requests in chunks
@@ -73,14 +72,10 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
       final latestRequest = this._inflight = requests.max();
 
       /// Cancel any requests that aren't the latest
-      await requests
-          .where((req) => req != latestRequest)
-          .map((req) => req.cancel())
-          .awaitAll();
+      await requests.where((req) => req != latestRequest).map((req) => req.cancel()).awaitAll();
 
       if (latestRequest.requestId < _accepted) {
-        log.warning(
-            "Skipping ${latestRequest.requestId} because it was too stale");
+        log.warning("Skipping ${latestRequest.requestId} because it was too stale");
 
         _nextFrame
           ..start()
@@ -92,14 +87,12 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
         final cancellable = latestRequest.start();
         try {
           /// And wait for either completion or cancellation
-          final result = await cancellable
-              ?.valueOrCancellation(const UpdateResult.cancelled());
+          final result = await cancellable?.valueOrCancellation(const UpdateResult.cancelled());
           if (result?.isCompleted != true) {
             log.info("Ignoring cancelled request ${latestRequest.requestId}");
           } else {
             _inflight = null;
-            log.info(
-                "Request ${latestRequest.requestId} completed with ${result?.value}");
+            log.info("Request ${latestRequest.requestId} completed with ${result?.value}");
             _internalUpdate(latestRequest.requestId, result?.value);
           }
           _nextFrame
@@ -148,8 +141,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
     }
   }
 
-  Future<T> update(Producer<T> current,
-      {String debugLabel, Duration timeout, bool fallbackToCurrent}) {
+  Future<T> update(Producer<T> current, {String debugLabel, Duration timeout, bool fallbackToCurrent}) {
     assert(current != null);
     bool isQueued = _queue(current, debugLabel: debugLabel);
 
@@ -166,8 +158,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
     final requestId = _requestId++;
     log.fine("Queued request: $requestId");
     if (!_requests.isClosed) {
-      _requests
-          .add(UpdateRequest(producer, requestId, log, debugLabel: debugLabel));
+      _requests.add(UpdateRequest(producer, requestId, log, debugLabel: debugLabel));
       _nextFrame.start();
       return true;
     } else {
@@ -178,8 +169,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
   /// Updates the internal values and notifies listeners
   void _internalUpdate(int requestId, T current) {
     if (_accepted >= requestId) {
-      log.info(
-          'Update $requestId completed, but was older than $_accepted => value = $current');
+      log.info('Update $requestId completed, but was older than $_accepted => value = $current');
       return;
     } else {
       _accepted = requestId;
@@ -204,15 +194,13 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
   }
 
   @override
-  Future<T> get future =>
-      _nextFrame.isActive ? _nextFrame.future : Future.value(_current);
+  Future<T> get future => _nextFrame.isActive ? _nextFrame.future : Future.value(_current);
 
   @override
   T resolve([T ifAbsent]) => current ?? ifAbsent;
 
   @override
-  FutureOr<T> get() =>
-      _isResolved ? current as FutureOr<T> : nextUpdate as FutureOr<T>;
+  FutureOr<T> get() => _isResolved ? current as FutureOr<T> : nextUpdate as FutureOr<T>;
 
   @override
   ValueStream<R> map<R>(R mapper(T input)) {
@@ -222,10 +210,10 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
   @override
   bool get isFirstResolved => _isResolved;
 
-  dispose() async {
+  Future dispose() async {
     await _requests.close();
     await _after.close();
-    disposeAll();
+    await disposeAll();
   }
 }
 
@@ -240,9 +228,7 @@ class UpdateResult<T> {
         isCompleted = false;
 }
 
-class UpdateRequest<T>
-    with EquatableMixin
-    implements Comparable<UpdateRequest> {
+class UpdateRequest<T> with EquatableMixin implements Comparable<UpdateRequest> {
   final Producer<T> producer;
   final int requestId;
   final Logger log;

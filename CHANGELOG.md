@@ -1,3 +1,4 @@
+## [0.5.5] - Analysis updates
 ## [0.5.2] - Adding equals,hashcode,toMap() to DateComponents
 ## [0.5.1] - Fixing analyzer issues
 ## [0.4.9] - Updating API for DateComponents

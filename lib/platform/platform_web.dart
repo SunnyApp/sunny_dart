@@ -52,11 +52,13 @@ abstract class File {
   int lengthSync();
   Stream<List<int>> openRead();
   String get path;
-  void writeAsBytesSync(List<int> bytes, {bool flush: false});
+  void writeAsBytesSync(List<int> bytes, {bool flush = false});
 }
 
 class _HtmlNoopFile implements File {
+  @override
   final String path;
+
   _HtmlNoopFile(this.path);
 
   @override
