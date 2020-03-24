@@ -4,9 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:sunny_dart/helpers/strings.dart';
 
 import '../extensions.dart';
-import 'platform_interface.dart'
-    if (dart.library.io) 'platform_native.dart'
-    if (dart.library.html) 'platform_web.dart';
+import 'platform_interface.dart' if (dart.library.io) 'platform_native.dart' if (dart.library.html) 'platform_web.dart';
 
 enum BuildMode { release, profile, debug }
 
@@ -32,10 +30,7 @@ class DeviceInfo {
       @required this.language,
       @required this.softwareVersion});
 
-  DeviceInfo.unknown(
-      {@required this.language,
-      @required this.locale,
-      @required this.isSimulator})
+  DeviceInfo.unknown({@required this.language, @required this.locale, @required this.isSimulator})
       : deviceBrand = null,
         deviceType = "Unknown",
         deviceModel = null,
@@ -70,8 +65,9 @@ FutureOr<DeviceInfo> get deviceInfo {
   return _deviceInfo;
 }
 
-set deviceInfo(DeviceInfo info) {
-  _deviceInfo = info;
+set deviceInfo(FutureOr<DeviceInfo> info) {
+  assert(info is DeviceInfo, "Must provide a resolved future");
+  _deviceInfo = info as DeviceInfo;
 }
 
 extension PlatformInfoFuture on FutureOr<DeviceInfo> {

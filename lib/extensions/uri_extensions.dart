@@ -8,13 +8,13 @@ extension StringUriExtensions on String {
 }
 
 extension UriTemplateExtensions on UriTemplate {
-  String merge(final data, [final data2]) {
+  String merge(final data, [final Object data2]) {
     if (this == null) {
       return null;
     }
 
-    if (data2 != null) {
-      return this.expand({data: data2});
+    if (data2 != null && data is String) {
+      return this.expand({data?.toString(): data2});
     } else if (data is Map<String, Object>) {
       return this.expand(data);
     } else {

@@ -2,8 +2,7 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 
-class _StreamSortSample<T extends Comparable<T>>
-    extends StreamTransformerBase<T, List<T>> {
+class _StreamSortSample<T extends Comparable<T>> extends StreamTransformerBase<T, List<T>> {
   final int size;
 
   _StreamSortSample(this.size);
@@ -37,7 +36,7 @@ class _StreamSortSample<T extends Comparable<T>>
     void onListen() {
       inbound = stream.listen(
         onItem,
-        onError: (error, stack) => output.addError(error, stack),
+        onError: (error, StackTrace stack) => output.addError(error, stack),
         onDone: onDone,
         cancelOnError: false,
       );
