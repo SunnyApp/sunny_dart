@@ -8,10 +8,10 @@ import '../extensions.dart';
 final _log = Logger("dateComponents");
 
 /// A flexible container for date components that provides a robust parsing/building mechanism.  If the input type is known
-/// to be a [Map] or [DateTime], then use the corresponding constructors.
+/// to be a [String], [Map] or [DateTime], then use the corresponding constructors.
 ///
-/// [DateComponents.tryParse] will / attempt to construct a [DateComponents] instance, and will return `null` if none could be constructed.
-/// [DateComponents.parse] will / attempt to construct a [DateComponents] instance, and will raise an exception if unable to create a [DateComponents] instance
+/// [DateComponents.tryFrom] will / attempt to construct a [DateComponents] instance, and will return `null` if none could be constructed.
+/// [DateComponents.from] will / attempt to construct a [DateComponents] instance, and will raise an exception if unable to create a [DateComponents] instance
 ///
 class DateComponents {
   int day;
@@ -26,12 +26,30 @@ class DateComponents {
         day: dateTime?.day, month: dateTime?.month, year: dateTime?.year);
   }
 
+  /// from a map, assuming keys [kday], [kmonth], [kyear]
   DateComponents.fromMap(Map toParse)
       : day = _tryParseInt(toParse[kday]),
         month = _tryParseInt(toParse[kmonth]),
         year = _tryParseInt(toParse[kyear]);
 
-  factory DateComponents.tryParse(input) {
+  factory DateComponents.tryFrom(input) {
+    try {
+      return DateComponents.from(input);
+    } catch (e) {
+      _log.finer("Date parse error: $e");
+      return null;
+    }
+  }
+
+  factory DateComponents.from(input) {
+    assert(input != null, "Input must not be null");
+    if (input is DateComponents) return input;
+    if (input is DateTime) return DateComponents.fromDateTime(input);
+    if (input is Map) return DateComponents.fromMap(input);
+    return DateComponents.parse("$input");
+  }
+
+  factory DateComponents.tryParse(String input) {
     try {
       return DateComponents.parse(input);
     } catch (e) {
@@ -40,13 +58,8 @@ class DateComponents {
     }
   }
 
-  factory DateComponents.parse(toParse) {
-    assert(toParse != null, "Input must not be null");
-    if (toParse is DateComponents) return toParse;
-    if (toParse is DateTime) return DateComponents.fromDateTime(toParse);
-    if (toParse is Map) return DateComponents.fromMap(toParse);
-
-    final parseAttempt = DateTime.tryParse("$toParse".trim());
+  factory DateComponents.parse(String toParse) {
+    final parseAttempt = DateTime.tryParse(toParse.trim());
     if (parseAttempt != null) {
       return DateComponents.fromDateTime(parseAttempt);
     }
