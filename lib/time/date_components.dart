@@ -7,6 +7,12 @@ import '../extensions.dart';
 
 final _log = Logger("dateComponents");
 
+/// A flexible container for date components that provides a robust parsing/building mechanism.  If the input type is known
+/// to be a [Map] or [DateTime], then use the corresponding constructors.
+///
+/// [DateComponents.tryParse] will / attempt to construct a [DateComponents] instance, and will return `null` if none could be constructed.
+/// [DateComponents.parse] will / attempt to construct a [DateComponents] instance, and will raise an exception if unable to create a [DateComponents] instance
+///
 class DateComponents {
   int day;
   int month;
@@ -34,10 +40,10 @@ class DateComponents {
   }
 
   factory DateComponents.parse(toParse) {
+    assert(toParse != null, "Input must not be null");
     if (toParse is DateComponents) return toParse;
     if (toParse is DateTime) return DateComponents.fromDateTime(toParse);
     if (toParse is Map) return DateComponents.fromMap(toParse);
-    if (toParse == null) return null;
 
     final parseAttempt = DateTime.tryParse("$toParse".trim());
     if (parseAttempt != null) {
