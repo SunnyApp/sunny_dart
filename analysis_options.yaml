@@ -5,8 +5,8 @@ include: package:pedantic/analysis_options.yaml
 analyzer:
   exclude:
     - "bin/cache/**"
-        # the following two are relative to the stocks example and the flutter package respectively
-        # see https://github.com/dart-lang/sdk/issues/28463
+      # the following two are relative to the stocks example and the flutter package respectively
+    # see https://github.com/dart-lang/sdk/issues/28463
     - "lib/l10n/*.p.dart"
     - "lib/src/http/**"
     - ".idea/"
@@ -35,7 +35,11 @@ analyzer:
     implicit-casts: false
   enable-experiment:
     - extension-methods
+
   errors:
+    throw_in_finally: warning
+    annotate_overrides: warning
+    library_names: warning
     # treat missing required parameters as a warning (not a hint)
     missing_required_param: warning
     # treat missing returns as a warning (not a hint)
@@ -52,21 +56,21 @@ linter:
     # these rules are documented on and in the same order as
     # the Dart Lint rules page to make maintenance easier
     # https://github.com/dart-lang/linter/blob/master/example/all.yaml
-#    - always_declare_return_types
-#    - always_put_control_body_on_new_line
+    #    - always_declare_return_types
+    #    - always_put_control_body_on_new_line
     # - always_put_required_named_parameters_first # we prefer having parameters in the same order as fields https://github.com/flutter/flutter/issues/10219
     - always_require_non_null_named_parameters
-#    - annotate_overrides
+    #    - annotate_overrides
     # - avoid_annotating_with_dynamic # conflicts with always_specify_types
-#    - avoid_as
+    #    - avoid_as
     - avoid_bool_literals_in_conditional_expressions
     # - avoid_catches_without_on_clauses # we do this commonly
     # - avoid_catching_errors # we do this commonly
-#    - avoid_classes_with_only_static_members
+    #    - avoid_classes_with_only_static_members
     # - avoid_double_and_int_checks # only useful when targeting JS runtime
-#    - avoid_empty_else
-#    - avoid_field_initializers_in_const_classes
-#    - avoid_function_literals_in_foreach_calls
+    #    - avoid_empty_else
+    #    - avoid_field_initializers_in_const_classes
+    #    - avoid_function_literals_in_foreach_calls
     # - avoid_implementing_value_types # not yet tested
     - avoid_init_to_null
     # - avoid_js_rounded_ints # only useful when targeting JS runtime
@@ -131,8 +135,8 @@ linter:
     # - prefer_asserts_with_message # not yet tested
     - prefer_collection_literals
     - prefer_conditional_assignment
-#    - prefer_const_constructors
-#    - prefer_const_constructors_in_immutables
+    #    - prefer_const_constructors
+    #    - prefer_const_constructors_in_immutables
     - prefer_const_declarations
     #- prefer_const_literals_to_create_immutables
     # - prefer_constructors_over_static_methods # not yet tested
@@ -140,13 +144,13 @@ linter:
     # - prefer_double_quotes # opposite of prefer_single_quotes
     #- prefer_equal_for_default_values
     # - prefer_expression_function_bodies # conflicts with https://github.com/flutter/flutter/wiki/Style-guide-for-Flutter-repo#consider-using--for-short-functions-and-methods
-   # - prefer_final_fields
+    # - prefer_final_fields
     # - prefer_final_in_for_each # not yet tested
-  #  - prefer_final_locals
+    #  - prefer_final_locals
     # - prefer_for_elements_to_map_fromIterable # not yet tested
     - prefer_foreach
     # - prefer_function_declarations_over_variables # not yet tested
-#    - prefer_generic_function_type_aliases
+    #    - prefer_generic_function_type_aliases
     - prefer_if_elements_to_conditional_expressions
     - prefer_if_null_operators
     - prefer_initializing_formals
@@ -160,16 +164,16 @@ linter:
     # - prefer_null_aware_operators # disable until NNBD, see https://github.com/flutter/flutter/pull/32711#issuecomment-492930932
     # - prefer_single_quotes
     - prefer_spread_collections
-#    - prefer_typing_uninitialized_variables
+    #    - prefer_typing_uninitialized_variables
     - prefer_void_to_null
     # - provide_deprecation_message # not yet tested
     # - public_member_api_docs # enabled on a case-by-case basis; see e.g. packages/analysis_options.yaml
     - recursive_getters
     - slash_for_doc_comments
     # - sort_child_properties_last # not yet tested
- #   - sort_constructors_first
+    #   - sort_constructors_first
     - sort_pub_dependencies
-  #  - sort_unnamed_constructors_first
+    #  - sort_unnamed_constructors_first
     - test_types_in_equals
     - throw_in_finally
     # - type_annotate_public_apis # subset of always_specify_types
@@ -177,16 +181,16 @@ linter:
     # - unawaited_futures # too many false positives
     # - unnecessary_await_in_return # not yet tested
     - unnecessary_brace_in_string_interps
-#    - unnecessary_const
+    #    - unnecessary_const
     - unnecessary_getters_setters
     # - unnecessary_lambdas # has false positives: https://github.com/dart-lang/linter/issues/498
-#    - unnecessary_new
+    #    - unnecessary_new
     - unnecessary_null_aware_assignments
     - unnecessary_null_in_if_null_operators
     - unnecessary_overrides
-#    - unnecessary_parenthesis
+    #    - unnecessary_parenthesis
     - unnecessary_statements
-  #  - unnecessary_this
+    #  - unnecessary_this
     - unrelated_type_equality_checks
     # - unsafe_html # not yet tested
     - use_full_hex_values_for_flutter_colors
@@ -198,3 +202,8 @@ linter:
     - valid_regexps
     # - void_checks # not yet tested
     - use_to_and_as_if_applicable
+    - prefer_double_quotes
+    - prefer_const_constructors_in_immutables
+    - unnecessary_new
+    - annotate_overrides
+    - always_declare_return_types
