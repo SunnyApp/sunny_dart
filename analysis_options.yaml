@@ -8,7 +8,6 @@ analyzer:
       # the following two are relative to the stocks example and the flutter package respectively
     # see https://github.com/dart-lang/sdk/issues/28463
     - "lib/l10n/*.p.dart"
-    - "lib/src/http/**"
     - ".idea/"
     - ".direnv/**/*.dart"
     - ".direnv/*.dart"
@@ -18,19 +17,6 @@ analyzer:
     - "lib/ext/**"
     - "fastlane"
     - "test_driver/**"
-    - "lib/sdk/**/model/*.dart"
-    - "lib/service/sql/*.g.dart"
-    - "lib/sdk/*/model/*.dart"
-    - "lib/sdk/**/api/*_api.dart"
-    - "lib/sdk/*/api/*_api.dart"
-    - "lib/sdk/contact_v2/contact_v2.dart"
-    - "lib/sdk/fact_schemas/fact_schemas.dart"
-    - "lib/sdk/facts/facts.dart"
-    - "lib/sdk/scheduling/scheduling.dart"
-    - "lib/sdk/smart_dates/smart_dates.dart"
-    - "lib/sdk/sunny/sunny.dart"
-    - "lib/sdk/truman/truman.dart"
-    - "lib/sdk/waypoints/waypoints.dart"
   strong-mode:
     implicit-casts: false
   enable-experiment:
