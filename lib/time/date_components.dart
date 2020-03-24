@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:sunny_dart/helpers/failures.dart';
@@ -13,7 +14,7 @@ final _log = Logger("dateComponents");
 /// [DateComponents.tryFrom] will / attempt to construct a [DateComponents] instance, and will return `null` if none could be constructed.
 /// [DateComponents.from] will / attempt to construct a [DateComponents] instance, and will raise an exception if unable to create a [DateComponents] instance
 ///
-class DateComponents {
+class DateComponents with EquatableMixin {
   int day;
   int month;
   int year;
@@ -25,6 +26,8 @@ class DateComponents {
     return DateComponents(
         day: dateTime?.day, month: dateTime?.month, year: dateTime?.year);
   }
+
+  factory DateComponents.now() => DateComponents.fromDateTime(DateTime.now());
 
   /// from a map, assuming keys [kday], [kmonth], [kyear]
   DateComponents.fromMap(Map toParse)
@@ -116,6 +119,14 @@ class DateComponents {
     return "$this";
   }
 
+  Map<String, int> toMap() {
+    return {
+      if (hasYear) kyear: year,
+      if (hasMonth) kmonth: month,
+      if (hasDay) kday: day,
+    };
+  }
+
   bool get isFullDate => year != null;
 
   bool get isFuture => isFullDate && toDateTime().isFuture;
@@ -139,7 +150,8 @@ class DateComponents {
   DateComponents withoutYear() =>
       DateComponents(day: day, month: month, year: null);
 
-  factory DateComponents.now() => DateComponents.fromDateTime(DateTime.now());
+  @override
+  List<Object> get props => [year, month, day];
 }
 
 int _tryParseInt(dyn) {

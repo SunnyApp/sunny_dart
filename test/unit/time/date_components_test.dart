@@ -59,5 +59,36 @@ void main() {
     test("31-5521-43", () {
       expect(() => DateComponents.parse("31-5521-43"), throwsException);
     });
+
+    test("equality, mmyy", () {
+      final a = DateComponents(year: 2000, month: 12);
+      final b = DateComponents(year: 2000, month: 12);
+      expect(a, b);
+    });
+
+    test("not equal, mmyy", () {
+      final a = DateComponents(year: 2000, month: 13);
+      final b = DateComponents(year: 2000, month: 12);
+      expect(a, isNot(b));
+    });
+
+    test("not equal, yyyymmdd", () {
+      final a = DateComponents(year: 2000, month: 13, day: 28);
+      final b = DateComponents(year: 2000, month: 12, day: 28);
+      expect(a, isNot(b));
+    });
+
+    test("is equal, yyyymmdd", () {
+      final a = DateComponents(year: 2000, month: 12, day: 28);
+      final b = DateComponents(year: 2000, month: 12, day: 28);
+      expect(a, b);
+    });
+
+    test("set hash", () {
+      final a = DateComponents(year: 2000, month: 12, day: 28);
+      final b = DateComponents(year: 2000, month: 12, day: 28);
+      final dates = {a, b};
+      expect(dates.length, 1);
+    });
   });
 }
