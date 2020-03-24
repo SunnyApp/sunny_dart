@@ -19,13 +19,15 @@ class JsonPath<T> extends MLiteral<String> {
         path = "/",
         super("/");
 
-  JsonPath.segments(List<String> segments) : this._(List.unmodifiable(segments), _toPathName(segments));
+  JsonPath.segments(List<String> segments)
+      : this._(List.unmodifiable(segments), _toPathName(segments));
 
   factory JsonPath.fromJson(json) => JsonPath<T>.parsed("$json");
 
   factory JsonPath.parsed(String value, {JsonPath relativeTo}) {
     final _segments = _parsePath(value);
-    final path = JsonPath<T>._(List.unmodifiable(_segments), _toPathName(_segments));
+    final path =
+        JsonPath<T>._(List.unmodifiable(_segments), _toPathName(_segments));
     if (relativeTo != null) {
       return path.relativize<T>(relativeTo);
     } else {
@@ -112,7 +114,8 @@ extension JsonPathOperatorExtensions<T> on JsonPath<T> {
 
   JsonPath<T> get self => this ?? const JsonPath.root();
 
-  JsonPath<T> get verifyNotRoot => isNotRoot ? this : illegalState("Expected ${this} to not be root");
+  JsonPath<T> get verifyNotRoot =>
+      isNotRoot ? this : illegalState("Expected ${this} to not be root");
   bool get isNotRoot => self.segments.isNotEmpty;
   bool get isNullOrRoot => this == null || this.segments.isEmpty;
 
@@ -124,6 +127,7 @@ extension JsonPathOperatorExtensions<T> on JsonPath<T> {
     if (path.self.isEmpty) {
       return this.cast();
     }
-    return JsonPath<TT>._(this.self.segments + path.self.segments, this.self.path + path.self.path);
+    return JsonPath<TT>._(this.self.segments + path.self.segments,
+        this.self.path + path.self.path);
   }
 }

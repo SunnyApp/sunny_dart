@@ -2,7 +2,8 @@ import 'dart:async';
 
 import 'package:collection/collection.dart';
 
-class _StreamSortSample<T extends Comparable<T>> extends StreamTransformerBase<T, List<T>> {
+class _StreamSortSample<T extends Comparable<T>>
+    extends StreamTransformerBase<T, List<T>> {
   final int size;
 
   _StreamSortSample(this.size);

@@ -72,7 +72,8 @@ const _titles = {'dōTERRA'};
 extension TypeExtensions on Type {
   String get name => "$this"
       .trimAround("_")
-      .replaceAllMapped(typeParameters, (match) => "[${match.group(1).uncapitalize()}]")
+      .replaceAllMapped(
+          typeParameters, (match) => "[${match.group(1).uncapitalize()}]")
       .uncapitalize();
 
   String get simpleName => "$this".removeAll(typeParameters).uncapitalize();
@@ -111,7 +112,8 @@ extension NumExt on num {
   }
 
   int toIntSafe() {
-    final i = this ?? nullPointer("Null receiver.  Attempting to call toIntSafe");
+    final i =
+        this ?? nullPointer("Null receiver.  Attempting to call toIntSafe");
     if (i is int) {
       return i;
     } else if (i.isIntegral) {
@@ -218,7 +220,8 @@ extension StringExtensions on String {
   List<String> get words {
     if (this == null) return const [];
     return [
-      for (final word in this.split(wordSeparator)) if (word.trim().isNotNullOrBlank) word,
+      for (final word in this.split(wordSeparator))
+        if (word.trim().isNotNullOrBlank) word,
     ];
   }
 
@@ -263,7 +266,10 @@ extension StringExtensions on String {
     return null;
   }
 
-  String trimAround(dynamic characters, {bool trimStart = true, bool trimEnd = true, bool trimWhitespace = true}) {
+  String trimAround(dynamic characters,
+      {bool trimStart = true,
+      bool trimEnd = true,
+      bool trimWhitespace = true}) {
     final target = this;
     var manipulated = target;
     if (trimWhitespace) {
@@ -347,9 +353,11 @@ extension StringExtensions on String {
   }
 }
 
-List<String> tokenizeString(String input, {bool splitAll = false, Pattern splitOn}) {
+List<String> tokenizeString(String input,
+    {bool splitAll = false, Pattern splitOn}) {
   if (input == null) return [];
-  splitOn ??= (splitAll == true) ? aggresiveTokenizerPattern : spaceTokenizerPattern;
+  splitOn ??=
+      (splitAll == true) ? aggresiveTokenizerPattern : spaceTokenizerPattern;
   return input.toSnakeCase().split(splitOn).whereNotBlank();
 }
 
@@ -551,8 +559,13 @@ extension IterableExtension<T> on Iterable<T> {
       ...this.map((T item) {
         final _i = i;
         i++;
-        return mapper(item,
-            _i == 0 ? IterationPosition.first : _i == length - 1 ? IterationPosition.last : IterationPosition.middle);
+        return mapper(
+            item,
+            _i == 0
+                ? IterationPosition.first
+                : _i == length - 1
+                    ? IterationPosition.last
+                    : IterationPosition.middle);
       })
     ];
   }
@@ -681,7 +694,9 @@ extension ListExtension<T> on List<T> {
   }
 
   Iterable<ListIndex<T>> whereIndexed([bool filter(T item)]) {
-    Iterable<ListIndex<T>> indexed = this != null ? this.indexed() as Iterable<ListIndex<T>> : <ListIndex<T>>[];
+    Iterable<ListIndex<T>> indexed = this != null
+        ? this.indexed() as Iterable<ListIndex<T>>
+        : <ListIndex<T>>[];
     if (filter != null) {
       indexed = indexed?.where((li) => filter(li.value));
     }
@@ -727,7 +742,8 @@ extension BoolExtension on bool {
 }
 
 extension DateTimeExtensions on DateTime {
-  DateTime withoutTime() => DateTime(this.year, this.month, this.day, 0, 0, 0, 0, 0);
+  DateTime withoutTime() =>
+      DateTime(this.year, this.month, this.day, 0, 0, 0, 0, 0);
 
   Duration sinceNow() => -(this.difference(DateTime.now()));
 
@@ -743,7 +759,11 @@ extension DateTimeExtensions on DateTime {
 
   int get daysApart => sinceNow().inDays;
 
-  bool get hasTime => this.second != 0 || this.minute != 0 || this.hour != 0 || this.millisecond != 0;
+  bool get hasTime =>
+      this.second != 0 ||
+      this.minute != 0 ||
+      this.hour != 0 ||
+      this.millisecond != 0;
 
   DateTime plusTimeSpan(TimeSpan span) {
     final duration = span.toDuration(this);
@@ -761,7 +781,8 @@ extension DateTimeExtensions on DateTime {
 
   TZDateTime withTimeZone([Location location]) {
     assert(location != null);
-    return TZDateTime.from(this, location ?? SunnyLocalization.userLocationOrNull);
+    return TZDateTime.from(
+        this, location ?? SunnyLocalization.userLocationOrNull);
   }
 }
 
@@ -873,8 +894,8 @@ extension MapDebug on Map {
 
   Map<String, String> toDebugMap() {
     return map((k, v) {
-      return MapEntry(
-          (k ?? '-').toString().truncate(20).removeNewlines(), (v ?? '-').toString().truncate(20).removeNewlines());
+      return MapEntry((k ?? '-').toString().truncate(20).removeNewlines(),
+          (v ?? '-').toString().truncate(20).removeNewlines());
     });
   }
 }

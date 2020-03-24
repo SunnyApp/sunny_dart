@@ -1,6 +1,6 @@
 name: sunny_dart
 description: Core utilities used by sunny packages
-version: 0.4.9
+version: 0.5.1
 homepage: https://github.com/SunnyApp/sunny_dart
 
 environment:
