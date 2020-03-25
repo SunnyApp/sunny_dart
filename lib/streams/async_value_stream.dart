@@ -57,7 +57,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
   Stream<T> get after => _after.stream;
 
   /// This returns the next calculated value.  It's reset each time
-  final SafeCompleter<T> _nextFrame = SafeCompleter<T>();
+  final SafeCompleter<T> _nextFrame = SafeCompleter<T>.stopped();
 
   AsyncValueStream({
     String debugName,
@@ -77,13 +77,15 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
       if (latestRequest.requestId < _accepted) {
         log.warning("Skipping ${latestRequest.requestId} because it was too stale");
 
-        _nextFrame
-          ..start()
-          ..complete(_current)
-          ..reset();
+//        _nextFrame
+//          ..start()
+//          ..complete(_current)
+//          ..reset();
         return;
       } else {
         /// Start that request
+        final thisRequestId = latestRequest.requestId;
+        _nextFrame.start();
         final cancellable = latestRequest.start();
         try {
           /// And wait for either completion or cancellation
@@ -91,14 +93,25 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
           if (result?.isCompleted != true) {
             log.info("Ignoring cancelled request ${latestRequest.requestId}");
           } else {
-            _inflight = null;
-            log.info("Request ${latestRequest.requestId} completed with ${result?.value}");
-            _internalUpdate(latestRequest.requestId, result?.value);
+            log.fine("Request ${latestRequest.requestId} completed with ${result?.value}");
+            final mostRecentRequest = _requestId - 1;
+            if (mostRecentRequest <= thisRequestId) {
+              log.fine(mostRecentRequest < thisRequestId
+                  ? "Older request $mostRecentRequest will be superceded by $thisRequestId"
+                  : "Request $thisRequestId is the latest");
+              _inflight = null;
+              _internalUpdate(latestRequest.requestId, result?.value);
+              _nextFrame
+                ..start()
+                ..complete(current)
+                ..reset();
+            } else {
+              log.fine(
+                  "Expecting a newer value $mostRecentRequest than $thisRequestId, so we're not going to complete.  Logging result as _current");
+              _current = result.value;
+              _isResolved = true;
+            }
           }
-          _nextFrame
-            ..start()
-            ..complete(current)
-            ..reset();
         } catch (e, stack) {
           log.severe("Error updating result: $e", e, stack);
           _nextFrame
@@ -118,18 +131,23 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
 
   /// When setting a value in this way, we can assume that this update is the latest, and should cancel out any
   /// other in-flight requests
-  Future<T> syncUpdate(T current) {
-    final requestId = _requestId++;
+  FutureOr<T> syncUpdate(T current) {
     switch (mode) {
       case ClearingHouseMode.AllowSynchronousValues:
+        final requestId = _requestId++;
         // Cancel any in-flight update, then update (after the cancellation completes)
 
         if (_inflight != null) {
           log.info("Cancelling inflight update");
-          _inflight.cancel().then((_) => _internalUpdate(requestId, current));
-        } else {
-          _internalUpdate(requestId, current);
+          _inflight.cancel().ignore();
+          _inflight = null;
         }
+        _internalUpdate(requestId, current);
+        _nextFrame
+          ..start()
+          ..complete(current)
+          ..reset();
+
         return future;
       default:
         if (_queue(() => current, debugLabel: "sync: $current")) {
@@ -175,6 +193,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
       _accepted = requestId;
       _current = current;
     }
+    log.finer("Emitting $current");
     _after.add(current);
     _isResolved = true;
   }
@@ -211,6 +230,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T> {
   bool get isFirstResolved => _isResolved;
 
   Future dispose() async {
+    await future;
     await _requests.close();
     await _after.close();
     await disposeAll();
@@ -252,7 +272,7 @@ class UpdateRequest<T> with EquatableMixin implements Comparable<UpdateRequest> 
   }
 
   Future cancel() async {
-    log.info("Cancelling request $requestId: (${debugLabel ?? 'no details'}}");
+    log.info("Cancelling request $requestId: (${debugLabel ?? 'no details'})");
     await operation?.cancel();
     _isCancelled = true;
   }

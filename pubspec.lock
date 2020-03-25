@@ -137,6 +137,20 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.16.1"
+  isolate:
+    dependency: transitive
+    description:
+      name: isolate
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.3"
+  js:
+    dependency: transitive
+    description:
+      name: js
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.6.1+1"
   libphonenumber:
     dependency: "direct main"
     description:
@@ -151,6 +165,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.11.4"
+  logging_config:
+    dependency: "direct dev"
+    description:
+      name: logging_config
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.4.7"
   matcher:
     dependency: transitive
     description:
@@ -310,6 +331,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.0.8"
+  worker_service:
+    dependency: transitive
+    description:
+      name: worker_service
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "0.5.2"
   xml:
     dependency: transitive
     description:
