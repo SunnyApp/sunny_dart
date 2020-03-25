@@ -1,3 +1,5 @@
+## [0.5.6]
+ * Fix issues with AsyncValueStream 
 ## [0.5.5] 
  * Analysis updates
 ## [0.5.2] 

@@ -43,7 +43,10 @@ class _Tuple<A, B> implements Tuple<A, B> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is Tuple && runtimeType == other.runtimeType && first == other.first && second == other.second;
+      other is Tuple &&
+          runtimeType == other.runtimeType &&
+          first == other.first &&
+          second == other.second;
 
   @override
   int get hashCode => first.hashCode ^ second.hashCode;
@@ -105,7 +108,11 @@ class _FutureTuple<A, B> implements Tuple<A, B> {
           _secondResolved == other._secondResolved;
 
   @override
-  int get hashCode => _first.hashCode ^ _second.hashCode ^ _firstResolved.hashCode ^ _secondResolved.hashCode;
+  int get hashCode =>
+      _first.hashCode ^
+      _second.hashCode ^
+      _firstResolved.hashCode ^
+      _secondResolved.hashCode;
 
   @override
   String toString() => "first[$_first]; second[$_second]";

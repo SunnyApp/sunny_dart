@@ -63,13 +63,16 @@ void main() {
 
   test("Format normal", () {
     final span = TimeSpan.ofISOString("P2Y3M1W23DT13H33M55.011932S");
-    expect(span.format(),
-        equals("2 years 3 months 1 week 23 days 13 hours 33 minutes 55 seconds 11 milliseconds 932 microseconds"));
+    expect(
+        span.format(),
+        equals(
+            "2 years 3 months 1 week 23 days 13 hours 33 minutes 55 seconds 11 milliseconds 932 microseconds"));
   });
 
   test("Format condensed", () {
     final span = TimeSpan.ofISOString("P2Y3M1W23DT13H33M55.011932S");
-    expect(span.formatCondensed(), equals("2y 3m 1w 23d 13h 33m 55s 11ms 932ns"));
+    expect(
+        span.formatCondensed(), equals("2y 3m 1w 23d 13h 33m 55s 11ms 932ns"));
   });
 
   test("Seconds Handling", () {
