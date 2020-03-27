@@ -26,12 +26,22 @@ extension ObjectToListExtension<T> on T {
   List<T> asList() {
     return [if (this != null) this];
   }
+
 }
 
 extension EnumValueExtensions on Object {
   String get enumValue {
     if (this == null) return null;
     return "$this".extension;
+  }
+
+  bool get isNullOrBlank {
+    final self = this;
+    if(self is String) {
+      return self.isNullOrBlank;
+    } else {
+      return this == null;
+    }
   }
 }
 
@@ -606,40 +616,6 @@ extension IterableIterableExtension<T> on Iterable<Iterable<T>> {
 extension CoreListExtension<T> on List<T> {
   T get(int index) => Lists.getOrNull(this, index);
 
-  T safeRemove(int index) {
-    if (this.length > index) {
-      return removeAt(index);
-    } else {
-      return null;
-    }
-  }
-
-  /// The existing List + operator only works for lists, so *= is the best we can do
-  ///
-  ///
-  List<T> operator *(item) {
-    if (item is List<T>) {
-      this.addAll(item);
-    } else if (item is T) {
-      this.add(item);
-    } else if (item == null) {
-      /// we don't add nulls, may regret this some day
-      return this;
-    } else {
-      throw "Invalid input - must be null, $T, List<$T>";
-    }
-    return this;
-  }
-}
-
-class ListIndex<T> {
-  final int index;
-  final T value;
-
-  const ListIndex(this.index, this.value);
-}
-
-extension ListExtension<T> on List<T> {
   // ignore: unnecessary_cast
   Iterable<T> get iterable => this as Iterable<T>;
 
@@ -658,6 +634,8 @@ extension ListExtension<T> on List<T> {
       return null;
     }
   }
+
+  int get lastIndex => length - 1;
 
   bool removeLastWhere({bool removeIf(T item), T removeItem}) {
     assert(removeIf != null || removeItem != null);
@@ -733,7 +711,37 @@ extension ListExtension<T> on List<T> {
 
     return list.sublist(0, list.length - num);
   }
+
+  @Deprecated("Use tryRemove")
+  T safeRemove(int index) {
+    return tryRemove(index);
+  }
+
+  /// The existing List + operator only works for lists, so *= is the best we can do
+  ///
+  ///
+  List<T> operator *(item) {
+    if (item is List<T>) {
+      this.addAll(item);
+    } else if (item is T) {
+      this.add(item);
+    } else if (item == null) {
+      /// we don't add nulls, may regret this some day
+      return this;
+    } else {
+      throw "Invalid input - must be null, $T, List<$T>";
+    }
+    return this;
+  }
 }
+
+class ListIndex<T> {
+  final int index;
+  final T value;
+
+  const ListIndex(this.index, this.value);
+}
+
 
 extension BoolExtension on bool {
   bool negate() {

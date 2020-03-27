@@ -23,10 +23,11 @@ mixin Disposable {
   }
 
   Future disposeAll() async {
-    for (final disposer in (_disposers ?? const [])) {
+    final copy = [...?_disposers];
+    _disposers?.clear();
+    for (final disposer in copy) {
       await disposer?.call();
     }
-    _disposers?.clear();
   }
 }
 
