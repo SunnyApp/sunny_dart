@@ -18,6 +18,44 @@ String buildString(void builder(StringBuffer buffer)) {
   return buffer.toString();
 }
 
+class StringJoiner {
+  final String join;
+  var str = "";
+
+  StringJoiner(String join) : join = join ?? ", ";
+
+  StringJoiner operator +(final value) {
+    if (value is Iterable) {
+      value.forEach((v) => this + v);
+      return this;
+    }
+    if (value == null || value == '') return this;
+    String s = '';
+    if (value is String) {
+      s = value;
+    } else {
+      s = value.toString();
+    }
+
+    if (s.isEmpty) return this;
+    if (str.isNotEmpty) str += join;
+    str += s;
+
+    return this;
+  }
+
+  @override
+  String toString() {
+    return str;
+  }
+}
+
+String joinString(void builder(StringJoiner buffer), [String separator]) {
+  final buffer = StringJoiner(separator);
+  builder(buffer);
+  return buffer.toString();
+}
+
 String nonBlank(String input) {
   if (input?.trim()?.isNotEmpty != true) return null;
   return input;

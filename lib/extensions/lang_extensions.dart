@@ -27,6 +27,26 @@ extension ObjectToListExtension<T> on T {
     return [if (this != null) this];
   }
 
+  int toInt() {
+    final self = this;
+    if (self == null) return null;
+    if (self is int) return self;
+    if (self is num) return self.toInt();
+    assert(false, "Can't convert to int");
+    return null;
+  }
+}
+
+extension ObjectExtension on dynamic {
+  int toInteger() {
+    final self = this;
+    if (self == null) return 0;
+    if (self is int) return self;
+    if (self is num) return self.toInt();
+    if (self is String) return (self.ifBlank("0")).toInt();
+    assert(false, "Can't convert to int");
+    return null;
+  }
 }
 
 extension EnumValueExtensions on Object {
@@ -37,7 +57,7 @@ extension EnumValueExtensions on Object {
 
   bool get isNullOrBlank {
     final self = this;
-    if(self is String) {
+    if (self is String) {
       return self.isNullOrBlank;
     } else {
       return this == null;
@@ -322,6 +342,7 @@ extension StringExtensions on String {
   double toDoubleOrNull() => double.tryParse(this);
 
   String toSnakeCase() => ReCase(this).snakeCase.toLowerCase();
+
   String toCamelCase() => ReCase(this).camelCase.uncapitalize();
 
   String toTitleCase() {
@@ -513,11 +534,12 @@ extension IterableExtension<T> on Iterable<T> {
   }
 
   List<T> sortedUsing(Comparable getter(T item)) {
-    return [...?this].sortedBy((a, b) {
-      final f1 = getter(a);
-      final f2 = getter(b);
+    final List<T> ts = <T>[...?this];
+    return ts.sortedBy((a, b) {
+      final f1 = getter(a as T);
+      final f2 = getter(b as T);
       return f1?.compareTo(f2) ?? -1;
-    });
+    }).cast();
   }
 
   Iterable<T> uniqueBy(dynamic uniqueProp(T item)) {
@@ -742,7 +764,6 @@ class ListIndex<T> {
   const ListIndex(this.index, this.value);
 }
 
-
 extension BoolExtension on bool {
   bool negate() {
     if (this == null) return null;
@@ -779,6 +800,12 @@ extension DateTimeExtensions on DateTime {
     return this.add(duration);
   }
 
+  bool isSameDay(DateTime other) {
+    return this.year == other.year &&
+        this.month == other.month &&
+        this.day == other.day;
+  }
+
   DateTime minusTimeSpan(TimeSpan span) {
     final duration = span.toDuration(this);
     return this.add(-duration);
@@ -790,8 +817,15 @@ extension DateTimeExtensions on DateTime {
 
   TZDateTime withTimeZone([Location location]) {
     assert(location != null);
+    if (this is TZDateTime) return (this as TZDateTime);
     return TZDateTime.from(
         this, location ?? SunnyLocalization.userLocationOrNull);
+  }
+
+  DateTime atStartOfDay() {
+    final t = this;
+    if (t == null) return null;
+    return DateTime(t.year, t.month, t.day);
   }
 }
 

@@ -62,7 +62,7 @@ Future<SunnyLocalization> _loadSunnyLocalization() async {
 
 class SunnyLocalization {
   final TimeZone userTimeZone;
-  final Location userLocation;
+  Location userLocation;
 
   SunnyLocalization(this.userTimeZone, this.userLocation);
 
@@ -80,6 +80,10 @@ class SunnyLocalization {
 
   static Location get userLocationOrNull {
     return _sunnyLocalization?.userLocation;
+  }
+
+  static void setUserLocation(Location location) {
+    _sunnyLocalization.userLocation = location;
   }
 }
 
