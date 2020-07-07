@@ -2,8 +2,8 @@ library helpers;
 
 export 'helpers/colors.dart';
 export 'helpers/disposable.dart';
-export 'helpers/failures.dart';
 export 'helpers/functions.dart';
+export 'helpers/hash_codes.dart';
 export 'helpers/ints.dart';
 export 'helpers/lists.dart';
 export 'helpers/logging_mixin.dart';

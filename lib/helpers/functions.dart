@@ -86,6 +86,24 @@ Future<R> timedAsync<R>(FutureOr<R> block(),
   return handled is R ? handled : r;
 }
 
+T nullPointer<T>(String property) =>
+    throw ArgumentError.notNull(property ?? "Null found");
+
+T todo<T>([String message]) => throw UnimplementedError(message);
+
+T assertNotNull<T>(T value) =>
+    value ??
+    nullPointer(
+        "Expected not-null value of type ${T.toString()}, but got null");
+
+T illegalState<T>([String message]) =>
+    throw Exception(message ?? "Illegal state");
+
+T illegalArg<T>(String prop, [String message]) => throw Exception(
+    message ?? "Illegal argument $prop: ${message ?? 'No message'}");
+
+T notImplemented<T>() => throw Exception("Not implemented");
+
 bool get isIOS => isPlatformIOS;
 
 bool get isAndroid => isPlatformAndroid;

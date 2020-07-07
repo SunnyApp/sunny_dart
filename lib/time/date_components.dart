@@ -1,10 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
-import 'package:sunny_dart/helpers/failures.dart';
 import 'package:sunny_dart/helpers/lists.dart';
+import 'package:timezone/timezone.dart';
 
 import '../extensions.dart';
+import '../helpers.dart';
 
 final _log = Logger("dateComponents");
 
@@ -50,6 +51,10 @@ class DateComponents with EquatableMixin {
     if (input is DateTime) return DateComponents.fromDateTime(input);
     if (input is Map) return DateComponents.fromMap(input);
     return DateComponents.parse("$input");
+  }
+
+  DateComponents copy() {
+    return DateComponents(day: day, month: month, year: year);
   }
 
   factory DateComponents.tryParse(String input) {
@@ -142,7 +147,17 @@ class DateComponents with EquatableMixin {
       .map((part) => part < 10 ? "0$part" : "$part")
       .join("-");
 
-  DateTime toDateTime() => DateTime(year ?? 1971, month ?? 1, day ?? 1);
+  int millisecondsSinceEpoch([Location location]) {
+    return toDateTime(location).millisecondsSinceEpoch;
+  }
+
+  DateTime toDateTime([Location location]) {
+    if (location != null) {
+      return TZDateTime(location, year ?? 1971, month ?? 1, day ?? 1);
+    } else {
+      return DateTime(year ?? 1971, month ?? 1, day ?? 1);
+    }
+  }
 
   DateComponents withoutDay() =>
       DateComponents(day: null, month: month, year: year);
@@ -162,3 +177,22 @@ int _tryParseInt(dyn) {
 const kyear = 'year';
 const kmonth = 'month';
 const kday = 'day';
+
+DateTime withoutTime(DateTime time) =>
+    DateTime(time.year, time.month, time.day, 0, 0, 0, 0, 0);
+
+bool hasTime(DateTime time) =>
+    time.second != 0 ||
+    time.minute != 0 ||
+    time.hour != 0 ||
+    time.millisecond != 0;
+
+bool isFuture(DateTime time) => time?.isAfter(DateTime.now());
+
+bool isPast(DateTime time) => time?.isBefore(DateTime.now());
+
+extension DateComponentsComparisons on DateComponents {
+  bool isSameMonth(DateTime date) {
+    return this.month == date.month && this.year == date.year;
+  }
+}

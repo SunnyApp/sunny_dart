@@ -800,10 +800,16 @@ extension DateTimeExtensions on DateTime {
     return this.add(duration);
   }
 
-  bool isSameDay(DateTime other) {
-    return this.year == other.year &&
-        this.month == other.month &&
-        this.day == other.day;
+  bool isSameDay(final other) {
+    if (other is DateTime) {
+      return this.year == other.year &&
+          this.month == other.month &&
+          this.day == other.day;
+    } else if (other is DateComponents) {
+      return (other.year == null || this.year == other.year) && this.month == other.month && this.day == other.day;
+    }
+    assert(false, 'Shouldnt get here');
+    return false;
   }
 
   DateTime minusTimeSpan(TimeSpan span) {
@@ -826,6 +832,12 @@ extension DateTimeExtensions on DateTime {
     final t = this;
     if (t == null) return null;
     return DateTime(t.year, t.month, t.day);
+  }
+
+  DateTime atTime([int hour = 0, int minute = 0, int second = 0]) {
+    final t = this;
+    if (t == null) return null;
+    return DateTime(t.year, t.month, t.day, hour, minute, second);
   }
 }
 

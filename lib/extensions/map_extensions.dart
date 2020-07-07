@@ -12,6 +12,8 @@ extension MapExtensions<K, V> on Map<K, V> {
         .join(entrySeparator);
   }
 
+  Keyed<K, V> toKeyed() => Keyed(this);
+
   Map<K, V> filterEntries(bool predicate(K k, V v)) {
     return Map.fromEntries(entries.where((e) => predicate(e.key, e.value)));
   }
@@ -87,6 +89,7 @@ extension IterableExtensions<V> on Iterable<V> {
       this?.map((_) => _?.toString()) ?? <String>[];
 
   bool get isNullOrEmpty => this?.isNotEmpty != true;
+
   bool get isNotNullOrEmpty => this?.isNotEmpty == true;
 
   Map<K, List<V>> groupBy<K>(K keyOf(V value)) {
@@ -117,6 +120,17 @@ extension IterableEntryExtensions<K, V> on Iterable<MapEntry<K, V>> {
   }
 
   Map<K, V> toMap() => Map.fromEntries(this);
+
   Iterable<MapEntry<K, V>> whereValuesNotNull() =>
       this.where((entry) => entry.value != null);
+}
+
+class Keyed<K, V> {
+  final Map<K, V> _boxed;
+
+  const Keyed([this._boxed = const {}]);
+
+  V operator [](K key) {
+    return _boxed[key];
+  }
 }
