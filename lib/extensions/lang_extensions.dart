@@ -87,7 +87,7 @@ extension AnyExtensions<T> on T {
     }
   }
 
-  T apply(dynamic block(T self)) {
+  T also(dynamic block(T self)) {
     if (this == null) {
       return null;
     } else {
@@ -153,7 +153,21 @@ extension NumExt on num {
     }
   }
 
+  double between(num low, num upper) {
+    return min(upper.toDouble(), max(low.toDouble(), this.toDouble()));
+  }
+
   String formatCurrency() => currencyFormat.format(this);
+
+  double times(num other) {
+    if (this == null) return null;
+    if (other == null) return this.toDouble();
+    return (this * other).toDouble();
+  }
+
+  bool get isGreaterThan0 {
+    return this != null && this > 0;
+  }
 }
 
 final currencyFormat = NumberFormat.simpleCurrency();
@@ -178,6 +192,11 @@ final wordSeparator = RegExp('[\.\;\, ]');
 final isLetters = RegExp(r"^[A-Za-z]*$");
 
 extension StringExtensions on String {
+  String get firstWord {
+    if (this == null) return null;
+    return this.split(" ").firstOrNull();
+  }
+
   String toPathName() {
     if (this == null) return null;
     if (!this.startsWith("/")) {
@@ -270,6 +289,14 @@ extension StringExtensions on String {
   bool get isNullOrBlank => this == null || this.trim().isEmpty == true;
 
   bool get isNotNullOrBlank => !isNullOrBlank;
+
+  String repeat(int count) {
+    return buildString((str) {
+      for (var i = 0; i < count; i++) {
+        str += this;
+      }
+    });
+  }
 
   String orEmpty() {
     if (this == null) return "";
@@ -782,6 +809,15 @@ extension DateTimeExtensions on DateTime {
   int get monthsAgo => daysAgo ~/ 30.3;
 
   int get daysAgo => max(sinceNow().inDays, 0);
+  int get hoursAgo => max(sinceNow().inHours, 0);
+
+  /// Returns how much time has elapsed since this date.  If the date is null
+  /// or in the future, then [Duration.zero] will be returned
+  Duration get elapsed {
+    if (this == null) return Duration.zero;
+    if (this.isFuture) return Duration.zero;
+    return this.sinceNow();
+  }
 
   int get yearsApart => daysApart ~/ 365;
 
@@ -806,7 +842,9 @@ extension DateTimeExtensions on DateTime {
           this.month == other.month &&
           this.day == other.day;
     } else if (other is DateComponents) {
-      return (other.year == null || this.year == other.year) && this.month == other.month && this.day == other.day;
+      return (other.year == null || this.year == other.year) &&
+          this.month == other.month &&
+          this.day == other.day;
     }
     assert(false, 'Shouldnt get here');
     return false;

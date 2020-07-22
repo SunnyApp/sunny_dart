@@ -9,3 +9,6 @@ export 'platform/platform_interface.dart'
     if (dart.library.html) 'platform/platform_web.dart';
 export 'streams.dart';
 export 'typedefs.dart';
+
+/// Makes it easier to import
+class SunnyDart {}

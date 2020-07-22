@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:device_info/device_info.dart';
 import 'package:devicelocale/devicelocale.dart';
 import 'package:flutter/services.dart';
+import 'package:get_ip/get_ip.dart';
 import 'package:sunny_dart/platform/device_info.dart';
 
 import '../extensions.dart';
@@ -35,12 +36,15 @@ Future<DeviceInfo> loadPlatformInfo() async {
   } on MissingPluginException {
     // Doesn't exist
   }
+  final ip = await GetIp.ipAddress;
+
   final languages = (await Devicelocale.preferredLanguages)
       .map((language) => language?.toString())
       .whereNotNull();
   String locale = await Devicelocale.currentLocale;
   if (android != null) {
     return DeviceInfo(
+      ipAddress: ip,
       isSimulator: android.isPhysicalDevice != true,
       deviceId: android.androidId,
       locale: locale,
@@ -53,6 +57,7 @@ Future<DeviceInfo> loadPlatformInfo() async {
     );
   } else if (ios != null) {
     return DeviceInfo(
+      ipAddress: ip,
       isSimulator: ios.isPhysicalDevice != true,
       deviceId: ios.identifierForVendor,
       deviceModel: ios.model,
@@ -66,6 +71,7 @@ Future<DeviceInfo> loadPlatformInfo() async {
   } else {
     return DeviceInfo.unknown(
       isSimulator: false,
+      ipAddress: ip,
       locale: locale,
       language: languages?.firstOrNull?.toString(),
     );

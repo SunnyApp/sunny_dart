@@ -30,6 +30,7 @@ Future<DeviceInfo> loadPlatformInfo() async {
   List languages = await Devicelocale.preferredLanguages;
   String locale = await Devicelocale.currentLocale;
   return DeviceInfo(
+    ipAddress: null,
     isSimulator: buildMode == BuildMode.debug,
     locale: locale,
     language: languages?.firstOrNull?.toString(),

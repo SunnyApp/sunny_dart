@@ -20,9 +20,11 @@ class DeviceInfo {
   final String softwareVersion;
   final String locale;
   final String language;
+  final String ipAddress;
 
   const DeviceInfo(
       {@required this.isSimulator,
+      @required this.ipAddress,
       @required this.deviceId,
       @required this.deviceType,
       @required this.deviceModel,
@@ -35,6 +37,7 @@ class DeviceInfo {
   DeviceInfo.unknown(
       {@required this.language,
       @required this.locale,
+      this.ipAddress,
       @required this.isSimulator})
       : deviceBrand = null,
         deviceType = "Unknown",
@@ -49,6 +52,7 @@ class DeviceInfo {
       'locale': this.locale,
       'language': this.language,
       'deviceId': this.deviceId,
+      'ipAddress': this.ipAddress,
       'deviceType': this.deviceType,
       'software': this.software,
       'deviceBrand': this.deviceBrand,
@@ -65,7 +69,7 @@ FutureOr<DeviceInfo> _deviceInfo;
 FutureOr<DeviceInfo> get deviceInfo {
   if (_deviceInfo != null) return _deviceInfo;
   _deviceInfo = loadPlatformInfo().then((_) {
-    return _deviceInfo = _;
+    return _;
   });
   return _deviceInfo;
 }
@@ -81,6 +85,7 @@ extension PlatformInfoFuture on FutureOr<DeviceInfo> {
     return this as DeviceInfo;
   }
 
+  Future<String> get ipAddress async => (await this).ipAddress;
   Future<bool> get isSimulator async => (await this).isSimulator;
 
   Future<String> get deviceUUID async => (await this).deviceId;
