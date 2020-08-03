@@ -189,12 +189,13 @@ extension StringBufferExt on StringBuffer {
 
 const _pluralStopWords = {"info", "information"};
 final wordSeparator = RegExp('[\.\;\, ]');
+final nameSeparator = RegExp('[@\.\; ]');
 final isLetters = RegExp(r"^[A-Za-z]*$");
 
 extension StringExtensions on String {
   String get firstWord {
     if (this == null) return null;
-    return this.split(" ").firstOrNull();
+    return this.split(nameSeparator).firstOrNull();
   }
 
   String toPathName() {
@@ -612,7 +613,7 @@ extension IterableExtension<T> on Iterable<T> {
     ];
   }
 
-  Iterable<R> mapPositioned<R>(R mapper(T item, IterationPosition pos)) {
+  Iterable<R> mapPos<R>(R mapper(T item, IterationPosition pos)) {
     int i = 0;
     final length = this.length;
     return [
@@ -635,7 +636,7 @@ extension IterableExtension<T> on Iterable<T> {
     if (length < 3) {
       return this.join(" and ");
     } else {
-      return mapPositioned((item, pos) {
+      return mapPos((item, pos) {
         String formatted = formatter(item);
         switch (pos) {
           case IterationPosition.first:

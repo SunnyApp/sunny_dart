@@ -122,8 +122,9 @@ int /*!*/ hashOf(Object /*?*/ arg01, Object /*?*/ arg02,
 int /*!*/ hashFromList(Iterable<Object /*?*/ > /*!*/ arguments) {
   int result = 0;
   if (arguments != null) {
-    for (Object argument in arguments)
+    for (Object argument in arguments) {
       result = _Jenkins.combine(result, argument);
+    }
   }
   return _Jenkins.finish(result);
 }

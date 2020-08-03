@@ -1,3 +1,5 @@
+## [0.5.7]
+ * Updated equatable dependency 
 ## [0.5.6]
  * Fix issues with AsyncValueStream 
 ## [0.5.5] 

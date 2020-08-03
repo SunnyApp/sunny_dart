@@ -220,6 +220,7 @@ extension ValueStreamIterableExtensions<X> on ValueStream<Iterable<X>> {
       Iterable<ValueStream<Iterable<X>>> others,
       [String debugName]) {
     /// Ensures that the ValueStream emits
+    // ignore: avoid_shadowing_type_parameters
     Stream<X> flatten<X>(ValueStream<X> input) {
       return Stream.fromFuture(Future.value(input.get())).merge(input.after);
     }

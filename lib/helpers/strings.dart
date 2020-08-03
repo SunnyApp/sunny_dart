@@ -171,6 +171,12 @@ String uuid() {
   return _uuid.v4();
 }
 
+List<int> uuidb() {
+  var buf = List<int>(16); // -> []
+  _uuid.v4buffer(buf);
+  return buf;
+}
+
 const chars = "abcdefghijklmnopqrstuvwxyz";
 const numbers = "0123456789";
 
