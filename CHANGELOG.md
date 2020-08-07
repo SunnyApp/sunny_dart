@@ -1,3 +1,5 @@
+## [0.5.8]
+ * Adding some files that were missed 
 ## [0.5.7]
  * Updated equatable dependency 
 ## [0.5.6]
