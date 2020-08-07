@@ -38,6 +38,7 @@ class DateComponents with EquatableMixin {
 
   factory DateComponents.tryFrom(input) {
     try {
+      if (input == null) return null;
       return DateComponents.from(input);
     } catch (e) {
       _log.finer("Date parse error: $e");
@@ -75,17 +76,17 @@ class DateComponents with EquatableMixin {
     final input = "$toParse";
     final tokenized = tokenizeString(input, splitAll: true);
     final parts = tokenized
-            ?.map((value) {
-              if (value.isNumeric) {
-                return value;
-              } else {
-                final month = DateFormat.MMMM().parseLoose(value);
-                return "${month.month}";
-              }
-            })
-            ?.map((value) => value.startsWith("0") ? value.substring(1) : value)
-            ?.map((value) => int.tryParse(value))
-            ?.toList() ??
+        ?.map((value) {
+      if (value.isNumeric) {
+        return value;
+      } else {
+        final month = DateFormat.MMMM().parseLoose(value);
+        return "${month.month}";
+      }
+    })
+        ?.map((value) => value.startsWith("0") ? value.substring(1) : value)
+        ?.map((value) => int.tryParse(value))
+        ?.toList() ??
         [];
 
     final length = parts.length;
@@ -143,9 +144,10 @@ class DateComponents with EquatableMixin {
   bool get hasDay => day != null;
 
   @override
-  String toString() => Lists.compact([year, month, day])
-      .map((part) => part < 10 ? "0$part" : "$part")
-      .join("-");
+  String toString() =>
+      Lists.compact([year, month, day])
+          .map((part) => part < 10 ? "0$part" : "$part")
+          .join("-");
 
   int millisecondsSinceEpoch([Location location]) {
     return toDateTime(location).millisecondsSinceEpoch;
@@ -179,13 +181,21 @@ const kmonth = 'month';
 const kday = 'day';
 
 DateTime withoutTime(DateTime time) =>
-    DateTime(time.year, time.month, time.day, 0, 0, 0, 0, 0);
+    DateTime(
+        time.year,
+        time.month,
+        time.day,
+        0,
+        0,
+        0,
+        0,
+        0);
 
 bool hasTime(DateTime time) =>
     time.second != 0 ||
-    time.minute != 0 ||
-    time.hour != 0 ||
-    time.millisecond != 0;
+        time.minute != 0 ||
+        time.hour != 0 ||
+        time.millisecond != 0;
 
 bool isFuture(DateTime time) => time?.isAfter(DateTime.now());
 
