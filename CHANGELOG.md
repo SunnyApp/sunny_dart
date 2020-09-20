@@ -1,3 +1,6 @@
+## [0.5.8+2]
+ * changes
+
 ## [0.5.8]
  * Adding some files that were missed 
 ## [0.5.7]
