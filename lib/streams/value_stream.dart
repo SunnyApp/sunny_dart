@@ -287,6 +287,7 @@ class ValueStreamController<T> {
   T _currentValue;
   final bool isUnique;
   final String debugLabel;
+  bool _isClosing = false;
   StreamController<T> _controller;
 
   ValueStreamController(this.debugLabel,
@@ -305,16 +306,19 @@ class ValueStreamController<T> {
 
   void add(T newValue) {
     this._currentValue = newValue;
-    _controller.add(newValue);
+    if (!_isClosing) {
+      _controller.add(newValue);
+    }
   }
 
   ValueStream<T> get stream => ValueStream.of(currentValue, _controller.stream);
 
   Future dispose() {
-    return _controller.close();
+    return this.close();
   }
 
   Future close() {
+    _isClosing = true;
     return _controller.close();
   }
 }

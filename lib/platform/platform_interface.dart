@@ -13,11 +13,8 @@ bool get isPlatformAndroid => throw "Not implemented";
 bool get isPlatformMacOS => throw "Not implemented";
 
 bool get isPlatformWindows => throw "Not implemented";
-
 bool get isPlatformLinux => throw "Not implemented";
-
 bool get isPlatformWeb => throw "Not implemented";
-
 String get platformName => throw "Not implemented";
 
 Map<String, String> get platformEnvironment => throw "Not implemented";

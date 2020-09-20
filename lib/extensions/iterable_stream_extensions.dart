@@ -34,3 +34,11 @@ extension StreamToVStreamExtensions<X> on Stream<X> {
   SyncStream<X> toSyncStream([X initial, Consumer<X> onChange, String name]) =>
       SyncStream.fromStream(this, initial, onChange, name);
 }
+
+extension SafeStreamController<X> on StreamController<X> {
+  void safeAdd(X item) {
+    if (!this.isClosed) {
+      this.add(item);
+    }
+  }
+}

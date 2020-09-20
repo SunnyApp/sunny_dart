@@ -61,6 +61,16 @@ Mapping<I, O> catching<I, O>(O execute(I input),
   };
 }
 
+O trying<O>(O execute(), {Logger log}) {
+  try {
+    return execute();
+  } catch (e, stack) {
+    print(e);
+    print(stack);
+    rethrow;
+  }
+}
+
 //typedef SetState = void Function(VoidCallback callback);
 
 R timed<R>(R block(), {dynamic result(R result, Duration time)}) {

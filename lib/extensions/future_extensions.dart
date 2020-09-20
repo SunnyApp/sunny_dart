@@ -116,6 +116,18 @@ extension FutureOrExts<T> on FutureOr<T> {
   FutureOr<R> thenOr<R>(R after(T resolved)) => (this is Future<T>)
       ? futureValue().then(after) as FutureOr<R>
       : after(this as T) as FutureOr<R>;
+
+  FutureOr<R> nonNull<R>(FutureOr<R> block(T nonNullValue)) {
+    final self = this;
+    if (self is Future<T>) {
+      return self.then((nonNull) {
+        return nonNull == null ? null : block(nonNull);
+      });
+    } else {
+      final v = this as T;
+      return v == null ? null : block(v);
+    }
+  }
 }
 
 extension StreamTxrExtensions<X> on Stream<X> {

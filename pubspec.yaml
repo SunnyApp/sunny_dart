@@ -4,7 +4,7 @@ version: 0.5.8
 homepage: https://github.com/SunnyApp/sunny_dart
 
 environment:
-  sdk: ">=2.6.0 <3.0.0"
+  sdk: ">=2.8.0 <3.0.0"
 
 dependencies:
   async: ^2.4.1

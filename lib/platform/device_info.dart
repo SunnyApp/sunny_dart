@@ -74,6 +74,8 @@ FutureOr<DeviceInfo> get deviceInfo {
   return _deviceInfo;
 }
 
+Future<DeviceInfo> loadDeviceInfo() => loadPlatformInfo();
+
 set deviceInfo(FutureOr<DeviceInfo> info) {
   assert(info is DeviceInfo, "Must provide a resolved future");
   _deviceInfo = info as DeviceInfo;

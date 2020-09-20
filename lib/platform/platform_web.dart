@@ -1,12 +1,9 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:devicelocale/devicelocale.dart';
 import 'package:platform_detect/platform_detect.dart';
 import 'package:sunny_dart/helpers/strings.dart';
 import 'package:sunny_dart/platform/device_info.dart';
-
-import '../extensions.dart';
 
 bool get isPlatformIOS => false;
 
@@ -27,13 +24,13 @@ Map<String, String> get platformEnvironment => {};
 bool get canPlatformReadFiles => false;
 
 Future<DeviceInfo> loadPlatformInfo() async {
-  List languages = await Devicelocale.preferredLanguages;
-  String locale = await Devicelocale.currentLocale;
+  // List languages = await Devicelocale.preferredLanguages;
+  // String locale = await Devicelocale.currentLocale;
   return DeviceInfo(
     ipAddress: null,
     isSimulator: buildMode == BuildMode.debug,
-    locale: locale,
-    language: languages?.firstOrNull?.toString(),
+    locale: "US",
+    language: "en",
     deviceType: "browser",
     software: "browser",
     deviceBrand: browser.name,

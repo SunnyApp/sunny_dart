@@ -14,6 +14,8 @@ import 'package:timezone/timezone.dart';
 import '../helpers.dart';
 import '../time.dart';
 
+final _random = Random();
+
 extension StringListExtension on List<String> {
   List<String> whereNotBlank() {
     return [
@@ -87,11 +89,30 @@ extension AnyExtensions<T> on T {
     }
   }
 
-  T also(dynamic block(T self)) {
+  T also<R>(R block(T self)) {
     if (this == null) {
       return null;
     } else {
       block(this);
+      return this;
+    }
+  }
+}
+
+extension AnyFutureExtensions<T> on Future<T> {
+  Future<R> let<R>(R block(T self)) async {
+    if (this == null) {
+      return null;
+    } else {
+      return block(await this);
+    }
+  }
+
+  Future<T> also<R>(R block(T self)) async {
+    if (this == null) {
+      return null;
+    } else {
+      block(await this);
       return this;
     }
   }
@@ -106,8 +127,14 @@ extension TypeExtensions on Type {
           typeParameters, (match) => "[${match.group(1).uncapitalize()}]")
       .uncapitalize();
 
-  String get simpleName => "$this".removeAll(typeParameters).uncapitalize();
+  String get simpleName => simpleNameOfType(this);
 }
+
+
+String simpleNameOfType(Type type ) {
+  return "$type".replaceAll(typeParameters, '').uncapitalize();
+}
+
 
 extension DoubleExt on double {
   /// Gets the fraction part
@@ -151,6 +178,26 @@ extension NumExt on num {
     } else {
       throw "Number $i could not be safely truncated to an int";
     }
+  }
+
+  double normalize(double end, [double start = 0]) {
+    if (this <= start) return 0;
+    if (this >= end) return 1;
+    return (this - start) / (end - start);
+  }
+
+  double notZero([double alt = 0.00001]) {
+    if (this == 0) {
+      return alt;
+    } else {
+      return this.toDouble();
+    }
+  }
+
+  n atLeast<n extends num>(n atLeast) {
+    if (this == null) return atLeast;
+    if (this < atLeast) return atLeast;
+    return this as n;
   }
 
   double between(num low, num upper) {
@@ -222,6 +269,11 @@ extension StringExtensions on String {
   String ifThen(String ifString, String thenString) {
     if (this == null || this == ifString) return thenString;
     return this;
+  }
+
+  String plus(String after) {
+    if (this.isNullOrBlank) return '';
+    return "${this}$after";
   }
 
   Color toColor() => colorFromHex(this);
@@ -426,12 +478,20 @@ final aggresiveTokenizerPattern = RegExp(aggresiveTokenizer);
 
 const spaceTokenizer = "(\s)";
 final spaceTokenizerPattern = RegExp(spaceTokenizer);
-enum IterationPosition { first, middle, last }
+enum IterationPosition { only, first, middle, last }
 
 extension IterationPositionExtensions on IterationPosition {
-  bool get isLast => this == IterationPosition.last;
+  bool get isLast =>
+      this == IterationPosition.last || this == IterationPosition.only;
 
-  bool get isFirst => this == IterationPosition.first;
+  bool get isNotLast =>
+      this != IterationPosition.last && this != IterationPosition.only;
+
+  bool get isNotFirst =>
+      this != IterationPosition.first && this != IterationPosition.only;
+
+  bool get isFirst =>
+      this == IterationPosition.first || this == IterationPosition.only;
 }
 
 extension IterableOfIntExtensions on Iterable<int> {
@@ -510,8 +570,19 @@ extension IterableExtension<T> on Iterable<T> {
     return this;
   }
 
+  T random() {
+    if (this == null || this.isEmpty) return null;
+    final randomIdx = _random.nextInt(this.length);
+    return this.toList()[randomIdx];
+  }
+
   double sumBy(double toDouble(T t)) {
     if (this == null) return 0.0;
+    return this.map(toDouble).sum();
+  }
+
+  int sumByInt(int toDouble(T t)) {
+    if (this == null) return 0;
     return this.map(toDouble).sum();
   }
 
@@ -607,6 +678,8 @@ extension IterableExtension<T> on Iterable<T> {
 
   Iterable<T> orEmpty() => this ?? <T>[];
 
+  List<T> orEmptyList() => this?.toList() ?? <T>[];
+
   List<R> mapNotNull<R>(R mapper(T item)) {
     return [
       ...map(mapper).where(notNull()),
@@ -615,18 +688,22 @@ extension IterableExtension<T> on Iterable<T> {
 
   Iterable<R> mapPos<R>(R mapper(T item, IterationPosition pos)) {
     int i = 0;
+
     final length = this.length;
+    final isSingle = length == 1;
     return [
       ...this.map((T item) {
         final _i = i;
         i++;
         return mapper(
             item,
-            _i == 0
-                ? IterationPosition.first
-                : _i == length - 1
-                    ? IterationPosition.last
-                    : IterationPosition.middle);
+            isSingle
+                ? IterationPosition.only
+                : _i == 0
+                    ? IterationPosition.first
+                    : _i == length - 1
+                        ? IterationPosition.last
+                        : IterationPosition.middle);
       })
     ];
   }
@@ -640,6 +717,7 @@ extension IterableExtension<T> on Iterable<T> {
         String formatted = formatter(item);
         switch (pos) {
           case IterationPosition.first:
+          case IterationPosition.only:
             return formatted;
           case IterationPosition.middle:
             return ", $formatted";
@@ -665,6 +743,17 @@ extension IterableIterableExtension<T> on Iterable<Iterable<T>> {
 
 extension CoreListExtension<T> on List<T> {
   T get(int index) => Lists.getOrNull(this, index);
+
+  List<T> updateWhere(bool predicate(T check), dynamic mutate(T input)) {
+    return this.mapIndexed((item, idx) {
+      if (!predicate(item)) {
+        return item;
+      } else {
+        final res = mutate(item);
+        return res is T ? res : item;
+      }
+    });
+  }
 
   // ignore: unnecessary_cast
   Iterable<T> get iterable => this as Iterable<T>;
@@ -810,6 +899,7 @@ extension DateTimeExtensions on DateTime {
   int get monthsAgo => daysAgo ~/ 30.3;
 
   int get daysAgo => max(sinceNow().inDays, 0);
+
   int get hoursAgo => max(sinceNow().inHours, 0);
 
   /// Returns how much time has elapsed since this date.  If the date is null
