@@ -9,21 +9,22 @@ dependencies:
   flutter_native_timezone: ^1.0.4
   inflection2: ^0.4.3
   intl: ^0.16.1
-  equatable: ^1.2.3
+  equatable: ^1.2.5
   logging: ^0.11.4
-  devicelocale: ^0.3.1
+  devicelocale: ^0.3.2
   crypto: ^2.1.5
-  collection: ^1.14.11
+  collection: ^1.14.13
   get_ip: ^0.4.0
-  libphonenumber: ^1.0.1
+
+  libphonenumber: <=1.0.1
   recase: ^3.0.0
   stream_transform: ^1.2.0
   timezone: ^0.5.7
   platform_detect: ^1.4.0
-  pedantic: ^1.8.0+1
-  device_info: ^0.4.2+4
+  pedantic: <1.9.2
+  device_info: ^0.4.2+9
   uri: ^0.11.3+1
-  uuid: ^2.2.0
+  uuid: ^2.2.2
   flutter: 
     sdk: flutter
 dev_dependencies: 

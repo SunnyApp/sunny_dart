@@ -8,4 +8,9 @@ extension TextStyleExtensions on TextStyle {
   TextStyle get white {
     return this.copyWith(color: Colors.white);
   }
+
+  TextStyle scaled(double scaledBy) {
+    assert(this.fontSize != null);
+    return copyWith(fontSize: fontSize * scaledBy);
+  }
 }
