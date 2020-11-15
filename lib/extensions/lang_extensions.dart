@@ -130,11 +130,9 @@ extension TypeExtensions on Type {
   String get simpleName => simpleNameOfType(this);
 }
 
-
-String simpleNameOfType(Type type ) {
+String simpleNameOfType(Type type) {
   return "$type".replaceAll(typeParameters, '').uncapitalize();
 }
-
 
 extension DoubleExt on double {
   /// Gets the fraction part
@@ -764,6 +762,15 @@ extension CoreListExtension<T> on List<T> {
     } else {
       return null;
     }
+  }
+
+  List<T> trySublist(int startIndex, int endIndex) {
+    if (startIndex + 1 > length) {
+      return const [];
+    }
+    final _end = min(length, endIndex);
+    if (startIndex >= _end) return const [];
+    return sublist(startIndex, _end);
   }
 
   T tryRemove(int index) {
