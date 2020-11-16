@@ -11,8 +11,6 @@ analyzer:
     - ".direnv/*.dart"
     - "current/**/*.dart"
     - "current/*/*.dart"
-    - "lib/ext/*.dart"
-    - "lib/ext/**"
     - "fastlane"
     - "test_driver/**"
   strong-mode:
