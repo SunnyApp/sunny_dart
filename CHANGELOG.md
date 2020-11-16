@@ -1,3 +1,6 @@
+## [0.5.8+3]
+ * changing analysis_options
+
 ## [0.5.8+2]
  * changes
 
