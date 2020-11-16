@@ -15,7 +15,7 @@ dependencies:
   crypto: ^2.1.5
   collection: ^1.14.13
   get_ip: ^0.4.0
-  libphonenumber: <=1.0.1
+  libphonenumber: ^1.0.1
   recase: ^3.0.0
   stream_transform: ^1.2.0
   timezone: ^0.5.7
