@@ -425,6 +425,7 @@ extension StringExtensions on String {
 
   String toTitleCase() {
     if (_titles.contains(this)) return this;
+    if(this==null) return null;
     return ReCase(this).titleCase;
   }
 
