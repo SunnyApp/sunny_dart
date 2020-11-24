@@ -1,12 +1,13 @@
 import 'dart:async';
 
 class SafeCompleter<T> implements Completer<T> {
+  final String debugLabel;
   bool _isStarted = false;
   Completer<T> _delegate = Completer<T>();
 
-  SafeCompleter() : _isStarted = true;
+  SafeCompleter([this.debugLabel]) : _isStarted = true;
 
-  SafeCompleter.stopped() : _isStarted = false;
+  SafeCompleter.stopped([this.debugLabel]) : _isStarted = false;
 
   bool get isNotStarted => !_isStarted;
 
@@ -56,5 +57,10 @@ class SafeCompleter<T> implements Completer<T> {
     } else {
       return future.then((_) => exec());
     }
+  }
+
+  @override
+  String toString() {
+    return 'SafeCompleter{label=${debugLabel ?? 'empty'}';
   }
 }

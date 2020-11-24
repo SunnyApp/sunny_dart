@@ -4,4 +4,4 @@
 
 gem 'fastlane-plugin-unzip'
 gem 'fastlane-plugin-firebase_app_distribution'
-gem 'fastlane-plugin-sunny_project', path: "/Users/ericm/sunny/plugin/fastlane-plugin-sunny_project"
+gem 'fastlane-plugin-sunny_project'
