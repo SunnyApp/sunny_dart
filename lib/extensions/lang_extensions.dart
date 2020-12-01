@@ -1,3 +1,4 @@
+//ignore_for_file: unnecessary_cast
 import 'dart:async';
 import 'dart:math';
 
@@ -425,7 +426,7 @@ extension StringExtensions on String {
 
   String toTitleCase() {
     if (_titles.contains(this)) return this;
-    if(this==null) return null;
+    if (this == null) return null;
     return ReCase(this).titleCase;
   }
 
@@ -552,7 +553,7 @@ extension SetExtension<T> on Set<T> {
   }
 }
 
-extension IterableExtension<T> on Iterable<T> {
+extension SunnyIterableExtensionExt<T> on Iterable<T> {
   /// No way to override the + operator for an iterable, so I use a downcast to iterable
   Iterable<T> operator +(item) {
     final self = this as List<T>;
@@ -734,7 +735,7 @@ extension IterableExtension<T> on Iterable<T> {
   T firstOr([T ifEmpty]) => this.firstWhere((_) => true, orElse: () => ifEmpty);
 }
 
-extension IterableIterableExtension<T> on Iterable<Iterable<T>> {
+extension SunnyIterableIterableExtension<T> on Iterable<Iterable<T>> {
   List<T> flatten() {
     return [...this.expand((i) => i)];
   }
@@ -754,7 +755,6 @@ extension CoreListExtension<T> on List<T> {
     });
   }
 
-  // ignore: unnecessary_cast
   Iterable<T> get iterable => this as Iterable<T>;
 
   T tryGet(int index) {

@@ -226,7 +226,9 @@ final timeUnits = [...TimeSpanUnit.values.where((u) => u.isTimeField)];
 TimeSpanUnit timeSpanUnitOf(input) {
   if (input is TimeSpanUnit) return input;
   final lc = "$input".toLowerCase().trimEnd("s");
-  return TimeSpanUnit.values.where((unit) => unit.name == lc).firstOrNull;
+  return TimeSpanUnit.values
+      .where((unit) => unit.name == lc)
+      .firstWhere((element) => true, orElse: () => null);
 }
 
 List<TimeSpanUnit> tryParseTimeSpanUnit(input) {

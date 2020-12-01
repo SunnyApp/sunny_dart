@@ -74,7 +74,7 @@ extension MapExtensions<K, V> on Map<K, V> {
   }
 }
 
-extension IterableExtensions<V> on Iterable<V> {
+extension SunnyIterableExtensions<V> on Iterable<V> {
   Iterable<V> ifEmpty(Getter<Iterable<V>> other) {
     if (this.isNullOrEmpty) {
       return other();

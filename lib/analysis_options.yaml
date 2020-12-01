@@ -16,15 +16,13 @@ analyzer:
   strong-mode:
     implicit-casts: false
 
-  enable-experiment:
-    - extension-methods
-
   errors:
     throw_in_finally: warning
     annotate_overrides: warning
     library_names: warning
     # treat missing required parameters as a warning (not a hint)
     missing_required_param: warning
+
     # treat missing returns as a warning (not a hint)
     missing_return: warning
     # allow having TODOs in the code
@@ -39,7 +37,6 @@ analyzer:
     omit_local_variable_types: ignore
     use_to_and_as_if_applicable: warning
     always_declare_return_types: warning
-
 linter:
   rules:
     # these rules are documented on and in the same order as

@@ -1,3 +1,4 @@
+//ignore_for_file: unnecessary_cast
 import 'dart:async';
 
 import 'package:stream_transform/stream_transform.dart';
@@ -82,8 +83,11 @@ extension FutureOrExts<T> on FutureOr<T> {
           ? illegalState<T>("Attempting to resolve a future.")
           : null);
 
-  T resolveOrNull([T or]) =>
-      this is Future<T> ? (or == null) ? null : or : (this as T ?? or);
+  T resolveOrNull([T or]) => this is Future<T>
+      ? (or == null)
+          ? null
+          : or
+      : (this as T ?? or);
 
   FutureOr<R> thenCast<R>() => thenOr((self) => self as R);
 
