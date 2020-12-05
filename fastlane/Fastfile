@@ -21,10 +21,7 @@ p $VERBOSE
 
 lane :publish do |options|
   ensure_git_status_clean
-
-
   old_version = curr_semver
-
   increase_version
 
   # Whatever happened with the incrementing, this is the build number we're
