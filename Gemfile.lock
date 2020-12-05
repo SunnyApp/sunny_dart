@@ -82,7 +82,7 @@ GEM
       xcpretty (~> 0.3.0)
       xcpretty-travis-formatter (>= 0.0.3)
     fastlane-plugin-firebase_app_distribution (0.2.4)
-    fastlane-plugin-sunny_project (0.1.17)
+    fastlane-plugin-sunny_project (0.1.18)
     fastlane-plugin-unzip (1.0.1)
     gh_inspector (1.1.3)
     google-api-client (0.38.0)
