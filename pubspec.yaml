@@ -1,5 +1,5 @@
 name: sunny_dart
-version: 0.5.8+3
+version: 0.5.8+4
 homepage: https://github.com/SunnyApp/sunny_dart
 description: Core utilities used by sunny packages
 environment: 
@@ -11,8 +11,6 @@ dependencies:
   device_info: ^1.0.0
   devicelocale: ^0.3.3
   equatable: ^1.2.5
-  flutter:
-    sdk: flutter
   flutter_native_timezone: ^1.0.4
   get_ip: ^0.4.0
   inflection2: ^0.4.3
@@ -26,8 +24,9 @@ dependencies:
   timezone: ^0.5.9
   uri: ^0.11.3+1
   uuid: ^2.2.2
-dev_dependencies:
-  flutter_test:
+  flutter: 
     sdk: flutter
-
+dev_dependencies: 
   logging_config: any
+  flutter_test: 
+    sdk: flutter
