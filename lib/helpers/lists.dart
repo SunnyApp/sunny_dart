@@ -1,8 +1,8 @@
-import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
-
+import 'package:meta/meta.dart';
 import '../typedefs.dart';
 import 'functions.dart';
+import 'dart:collection';
 
 final _log = Logger("Lists");
 
@@ -220,9 +220,6 @@ T wrongType<T>(String name, value, List<Type> accepted) =>
     throw ArgumentError.value(value, name,
         "Wrong type (${value?.runtimeType}) - expected one of $accepted");
 
-Widget widgetIf(bool condition, Factory<Widget> factory) =>
-    condition ? factory() : Container();
-
 List<T> removeElement<T>(Iterable<T> elements, T toRemove) =>
     elements?.where((item) => item != toRemove)?.toList() ?? [];
 
@@ -247,5 +244,28 @@ Map<String, T> toMap<T>(value, DynTransformer<T> txr) {
     });
   } else {
     throw ArgumentError("Expected map value");
+  }
+}
+
+abstract class ListDelegateMixin<T> extends ListMixin<T> {
+  List<T> get delegate;
+
+  @override
+  Iterator<T> get iterator => delegate.iterator;
+
+  @override
+  int get length => delegate.length;
+
+  @override
+  set length(int length) => delegate.length = length;
+
+  @override
+  T operator [](int index) {
+    return delegate[index];
+  }
+
+  @override
+  void operator []=(int index, T value) {
+    delegate[index] = value;
   }
 }

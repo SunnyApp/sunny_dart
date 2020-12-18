@@ -16,22 +16,10 @@ bool get isPlatformWindows => throw "Not implemented";
 bool get isPlatformLinux => throw "Not implemented";
 bool get isPlatformWeb => throw "Not implemented";
 String get platformName => throw "Not implemented";
+Future<String> get currentUserTimeZone => throw "Not implemented";
 
 Map<String, String> get platformEnvironment => throw "Not implemented";
 
 bool get canPlatformReadFiles => throw "Not implemented";
-
-abstract class File {
-  factory File(String path) => throw "Not implemented: $path";
-  File get absolute;
-  bool existsSync();
-  String readAsStringSync();
-  void writeAsStringSync(String data);
-  Uint8List readAsBytesSync();
-  int lengthSync();
-  Stream<List<int>> openRead();
-  String get path;
-  void writeAsBytesSync(List<int> bytes, {bool flush = false});
-}
 
 Future<DeviceInfo> loadPlatformInfo() => throw "Not implemented";

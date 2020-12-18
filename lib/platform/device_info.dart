@@ -1,12 +1,12 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
+import 'package:meta/meta.dart';
 import 'package:sunny_dart/helpers/strings.dart';
 
 import '../extensions.dart';
 import 'platform_interface.dart'
     if (dart.library.io) 'platform_native.dart'
-    if (dart.library.html) 'platform_web.dart';
+    if (dart.library.js) 'platform_web.dart';
 
 enum BuildMode { release, profile, debug }
 
@@ -104,7 +104,3 @@ extension PlatformInfoFuture on FutureOr<DeviceInfo> {
 
   Future<String> get softwareVersion async => (await this).softwareVersion;
 }
-
-const buildMode = bool.fromEnvironment('dart.vm.product')
-    ? BuildMode.release
-    : kDebugMode ? BuildMode.debug : BuildMode.profile;

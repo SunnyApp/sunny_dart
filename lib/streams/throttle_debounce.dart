@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:meta/meta.dart';
 
 abstract class Limiter {
   void limit([callback]);
@@ -9,8 +10,16 @@ class Throttler implements Limiter {
   final callback;
   final List args;
   final bool noTrailing;
+  final Duration max;
 
-  Throttler(this.delay, this.callback, this.args, [this.noTrailing = false]);
+  // ignore: always_require_non_null_named_parameters
+  Throttler(
+      {@required this.delay,
+      this.callback,
+      this.max,
+      this.args,
+      this.noTrailing = false})
+      : assert(delay != null);
 
   Timer timeoutId;
 
@@ -32,7 +41,8 @@ class Throttler implements Limiter {
       }
     }
 
-    if (elapsed.compareTo(delay) >= 0) {
+    if (elapsed.compareTo(delay) >= 0 ||
+        (max != null && elapsed.compareTo(max) >= 0)) {
       exec();
     }
 

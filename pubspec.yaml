@@ -4,8 +4,11 @@ homepage: https://github.com/SunnyApp/sunny_dart
 description: Core utilities used by sunny packages
 environment: 
   sdk: '>=2.8.0 <3.0.0'
-dependencies: 
+dependencies:
+  flutter:
+    sdk: flutter
   async: ^2.4.2
+  chunked_stream: ^1.1.0
   collection: ^1.14.13
   crypto: ^2.1.5
   device_info: ^1.0.0
@@ -14,6 +17,7 @@ dependencies:
   flutter_native_timezone: ^1.0.4
   get_ip: ^0.4.0
   inflection2: ^0.4.3
+  meta: ^1.2.4
   intl: ^0.16.1
   libphonenumber: ^1.0.2
   logging: ^0.11.4
@@ -24,9 +28,8 @@ dependencies:
   timezone: ^0.5.9
   uri: ^0.11.3+1
   uuid: ^2.2.2
-  flutter: 
-    sdk: flutter
+
 dev_dependencies: 
   logging_config: any
-  flutter_test: 
+  flutter_test:
     sdk: flutter

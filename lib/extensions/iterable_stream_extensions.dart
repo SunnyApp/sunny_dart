@@ -3,11 +3,14 @@ import 'dart:async';
 import 'package:stream_transform/stream_transform.dart';
 import 'package:sunny_dart/sunny_dart.dart';
 import 'package:sunny_dart/typedefs.dart';
+import 'package:chunked_stream/chunked_stream.dart';
 
 extension StreamExt<T> on Stream<T> {
   Future<void> complete() {
     return this.drain();
   }
+
+  Stream<List<T>> chunked(int chunkSize) => asChunkedStream(chunkSize, this);
 
   Stream<E> mapAsyncLimited<E>(FutureOr<E> convert(T event),
       {int maxPending = 1}) {

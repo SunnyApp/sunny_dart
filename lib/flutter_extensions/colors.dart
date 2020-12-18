@@ -1,4 +1,4 @@
-import 'package:flutter/rendering.dart';
+import 'dart:ui';
 
 /// String is in the format "aabbcc" or "ffaabbcc" with an optional leading "#".
 Color colorFromHex(String hexString) {

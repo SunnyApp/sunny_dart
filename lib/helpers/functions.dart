@@ -1,12 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter/widgets.dart';
 import 'package:logging/logging.dart';
 import 'package:sunny_dart/typedefs.dart';
 
 import '../platform/platform_interface.dart'
     if (dart.library.io) '../platform/platform_native.dart'
-    if (dart.library.html) '../platform/platform_web.dart';
+    if (dart.library.js) '../platform/platform_web.dart';
 
 final _log = Logger("functions");
 
@@ -25,8 +24,6 @@ class Functions {
     }
     return null;
   }
-
-  static WidgetBuilder ofStatic(Widget widget) => (context) => widget;
 }
 
 Factory<T> returnNull<T>() => () => null;

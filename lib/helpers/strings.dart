@@ -2,9 +2,8 @@ import 'dart:math';
 import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
-
+import 'package:meta/meta.dart';
 import 'lists.dart';
 
 bool isPhone(String input) {

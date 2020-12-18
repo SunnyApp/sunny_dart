@@ -29,6 +29,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.2.0-nullsafety.3"
+  chunked_stream:
+    dependency: "direct main"
+    description:
+      name: chunked_stream
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
   clock:
     dependency: transitive
     description:
@@ -173,7 +180,7 @@ packages:
     source: hosted
     version: "0.12.10-nullsafety.3"
   meta:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: meta
       url: "https://pub.dartlang.org"

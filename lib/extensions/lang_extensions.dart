@@ -1,9 +1,10 @@
 //ignore_for_file: unnecessary_cast
 import 'dart:async';
 import 'dart:math';
+import 'dart:math' as math;
 
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:flutter/material.dart';
+import 'package:chunked_stream/chunked_stream.dart';
 import 'package:inflection2/inflection2.dart' as inflection;
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
@@ -203,7 +204,25 @@ extension NumExt on num {
     return min(upper.toDouble(), max(low.toDouble(), this.toDouble()));
   }
 
+  static const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
+
+  static String _defaultFormatBytes(num v, int power) {
+    return "${v.formatCompact()} ${suffixes[power]}";
+  }
+
+  String formatBytes(
+      {String formatBytes(num v, int power) = NumExt._defaultFormatBytes}) {
+    assert(formatBytes != null);
+    var bytes = this;
+    if (bytes <= 0) return formatBytes(0, 0);
+    var i = (log(bytes) / log(1024)).floor();
+    var b = ((bytes / pow(1024, i)));
+    return formatBytes(b, i);
+  }
+
   String formatCurrency() => currencyFormat.format(this);
+
+  String formatCompact() => compactFormat.format(this);
 
   double times(num other) {
     if (this == null) return null;
@@ -217,6 +236,7 @@ extension NumExt on num {
 }
 
 final currencyFormat = NumberFormat.simpleCurrency();
+final compactFormat = NumberFormat.compactLong();
 
 extension ModelMapExtensions on Map<String, dynamic> {
   Map<String, dynamic> orEmpty() => <String, dynamic>{};
@@ -274,8 +294,6 @@ extension StringExtensions on String {
     if (this.isNullOrBlank) return '';
     return "${this}$after";
   }
-
-  Color toColor() => colorFromHex(this);
 
   Uri toUri() => this == null ? null : Uri.parse(this);
 
@@ -570,6 +588,10 @@ extension SunnyIterableExtensionExt<T> on Iterable<T> {
     return this;
   }
 
+  Stream<List<T>> chunkedStream(int chunkSize) {
+    return asChunkedStream(chunkSize, Stream.fromIterable(this ?? <T>[]));
+  }
+
   T random() {
     if (this == null || this.isEmpty) return null;
     final randomIdx = _random.nextInt(this.length);
@@ -753,6 +775,10 @@ extension CoreListExtension<T> on List<T> {
         return res is T ? res : item;
       }
     });
+  }
+
+  Stream<List<T>> chunkedStream(int chunkSize) {
+    return asChunkedStream(chunkSize, Stream.fromIterable(this ?? <T>[]));
   }
 
   Iterable<T> get iterable => this as Iterable<T>;
@@ -957,13 +983,6 @@ extension DateTimeExtensions on DateTime {
   bool get isFuture => this != null && this.isAfter(DateTime.now());
 
   bool get isPast => this != null && this.isBefore(DateTime.now());
-
-  TZDateTime withTimeZone([Location location]) {
-    assert(location != null);
-    if (this is TZDateTime) return (this as TZDateTime);
-    return TZDateTime.from(
-        this, location ?? SunnyLocalization.userLocationOrNull);
-  }
 
   DateTime atStartOfDay() {
     final t = this;

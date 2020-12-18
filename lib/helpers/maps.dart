@@ -1,5 +1,5 @@
-import '../helpers.dart';
 import '../json.dart';
+import 'functions.dart';
 
 class Maps {
   Maps._();

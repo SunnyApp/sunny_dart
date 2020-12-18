@@ -4,8 +4,10 @@ import 'dart:io';
 import 'package:device_info/device_info.dart';
 import 'package:devicelocale/devicelocale.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_native_timezone/flutter_native_timezone.dart';
 import 'package:get_ip/get_ip.dart';
 import 'package:sunny_dart/platform/device_info.dart';
+import 'package:timezone/timezone.dart';
 
 import '../extensions.dart';
 
@@ -89,3 +91,12 @@ Future<DeviceInfo> loadPlatformInfo() async {
     );
   }
 }
+
+// Future initializeTimeZones() async {
+//   final byteData = await rootBundle.load('packages/timezone/data/latest.tzf');
+//   final rawData = byteData.buffer.asUint8List();
+//   initializeDatabase(rawData);
+// }
+
+Future<String> get currentUserTimeZone =>
+    FlutterNativeTimezone.getLocalTimezone();

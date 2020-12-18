@@ -54,6 +54,11 @@ class JsonPath<T> extends MLiteral<String> {
   /// The last segment in the path
   String get last => segments.last;
 
+  /// The first segment in the path
+  String get first => segments.first;
+
+  int get length => segments.length;
+
   /// Whether this path starts with another [JsonPath] instance.
   bool startsWith(JsonPath otherPath) {
     return path.startsWith(otherPath.path);
@@ -105,8 +110,12 @@ List<String> _parsePath(String path) {
 String _toPathName(Iterable<String> segments) => "/" + segments.join("/");
 
 extension JsonPathOperatorExtensions<T> on JsonPath<T> {
-  JsonPath operator +(JsonPath path) {
-    return self.plus(path.self);
+  JsonPath operator +(path) {
+    if (path is JsonPath) {
+      return self.plus(path.self);
+    } else {
+      return self.plus(JsonPath.of(path));
+    }
   }
 
   /// Whether this path is empty, eg "/"

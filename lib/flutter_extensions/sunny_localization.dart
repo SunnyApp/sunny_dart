@@ -1,31 +1,16 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_native_timezone/flutter_native_timezone.dart';
-import 'package:sunny_dart/time/time_span.dart';
 import 'package:timezone/timezone.dart';
 
-Location locationOf(name) {
-  return sunnyLocalization.locationOf(name?.toString());
-}
+import '../platform/platform_interface.dart'
+    if (dart.library.io) '../platform/platform_native.dart'
+    if (dart.library.js) '../platform/platform_web.dart';
 
-TimeZone timeZoneOf(name) {
-  return sunnyLocalization.timeZoneOf(name?.toString());
-}
-
-DateTime dateTimeOf(json) {
-  if (json == null) return null;
-  return DateTime.parse(json.toString());
-}
-
-Uri uriOf(json) {
-  if (json == null) return null;
-  return Uri.parse(json.toString());
-}
-
-TimeSpan timeSpanOf(String duration) {
-  return TimeSpan.ofISOString(duration);
+Future initializeTimeZones() async {
+  final byteData = await rootBundle.load('packages/timezone/data/latest.tzf');
+  final rawData = byteData.buffer.asUint8List();
+  initializeDatabase(rawData);
 }
 
 Completer<SunnyLocalization> _sunnyLocalizationCompleter;
@@ -35,6 +20,14 @@ Future<SunnyLocalization> get sunnyLocalizationFuture {
   } else {
     return _loadSunnyLocalization();
   }
+}
+
+Location locationOf(name) {
+  return sunnyLocalization.locationOf(name?.toString());
+}
+
+TimeZone timeZoneOf(name) {
+  return sunnyLocalization.timeZoneOf(name?.toString());
 }
 
 SunnyLocalization _sunnyLocalization;
@@ -47,12 +40,8 @@ SunnyLocalization get sunnyLocalization {
 Future<SunnyLocalization> _loadSunnyLocalization() async {
   _sunnyLocalizationCompleter ??= Completer<SunnyLocalization>();
   if (_sunnyLocalization != null) return _sunnyLocalization;
-  final userTimeZoneName = (kIsWeb)
-      ? "America/Chicago"
-      : await FlutterNativeTimezone.getLocalTimezone();
-  final byteData = await rootBundle.load('packages/timezone/data/latest.tzf');
-  final rawData = byteData.buffer.asUint8List();
-  initializeDatabase(rawData);
+  final userTimeZoneName = await currentUserTimeZone;
+
   final userLocation = getLocation(userTimeZoneName);
   final userTimeZone = userLocation.currentTimeZone;
   _sunnyLocalization = SunnyLocalization(userTimeZone, userLocation);
@@ -90,4 +79,13 @@ class SunnyLocalization {
 extension SunnyLocalizationExt on Future<SunnyLocalization> {
   Future<TimeZone> get userTimeZone => then((_) => _.userTimeZone);
   Future<Location> get userLocation => then((_) => _.userLocation);
+}
+
+extension LocalizationDateTimeExt on DateTime {
+  TZDateTime withTimeZone([Location location]) {
+    assert(location != null);
+    if (this is TZDateTime) return (this as TZDateTime);
+    return TZDateTime.from(
+        this, location ?? SunnyLocalization.userLocationOrNull);
+  }
 }
