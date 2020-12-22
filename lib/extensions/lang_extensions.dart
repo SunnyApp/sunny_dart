@@ -110,6 +110,11 @@ extension AnyFutureExtensions<T> on Future<T> {
     }
   }
 
+  Future<T> maybeTimeout(Duration duration, FutureOr<T> onTimeout()) {
+    if (duration.inMicroseconds <= 0) return this;
+    return this.timeout(duration, onTimeout: onTimeout);
+  }
+
   Future<T> also<R>(R block(T self)) async {
     if (this == null) {
       return null;
@@ -262,6 +267,12 @@ extension StringExtensions on String {
   String get firstWord {
     if (this == null) return null;
     return this.split(nameSeparator).firstOrNull();
+  }
+
+  String charAt(int c) {
+    if (this == null) return null;
+    if (this.length > c) return this[c];
+    return null;
   }
 
   String toPathName() {

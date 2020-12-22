@@ -4,9 +4,6 @@ import 'package:meta/meta.dart';
 import 'package:sunny_dart/helpers/strings.dart';
 
 import '../extensions.dart';
-import 'platform_interface.dart'
-    if (dart.library.io) 'platform_native.dart'
-    if (dart.library.js) 'platform_web.dart';
 
 enum BuildMode { release, profile, debug }
 
@@ -21,10 +18,12 @@ class DeviceInfo {
   final String locale;
   final String language;
   final String ipAddress;
+  final GeoPoint geo;
 
   const DeviceInfo(
       {@required this.isSimulator,
       @required this.ipAddress,
+      @required this.geo,
       @required this.deviceId,
       @required this.deviceType,
       @required this.deviceModel,
@@ -38,6 +37,7 @@ class DeviceInfo {
       {@required this.language,
       @required this.locale,
       this.ipAddress,
+      this.geo,
       @required this.isSimulator})
       : deviceBrand = null,
         deviceType = "Unknown",
@@ -52,6 +52,7 @@ class DeviceInfo {
       'locale': this.locale,
       'language': this.language,
       'deviceId': this.deviceId,
+      'geo': this.geo?.toMap(),
       'ipAddress': this.ipAddress,
       'deviceType': this.deviceType,
       'software': this.software,
@@ -62,23 +63,6 @@ class DeviceInfo {
   }
 
   dynamic toJson() => toMap();
-}
-
-FutureOr<DeviceInfo> _deviceInfo;
-
-FutureOr<DeviceInfo> get deviceInfo {
-  if (_deviceInfo != null) return _deviceInfo;
-  _deviceInfo = loadPlatformInfo().then((_) {
-    return _;
-  });
-  return _deviceInfo;
-}
-
-Future<DeviceInfo> loadDeviceInfo() => loadPlatformInfo();
-
-set deviceInfo(FutureOr<DeviceInfo> info) {
-  assert(info is DeviceInfo, "Must provide a resolved future");
-  _deviceInfo = info as DeviceInfo;
 }
 
 extension PlatformInfoFuture on FutureOr<DeviceInfo> {
@@ -103,4 +87,32 @@ extension PlatformInfoFuture on FutureOr<DeviceInfo> {
   Future<String> get deviceModel async => (await this).deviceModel;
 
   Future<String> get softwareVersion async => (await this).softwareVersion;
+  Future<GeoPoint> get location async => (await this).location;
+}
+
+class GeoPoint {
+  final double lat;
+  final double lon;
+
+  factory GeoPoint.of(double lat, double lon) {
+    if (lat == null || lon == null) return null;
+    return GeoPoint(lat, lon);
+  }
+
+  GeoPoint(this.lat, this.lon);
+
+  factory GeoPoint.fromMap(Map<String, dynamic> map) {
+    return GeoPoint(
+      map['lat'] as double,
+      map['lon'] as double,
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    // ignore: unnecessary_cast
+    return {
+      'lat': this.lat,
+      'lon': this.lon,
+    } as Map<String, dynamic>;
+  }
 }

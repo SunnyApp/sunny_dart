@@ -1,25 +1,28 @@
 import 'dart:async';
 
+import '../extensions.dart';
 import 'package:flutter/services.dart';
 import 'package:timezone/timezone.dart';
+import '../xfo/info_x.dart';
+// import '../platform/platform_interface.dart'
+//     if (dart.library.io) '../platform/platform_native.dart'
+//     if (dart.library.js) '../platform/platform_web.dart';
 
-import '../platform/platform_interface.dart'
-    if (dart.library.io) '../platform/platform_native.dart'
-    if (dart.library.js) '../platform/platform_web.dart';
-
-Future initializeTimeZones() async {
-  final byteData = await rootBundle.load('packages/timezone/data/latest.tzf');
-  final rawData = byteData.buffer.asUint8List();
-  initializeDatabase(rawData);
-}
-
-Completer<SunnyLocalization> _sunnyLocalizationCompleter;
+Completer<SunnyLocalization> _initComplete;
 Future<SunnyLocalization> get sunnyLocalizationFuture {
-  if (_sunnyLocalizationCompleter != null) {
-    return _sunnyLocalizationCompleter.future;
-  } else {
-    return _loadSunnyLocalization();
+  if (_initComplete == null) {
+    _initComplete = Completer();
+    rootBundle.load('packages/timezone/data/latest.tzf').then((byteData) async {
+      final rawData = byteData.buffer.asUint8List();
+      initializeDatabase(rawData);
+      final userTimeZoneName = await infoX.currentTimeZone;
+      final userLocation = getLocation(userTimeZoneName);
+      final userTimeZone = userLocation.currentTimeZone;
+      _sunnyLocalization = SunnyLocalization(userTimeZone, userLocation);
+      _initComplete.complete(_sunnyLocalization);
+    }).ignore();
   }
+  return _initComplete.future;
 }
 
 Location locationOf(name) {
@@ -34,18 +37,6 @@ SunnyLocalization _sunnyLocalization;
 SunnyLocalization get sunnyLocalization {
   assert(_sunnyLocalization != null,
       "Sunny localization has not been initialized yet");
-  return _sunnyLocalization;
-}
-
-Future<SunnyLocalization> _loadSunnyLocalization() async {
-  _sunnyLocalizationCompleter ??= Completer<SunnyLocalization>();
-  if (_sunnyLocalization != null) return _sunnyLocalization;
-  final userTimeZoneName = await currentUserTimeZone;
-
-  final userLocation = getLocation(userTimeZoneName);
-  final userTimeZone = userLocation.currentTimeZone;
-  _sunnyLocalization = SunnyLocalization(userTimeZone, userLocation);
-  _sunnyLocalizationCompleter.complete(_sunnyLocalization);
   return _sunnyLocalization;
 }
 

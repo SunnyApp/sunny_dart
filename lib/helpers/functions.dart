@@ -3,10 +3,6 @@ import 'dart:async';
 import 'package:logging/logging.dart';
 import 'package:sunny_dart/typedefs.dart';
 
-import '../platform/platform_interface.dart'
-    if (dart.library.io) '../platform/platform_native.dart'
-    if (dart.library.js) '../platform/platform_web.dart';
-
 final _log = Logger("functions");
 
 typedef Func<R> = R Function();
@@ -110,21 +106,3 @@ T illegalArg<T>(String prop, [String message]) => throw Exception(
     message ?? "Illegal argument $prop: ${message ?? 'No message'}");
 
 T notImplemented<T>() => throw Exception("Not implemented");
-
-bool get isIOS => isPlatformIOS;
-
-bool get isAndroid => isPlatformAndroid;
-
-bool get isMacOS => isPlatformMacOS;
-
-bool get isWindows => isPlatformWindows;
-
-bool get isLinux => isPlatformLinux;
-
-bool get isWeb => isPlatformWeb;
-
-String get operatingSystem => platformName;
-
-Map<String, String> get environment => platformEnvironment;
-
-bool get canReadFiles => canPlatformReadFiles;
