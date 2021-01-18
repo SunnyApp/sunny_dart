@@ -2,6 +2,7 @@ library sunny_dart;
 
 export 'extensions.dart';
 export 'helpers.dart';
+export 'i18n.dart';
 export 'json.dart';
 export 'platform/device_info.dart';
 // export 'platform/platform_interface.dart'

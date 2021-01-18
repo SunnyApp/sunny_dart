@@ -3,6 +3,21 @@ import 'package:sunny_dart/json/json_path.dart';
 import '../helpers.dart';
 import '../typedefs.dart';
 import 'lang_extensions.dart';
+import 'lang_extensions.dart';
+
+extension DynamicMapExtensionMap<K> on Map<K, dynamic> {
+  Iterable<MapEntry<K, dynamic>> flatEntry() {
+    return entries.expand((entry) {
+      final viter = [
+        if (entry.value is Iterable)
+          ...entry.value
+        else if (entry.value != null)
+          entry.value,
+      ];
+      return viter.map((v) => MapEntry<K, dynamic>(entry.key, v));
+    });
+  }
+}
 
 extension MapExtensions<K, V> on Map<K, V> {
   String join([String entrySeparator = "; ", String keyValueSeparator = "="]) {

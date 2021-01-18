@@ -1,10 +1,11 @@
-import 'package:logging/logging.dart';
-import 'sunny_get.dart';
+import '../i18n/sunny_localization.dart';
 import '../platform/device_info.dart';
+import 'sunny_get.dart';
 
 InfoX get infoX => sunny.get();
 
 abstract class InfoX {
+  Future<SunnyLocalization> initializeLocalization();
   Future<DeviceInfo> loadDeviceInfo();
   Future<DeviceInfo> get deviceInfo;
   Future<String> get currentTimeZone;

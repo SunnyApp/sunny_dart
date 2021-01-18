@@ -10,6 +10,7 @@ class IsX {}
 @deprecated
 SunnyGet get Sunny => sunny;
 
+/// Use infoX.isIOS
 @deprecated
 bool get isIOS => infoX.isIOS;
 

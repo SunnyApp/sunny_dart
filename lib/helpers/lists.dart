@@ -1,8 +1,10 @@
+import 'dart:collection';
+
 import 'package:logging/logging.dart';
 import 'package:meta/meta.dart';
+
 import '../typedefs.dart';
 import 'functions.dart';
-import 'dart:collection';
 
 final _log = Logger("Lists");
 

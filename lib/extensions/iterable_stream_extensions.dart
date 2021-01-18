@@ -1,9 +1,10 @@
 import 'dart:async';
 
-import 'package:stream_transform/stream_transform.dart';
-import 'package:sunny_dart/sunny_dart.dart';
-import 'package:sunny_dart/typedefs.dart';
 import 'package:chunked_stream/chunked_stream.dart';
+import 'package:stream_transform/stream_transform.dart';
+import 'package:sunny_dart/typedefs.dart';
+
+import '../streams/value_stream.dart';
 
 extension StreamExt<T> on Stream<T> {
   Future<void> complete() {

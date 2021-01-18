@@ -1,17 +1,15 @@
 //ignore_for_file: unnecessary_cast
 import 'dart:async';
 import 'dart:math';
-import 'dart:math' as math;
 
-import 'package:crypto/crypto.dart' as crypto;
 import 'package:chunked_stream/chunked_stream.dart';
+import 'package:crypto/crypto.dart' as crypto;
 import 'package:inflection2/inflection2.dart' as inflection;
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:recase/recase.dart';
 import 'package:sunny_dart/json/json_path.dart';
 import 'package:sunny_dart/time/time_span.dart';
-import 'package:timezone/timezone.dart';
 
 import '../helpers.dart';
 import '../time.dart';
@@ -26,8 +24,20 @@ extension StringListExtension on List<String> {
   }
 }
 
+extension ObjectAsListExtension on Object {
+  List asIterable() {
+    final self = this;
+    if (self is Iterable) {
+      return [...self];
+    } else {
+      return [if (this != null) this];
+    }
+  }
+}
+
 extension ObjectToListExtension<T> on T {
   List<T> asList() {
+    if (this == null) return [];
     return [if (this != null) this];
   }
 
@@ -111,6 +121,7 @@ extension AnyFutureExtensions<T> on Future<T> {
   }
 
   Future<T> maybeTimeout(Duration duration, FutureOr<T> onTimeout()) {
+    if (duration == null) return this;
     if (duration.inMicroseconds <= 0) return this;
     return this.timeout(duration, onTimeout: onTimeout);
   }
