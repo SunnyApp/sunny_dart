@@ -19,7 +19,7 @@ dependencies:
   platform_detect: ^1.4.0
   recase: ^3.0.1
   stream_transform: ^1.2.0
-  timezone: ^0.5.9
+  timezone: ^0.6.1
   uri: ^0.11.3+1
   uuid: ^2.2.2
   flutter: 
