@@ -1,3 +1,7 @@
+## [0.7.0+5]
+ * Updated Gemfile
+Updated version
+
 ## [0.5.8+3]
  * changing analysis_options
 
