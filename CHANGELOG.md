@@ -1,3 +1,6 @@
+## [0.8.0+7]
+ * Fixing compile errors
+
 ## [0.8.0+6]
  * Adding pubspec.lock
 null-safety
