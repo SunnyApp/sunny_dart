@@ -1,3 +1,7 @@
+## [0.8.0+6]
+ * Adding pubspec.lock
+null-safety
+
 ## [0.7.0+5]
  * Updated Gemfile
 Updated version
