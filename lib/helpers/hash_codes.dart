@@ -119,7 +119,7 @@ int hashOf(Object? arg01, Object? arg02,
 /// Combine the [Object.hashCode] values of an arbitrary number of objects from
 /// an [Iterable] into one value. This function will return the same value if
 /// given null as if given an empty list.
-int hashFromList(Iterable<Object? > arguments) {
+int hashFromList(Iterable<Object?>? arguments) {
   int result = 0;
   if (arguments != null) {
     for (Object? argument in arguments) {

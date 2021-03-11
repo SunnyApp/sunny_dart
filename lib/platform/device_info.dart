@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:meta/meta.dart';
 import 'package:sunny_dart/helpers/strings.dart';
 
 import '../extensions.dart';

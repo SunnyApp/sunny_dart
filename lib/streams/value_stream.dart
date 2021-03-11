@@ -1,10 +1,9 @@
 import 'dart:async';
 
-import 'package:meta/meta.dart';
 import 'package:logging/logging.dart';
 import 'package:stream_transform/stream_transform.dart';
-import 'package:sunny_dart/helpers/disposable.dart';
 import 'package:sunny_dart/extensions.dart';
+import 'package:sunny_dart/helpers/disposable.dart';
 
 import '../helpers.dart';
 import '../typedefs.dart';

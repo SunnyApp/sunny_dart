@@ -166,7 +166,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T?> {
     }
   }
 
-  Future<T> update(Producer<T> current,
+  Future<T?> update(Producer<T> current,
       {String? debugLabel, Duration? timeout, bool? fallbackToCurrent}) {
     bool isQueued = _queue(current, debugLabel: debugLabel);
 
@@ -175,9 +175,8 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T?> {
         ? value
         : value.timeout(
             timeout,
-            onTimeout: fallbackToCurrent == true
-                ? (() => this._current!) as FutureOr<T> Function()?
-                : null,
+            onTimeout:
+                fallbackToCurrent == true ? (() => this._current!) : null,
           );
   }
 

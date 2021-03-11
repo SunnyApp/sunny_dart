@@ -170,7 +170,7 @@ extension ValueStreamIterableFutureExtensions<X>
 }
 
 extension ValueStreamIterableExtensions<X> on ValueStream<Iterable<X>> {
-  ValueStream<Iterable<X>> filterItems(bool predicate(X input)) {
+  ValueStream<Iterable<X>> filterItems(bool predicate(X input)?) {
     if (predicate == null) return this;
     return this.map((items) => items.where(predicate));
   }

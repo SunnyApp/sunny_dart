@@ -10,7 +10,7 @@ typedef Func<R> = R Function();
 class Functions {
   Functions._();
 
-  static T? findResult<T>({required List<Func<T>> checks, T? exclude}) {
+  static T? findResult<T>({required List<Func<T>?> checks, T? exclude}) {
     for (var check in checks) {
       if (check == null) continue;
       final result = check();

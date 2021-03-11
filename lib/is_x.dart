@@ -1,3 +1,5 @@
+// ignore_for_file: non_constant_identifier_names
+
 import 'xfo/info_x.dart';
 import 'xfo/sunny_get.dart';
 export 'xfo/info_x.dart';

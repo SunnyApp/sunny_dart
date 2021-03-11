@@ -58,6 +58,18 @@ extension NestedFutureOr<T> on FutureOr<FutureOr<T>> {
   }
 }
 
+extension NestedFuture<T> on Future<Future<T>?> {
+  /// Unboxes a Future/Future
+  Future<T?> unboxFuture() async {
+    final a = await Future.value(this);
+    if (a != null) {
+      return await a;
+    } else {
+      return null;
+    }
+  }
+}
+
 extension NestedNullableFutureOr<T> on FutureOr<FutureOr<T>?>? {
   /// Unboxes a Future/FutureOr
   FutureOr<T?> unbox() {
@@ -70,15 +82,17 @@ extension NestedNullableFutureOr<T> on FutureOr<FutureOr<T>?>? {
 extension FutureNullableExtensions<T> on Future<T?> {
   void ignore() {}
 
-  FutureOr<Tuple<T, R>?> to<R>(FutureOr<R> mapper(T? input)) {
-    final other = this.then((resolved) {
-      return resolved == null
-          ? null
-          : mapper(resolved).thenOr((second) {
-              return Tuple<T, R>(resolved, second);
-            });
-    });
-    return other.unbox();
+  Future<Tuple<T, R>?> to<R>(FutureOr<R> mapper(T? input)) async {
+    final resolved = await this;
+    if (resolved == null) {
+      return null;
+    }
+    final b = await mapper(resolved);
+    if (b != null) {
+      return Tuple(resolved, b);
+    } else {
+      return null;
+    }
   }
 }
 
