@@ -12,14 +12,14 @@ abstract class MLiteral<T> {
 
   @override
   String toString() {
-    return value?.toString() ?? "null literal";
+    return value.toString();
   }
 
   bool get isKnown => true;
 
   dynamic get diffSource => value;
 
-  String get diffKey => value?.toString();
+  String get diffKey => value.toString();
 
   int get equalityHashCode => diffSource.hashCode;
 

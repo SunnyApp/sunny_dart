@@ -1,8 +1,8 @@
+import 'package:collection/collection.dart' show IterableExtension;
 import 'package:sunny_dart/json/json_path.dart';
 
 import '../helpers.dart';
 import '../typedefs.dart';
-import 'lang_extensions.dart';
 import 'lang_extensions.dart';
 
 extension DynamicMapExtensionMap<K> on Map<K, dynamic> {
@@ -16,6 +16,12 @@ extension DynamicMapExtensionMap<K> on Map<K, dynamic> {
       ];
       return viter.map((v) => MapEntry<K, dynamic>(entry.key, v));
     });
+  }
+}
+
+extension MapNullableExtensions<K, V> on Map<K, V>? {
+  Map<K, V> orEmpty() {
+    return this ?? {};
   }
 }
 
@@ -83,25 +89,21 @@ extension MapExtensions<K, V> on Map<K, V> {
       return "${e.key}=${e.value.toString().removeNewlines().truncate(40)}";
     }).join("; ");
   }
-
-  Map<K, V> orEmpty() {
-    return this ?? {};
-  }
 }
 
-extension SunnyIterableExtensions<V> on Iterable<V> {
+extension SunnyIterableExtensions<V> on Iterable<V>? {
   Iterable<V> ifEmpty(Getter<Iterable<V>> other) {
     if (this.isNullOrEmpty) {
       return other();
     } else {
-      return this;
+      return this!;
     }
   }
 
   Iterable<V> whereNotNull() => this?.where(notNull()) ?? <V>[];
 
   Iterable<String> mapToString() =>
-      this?.map((_) => _?.toString()) ?? <String>[];
+      this?.map((_) => _?.toString()).whereType<String>() ?? <String>[];
 
   bool get isNullOrEmpty => this?.isNotEmpty != true;
 
@@ -109,20 +111,22 @@ extension SunnyIterableExtensions<V> on Iterable<V> {
 
   Map<K, List<V>> groupBy<K>(K keyOf(V value)) {
     final result = <K, List<V>>{};
-    for (final item in this) {
+    for (final item in this.orEmpty()) {
       result.putIfAbsent(keyOf(item), () => <V>[]).add(item);
     }
     return result;
   }
 
-  Map<K, V> keyed<K>(K keyOf(V value)) =>
-      this?.map((v) => MapEntry<K, V>(keyOf(v), v))?.toMap() ?? <K, V>{};
+  Iterable<V> orEmpty() => this == null ? const [] : this!;
+
+  Map<K?, V?> keyed<K>(K keyOf(V value)) =>
+      this?.map((v) => MapEntry<K, V>(keyOf(v), v)).toMap() ?? <K, V>{};
 
   Map<Type, List<V>> groupByType() {
     return groupBy((_) => _.runtimeType);
   }
 
-  V get firstOrNull => this.firstWhere((_) => true, orElse: () => null);
+  V? get firstOrNull => this?.firstWhereOrNull((_) => true);
 }
 
 extension IterableEntryExtensions<K, V> on Iterable<MapEntry<K, V>> {
@@ -145,7 +149,7 @@ class Keyed<K, V> {
 
   const Keyed([this._boxed = const {}]);
 
-  V operator [](K key) {
+  V? operator [](K key) {
     return _boxed[key];
   }
 }

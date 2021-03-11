@@ -4,28 +4,28 @@ import 'package:sunny_dart/time/date_components.dart';
 void main() {
   group("Date Components Test", () {
     test("Standard iso date", () {
-      final parsed = DateComponents.parse("2012-10-03");
+      final parsed = DateComponents.parse("2012-10-03")!;
       expect(parsed.year, 2012);
       expect(parsed.month, 10);
       expect(parsed.day, 3);
     });
 
     test("Month and year (4 digits)", () {
-      final parsed = DateComponents.parse("12-2000");
+      final parsed = DateComponents.parse("12-2000")!;
       expect(parsed.year, 2000);
       expect(parsed.month, 12);
       expect(parsed.day, isNull);
     });
 
     test("Month and day", () {
-      final parsed = DateComponents.parse("12-28");
+      final parsed = DateComponents.parse("12-28")!;
       expect(parsed.year, null);
       expect(parsed.month, 12);
       expect(parsed.day, 28);
     });
 
     test("Month and year (short month digits)", () {
-      final parsed = DateComponents.parse("Jan 12");
+      final parsed = DateComponents.parse("Jan 12")!;
       expect(parsed.year, null);
       expect(parsed.month, 1);
       expect(parsed.day, 12);

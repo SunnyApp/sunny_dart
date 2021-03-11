@@ -3,7 +3,6 @@ import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart' as crypto;
 import 'package:uuid/uuid.dart';
-import 'package:meta/meta.dart';
 import 'lists.dart';
 
 bool isPhone(String input) {
@@ -21,7 +20,7 @@ class StringJoiner {
   final String join;
   var str = "";
 
-  StringJoiner(String join) : join = join ?? ", ";
+  StringJoiner(String? join) : join = join ?? ", ";
 
   StringJoiner operator +(final value) {
     if (value is Iterable) {
@@ -49,14 +48,14 @@ class StringJoiner {
   }
 }
 
-String joinString(void builder(StringJoiner buffer), [String separator]) {
+String joinString(void builder(StringJoiner buffer), [String? separator]) {
   final buffer = StringJoiner(separator);
   builder(buffer);
   return buffer.toString();
 }
 
-String nonBlank(String input) {
-  if (input?.trim()?.isNotEmpty != true) return null;
+String? nonBlank(String? input) {
+  if (input?.trim().isNotEmpty != true) return null;
   return input;
 }
 
@@ -68,7 +67,8 @@ String repeat(String source, int times) {
   return value;
 }
 
-String trim(String target, List<String> chars, {bool trimWhitespace = true}) {
+String? trim(String? target, List<String>? chars,
+    {bool trimWhitespace = true}) {
   if (target == null) {
     return null;
   }
@@ -87,24 +87,24 @@ String trim(String target, List<String> chars, {bool trimWhitespace = true}) {
   return manipulated;
 }
 
-String joinOrNull(Iterable<String> items, {String separator = " "}) {
+String? joinOrNull(Iterable<String?>? items, {String separator = " "}) {
   if (items?.isNotEmpty == true) {
-    return items.join(separator);
+    return items!.join(separator);
   } else {
     return null;
   }
 }
 
-bool startsWith(String first, String second, {bool ignoreCase = true}) {
+bool startsWith(String? first, String? second, {bool ignoreCase = true}) {
   if (second?.isNotEmpty != true) return false;
   if (ignoreCase) {
     first = first?.toLowerCase();
     second = second?.toLowerCase();
   }
-  return first?.startsWith(second) == true;
+  return first?.startsWith(second!) == true;
 }
 
-bool anyMatch(String subject, List<String> potentials,
+bool anyMatch(String? subject, List<String> potentials,
     {bool caseSensitive = true}) {
   if (subject == null) return false;
   if (caseSensitive != true) {
@@ -120,7 +120,7 @@ bool anyMatch(String subject, List<String> potentials,
   return false;
 }
 
-String capitalize(String source) {
+String? capitalize(String? source) {
   if (source == null || source.isEmpty) {
     return source;
   } else {
@@ -128,7 +128,7 @@ String capitalize(String source) {
   }
 }
 
-String uncapitalize(String source) {
+String? uncapitalizeNull(String? source) {
   if (source == null || source.isEmpty) {
     return source;
   } else {
@@ -136,28 +136,40 @@ String uncapitalize(String source) {
   }
 }
 
-String splitSnakeCase(String source) => source?.replaceAll("_", " ");
+String uncapitalize(String source) {
+  if (source.isEmpty) {
+    return source;
+  } else {
+    return source[0].toLowerCase() + source.substring(1);
+  }
+}
 
-String properCase(String source) =>
-    source?.split(" ")?.map(capitalize)?.join(" ");
+String? splitSnakeCase(String? source) => source?.replaceAll("_", " ");
 
-String defaultIfEmpty(String primary, String ifBlank) =>
-    (primary?.trim()?.isNotEmpty == true) ? primary : ifBlank;
+String? properCase(String? source) =>
+    source?.split(" ").map(capitalize).join(" ");
 
-bool isNullOrBlank(String input) {
+String? defaultIfEmpty(String? primary, String ifBlank) =>
+    (primary?.trim().isNotEmpty == true) ? primary : ifBlank;
+
+bool isNullOrBlank(String? input) {
   return input == null || input.trim().isEmpty == true;
 }
 
-String firstNonEmpty(Iterable<String> strings) {
-  for (final string in strings) {
-    if (string != null && string.isNotEmpty) {
-      return string;
+String? firstNonEmpty(Iterable<String?>? strings) {
+  if (strings == null) {
+    return null;
+  } else {
+    for (final string in strings) {
+      if (string != null && string.isNotEmpty) {
+        return string;
+      }
     }
+    return null;
   }
-  return null;
 }
 
-R withString<R>(Iterable<String> strings, R Function(String string) handler) {
+R? withString<R>(Iterable<String?> strings, R Function(String string) handler) {
   for (final string in strings) {
     if (string != null && string.isNotEmpty) {
       return handler(string);
@@ -170,16 +182,16 @@ String uuid() {
   return _uuid.v4();
 }
 
-List<int> uuidb() {
-  var buf = List<int>(16); // -> []
-  _uuid.v4buffer(buf);
+List<int?> uuidb() {
+  var buf = List<int?>.filled(16, null); // -> []
+  _uuid.v4buffer(buf as List<int>);
   return buf;
 }
 
 const chars = "abcdefghijklmnopqrstuvwxyz";
 const numbers = "0123456789";
 
-String randomString(int length, {bool numbersOnly, Random rnd}) {
+String randomString(int length, {bool? numbersOnly, Random? rnd}) {
   rnd ??= Random(DateTime.now().millisecondsSinceEpoch);
   String result = "";
   final source = numbersOnly == true ? numbers : chars;
@@ -193,7 +205,7 @@ final _uuid = Uuid();
 
 final Pattern notLetterOrNumber = RegExp("[^A-Za-z0-9]+");
 
-String initials(from, {int max = 2}) {
+String? initials(from, {int max = 2}) {
   Iterable<String> _sanitize(source) {
     if (source == null) return [];
     if (source is Iterable) {
@@ -207,7 +219,7 @@ String initials(from, {int max = 2}) {
   }
 
   final initials = _sanitize(from)
-      .where((word) => word?.isNotEmpty == true)
+      .where((word) => word.isNotEmpty)
       .take(max)
       .map((word) => word[0].toUpperCase())
       .join("");
@@ -218,9 +230,9 @@ String initials(from, {int max = 2}) {
   }
 }
 
-String findInitials(List<dynamic> sources) => sources
+String? findInitials(List<dynamic>? sources) => sources
     ?.map(initials)
-    ?.firstWhere((initials) => initials?.isNotEmpty == true);
+    .firstWhere((initials) => initials?.isNotEmpty == true);
 
 class WordBuilder {
   final int lineLength;
@@ -228,16 +240,15 @@ class WordBuilder {
   String _currentLine = "";
   final List<String> _results = [];
 
-  WordBuilder({@required this.lineLength})
-      : assert(lineLength != null && lineLength > 0);
+  WordBuilder({required this.lineLength}) : assert(lineLength > 0);
 
   void addAll(
-      [String line1,
-      String line2,
-      String line3,
-      String line4,
-      String line5,
-      String line6]) {
+      [String? line1,
+      String? line2,
+      String? line3,
+      String? line4,
+      String? line5,
+      String? line6]) {
     if (line1?.isNotEmpty == true) {}
   }
 
@@ -246,7 +257,7 @@ class WordBuilder {
     return this;
   }
 
-  void addLine(String single, {String separator}) {
+  void addLine(String? single, {String? separator}) {
     if (single == null || single == "") return;
     if (_currentLine.length + single.length + (separator?.length ?? 0) >
         lineLength) {
@@ -258,7 +269,7 @@ class WordBuilder {
   }
 
   List<String> complete() {
-    if (_currentLine != null && _currentLine?.isNotEmpty == true) {
+    if (_currentLine.isNotEmpty) {
       _results.add(_currentLine);
     }
     return List.unmodifiable(_results);
@@ -267,7 +278,7 @@ class WordBuilder {
 
 final Pattern phoneNumberSplitCharacters = RegExp("[\\s\-\(\)\+]");
 
-Iterable<String> tokenizePhoneNumber(String phoneNumber) {
+Iterable<String> tokenizePhoneNumber(String? phoneNumber) {
   final split =
       Lists.compactEmpty(phoneNumber?.split(phoneNumberSplitCharacters));
   split.remove("1");
@@ -276,6 +287,5 @@ Iterable<String> tokenizePhoneNumber(String phoneNumber) {
 }
 
 String md5(Uint8List bytes) {
-  assert(bytes != null);
   return crypto.md5.convert(bytes).toString();
 }

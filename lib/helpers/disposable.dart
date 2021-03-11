@@ -8,15 +8,15 @@ abstract class HasDisposers {
 }
 
 mixin Disposable implements HasDisposers {
-  List<Disposer> _disposers;
+  List<Disposer>? _disposers;
 
-  void registerSubscription(StreamSubscription subscription) {
+  void registerSubscription(StreamSubscription? subscription) {
     if (subscription != null) {
       registerDisposer(subscription.cancel);
     }
   }
 
-  void registerStream(Stream stream) {
+  void registerStream(Stream? stream) {
     if (stream != null) {
       registerDisposer(stream.listen((_) {}, cancelOnError: false).cancel);
     }
@@ -24,20 +24,20 @@ mixin Disposable implements HasDisposers {
 
   @override
   void removeDisposer(FutureOr dispose()) {
-    _disposers.remove(dispose);
+    _disposers!.remove(dispose);
   }
 
   @override
   void registerDisposer(Disposer callback) {
     _disposers ??= <Disposer>[];
-    _disposers.add(callback);
+    _disposers!.add(callback);
   }
 
   Future disposeAll() async {
     final copy = [...?_disposers];
     _disposers?.clear();
     for (final disposer in copy) {
-      await disposer?.call();
+      await disposer.call();
     }
   }
 }
@@ -56,7 +56,7 @@ extension StateObserverStream<T> on StreamSubscription<T> {
 }
 
 extension StreamReader<T> on Stream<T> {
-  void auto(HasDisposers obs, {FutureOr onItem(T item)}) {
+  void auto(HasDisposers obs, {FutureOr onItem(T item)?}) {
     this.listen(onItem ?? _doNothing, cancelOnError: false).auto(obs);
   }
 }

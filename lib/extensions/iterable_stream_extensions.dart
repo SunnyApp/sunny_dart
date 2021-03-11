@@ -15,8 +15,8 @@ extension StreamExt<T> on Stream<T> {
 
   Stream<E> mapAsyncLimited<E>(FutureOr<E> convert(T event),
       {int maxPending = 1}) {
-    StreamController<E> output;
-    StreamSubscription<T> input;
+    late StreamController<E> output;
+    late StreamSubscription<T> input;
 
     /// Used to track when we've completed reading the source stream.
     var isClosing = false;
@@ -35,7 +35,7 @@ extension StreamExt<T> on Stream<T> {
     void onListen() {
       final add = output.add;
 
-      final addError = output.addError;
+      final void Function(Object, [StackTrace]) addError = output.addError;
       input = this.listen(
           (T event) {
             FutureOr<E> newValue;
@@ -97,7 +97,7 @@ extension StreamExt<T> on Stream<T> {
 }
 
 extension StreamIterableExtension<X> on Stream<Iterable<X>> {
-  Stream<Iterable<X>> filterItems(bool predicate(X input)) {
+  Stream<Iterable<X>> filterItems(bool predicate(X input)?) {
     if (predicate == null) return this;
     return this.map((items) => items.where(predicate));
   }
@@ -121,9 +121,10 @@ extension FutureIterableStreamExtension<V> on Stream<Iterable<Future<V>>> {
 }
 
 extension StreamToVStreamExtensions<X> on Stream<X> {
-  ValueStream<X> toVStream([X initial]) => ValueStream.of(initial, this);
+  ValueStream<X> toVStream([X? initial]) => ValueStream.of(initial, this);
 
-  SyncStream<X> toSyncStream([X initial, Consumer<X> onChange, String name]) =>
+  SyncStream<X> toSyncStream(
+          [X? initial, Consumer<X>? onChange, String? name]) =>
       SyncStream.fromStream(this, initial, onChange, name);
 }
 

@@ -4,7 +4,7 @@ import 'dart:math';
 
 import 'package:chunked_stream/chunked_stream.dart';
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:inflection2/inflection2.dart' as inflection;
+import 'package:inflection3/inflection3.dart' as inflection;
 import 'package:intl/intl.dart';
 import 'package:logging/logging.dart';
 import 'package:recase/recase.dart';
@@ -24,7 +24,7 @@ extension StringListExtension on List<String> {
   }
 }
 
-extension ObjectAsListExtension on Object {
+extension ObjectAsListExtension on Object? {
   List asIterable() {
     final self = this;
     if (self is Iterable) {
@@ -41,7 +41,7 @@ extension ObjectToListExtension<T> on T {
     return [if (this != null) this];
   }
 
-  int toInt() {
+  int? toInt() {
     final self = this;
     if (self == null) return null;
     if (self is int) return self;
@@ -52,7 +52,7 @@ extension ObjectToListExtension<T> on T {
 }
 
 extension ObjectExtension on dynamic {
-  int toInteger() {
+  int? toInteger() {
     final self = this;
     if (self == null) return 0;
     if (self is int) return self;
@@ -63,8 +63,8 @@ extension ObjectExtension on dynamic {
   }
 }
 
-extension EnumValueExtensions on Object {
-  String get enumValue {
+extension EnumValueExtensions on Object? {
+  String? get enumValue {
     if (this == null) return null;
     return "$this".extension;
   }
@@ -92,45 +92,47 @@ extension IntList on List<int> {
   }
 }
 
-extension AnyExtensions<T> on T {
-  R let<R>(R block(T self)) {
+extension AnyExtensions<T> on T? {
+  R? let<R>(R block(T self)) {
     if (this == null) {
       return null;
     } else {
-      return block(this);
+      return block(this!);
     }
   }
 
-  T also<R>(R block(T self)) {
+  T? also<R>(R block(T self)) {
     if (this == null) {
       return null;
     } else {
-      block(this);
+      block(this!);
       return this;
     }
   }
 }
 
 extension AnyFutureExtensions<T> on Future<T> {
-  Future<R> let<R>(R block(T self)) async {
-    if (this == null) {
-      return null;
-    } else {
-      return block(await this);
-    }
-  }
-
-  Future<T> maybeTimeout(Duration duration, FutureOr<T> onTimeout()) {
+  Future<T> maybeTimeout(Duration? duration, FutureOr<T> onTimeout()) {
     if (duration == null) return this;
     if (duration.inMicroseconds <= 0) return this;
     return this.timeout(duration, onTimeout: onTimeout);
   }
+}
 
-  Future<T> also<R>(R block(T self)) async {
+extension AnyFutureNullableExtensions<T> on Future<T>? {
+  Future<R> let<R>(R block(T self)) async {
     if (this == null) {
-      return null;
+      return Future.value(null);
     } else {
-      block(await this);
+      return block(await this!);
+    }
+  }
+
+  Future<T?> also<R>(R block(T self)) async {
+    if (this == null) {
+      return Future.value(null);
+    } else {
+      block(await this!);
       return this;
     }
   }
@@ -142,7 +144,7 @@ extension TypeExtensions on Type {
   String get name => "$this"
       .trimAround("_")
       .replaceAllMapped(
-          typeParameters, (match) => "[${match.group(1).uncapitalize()}]")
+          typeParameters, (match) => "[${match.group(1)!.uncapitalize()}]")
       .uncapitalize();
 
   String get simpleName => simpleNameOfType(this);
@@ -160,17 +162,6 @@ extension DoubleExt on double {
 const digits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
 extension NumExt on num {
-  bool get isIntegral {
-    return this is int || this?.roundToDouble() == this;
-  }
-
-  bool get isZero => this == 0.0;
-
-  bool get isNotZero {
-    if (this == null) return false;
-    return this != 0.0;
-  }
-
   void repeat(void forEach()) {
     assert(this > -1);
     for (int i = 0; i < this; i++) {
@@ -178,15 +169,8 @@ extension NumExt on num {
     }
   }
 
-  String formatNumber({int fixed = 3, NumberFormat using}) {
-    if (this == null) return null;
-    if (using != null) return using.format(this);
-    return isIntegral ? "${toInt()}" : toStringAsFixed(fixed);
-  }
-
   int toIntSafe() {
-    final i =
-        this ?? nullPointer("Null receiver.  Attempting to call toIntSafe");
+    final i = this;
     if (i is int) {
       return i;
     } else if (i.isIntegral) {
@@ -194,6 +178,10 @@ extension NumExt on num {
     } else {
       throw "Number $i could not be safely truncated to an int";
     }
+  }
+
+  double between(num low, num upper) {
+    return min(upper.toDouble(), max(low.toDouble(), this.toDouble()));
   }
 
   double normalize(double end, [double start = 0]) {
@@ -210,14 +198,39 @@ extension NumExt on num {
     }
   }
 
+  String formatBytes(
+      {String formatBytes(num v, int power) =
+          NumNullableExt._defaultFormatBytes}) {
+    var bytes = this;
+    if (bytes <= 0) return formatBytes(0, 0);
+    var i = (log(bytes) / log(1024)).floor();
+    var b = ((bytes / pow(1024, i)));
+    return formatBytes(b, i);
+  }
+}
+
+extension NumNullableExt on num? {
+  bool get isIntegral {
+    return this is int || this?.roundToDouble() == this;
+  }
+
   n atLeast<n extends num>(n atLeast) {
     if (this == null) return atLeast;
-    if (this < atLeast) return atLeast;
+    if (this! < atLeast) return atLeast;
     return this as n;
   }
 
-  double between(num low, num upper) {
-    return min(upper.toDouble(), max(low.toDouble(), this.toDouble()));
+  bool get isZero => this == 0.0;
+
+  bool get isNotZero {
+    if (this == null) return false;
+    return this != 0.0;
+  }
+
+  String? formatNumber({int fixed = 3, NumberFormat? using}) {
+    if (this == null) return null;
+    if (using != null) return using.format(this);
+    return isIntegral ? "${toInt()}" : this!.toStringAsFixed(fixed);
   }
 
   static const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
@@ -226,28 +239,18 @@ extension NumExt on num {
     return "${v.formatCompact()} ${suffixes[power]}";
   }
 
-  String formatBytes(
-      {String formatBytes(num v, int power) = NumExt._defaultFormatBytes}) {
-    assert(formatBytes != null);
-    var bytes = this;
-    if (bytes <= 0) return formatBytes(0, 0);
-    var i = (log(bytes) / log(1024)).floor();
-    var b = ((bytes / pow(1024, i)));
-    return formatBytes(b, i);
-  }
-
   String formatCurrency() => currencyFormat.format(this);
 
   String formatCompact() => compactFormat.format(this);
 
-  double times(num other) {
+  double? times(num? other) {
     if (this == null) return null;
-    if (other == null) return this.toDouble();
-    return (this * other).toDouble();
+    if (other == null) return this!.toDouble();
+    return (this! * other).toDouble();
   }
 
   bool get isGreaterThan0 {
-    return this != null && this > 0;
+    return this != null && this! > 0;
   }
 }
 
@@ -275,133 +278,6 @@ final nameSeparator = RegExp('[@\.\; ]');
 final isLetters = RegExp(r"^[A-Za-z]*$");
 
 extension StringExtensions on String {
-  String get firstWord {
-    if (this == null) return null;
-    return this.split(nameSeparator).firstOrNull();
-  }
-
-  String charAt(int c) {
-    if (this == null) return null;
-    if (this.length > c) return this[c];
-    return null;
-  }
-
-  String toPathName() {
-    if (this == null) return null;
-    if (!this.startsWith("/")) {
-      return "/$this";
-    } else {
-      return this;
-    }
-  }
-
-  List<String> toStringList() {
-    if (this.isNotNullOrBlank) {
-      return [this];
-    } else {
-      return const [];
-    }
-  }
-
-  JsonPath toJsonPath() {
-    return JsonPath.of(this.toPathName());
-  }
-
-  String ifThen(String ifString, String thenString) {
-    if (this == null || this == ifString) return thenString;
-    return this;
-  }
-
-  String plus(String after) {
-    if (this.isNullOrBlank) return '';
-    return "${this}$after";
-  }
-
-  Uri toUri() => this == null ? null : Uri.parse(this);
-
-  String nullIfBlank() {
-    if (isNullOrBlank) return null;
-    return this;
-  }
-
-  String join(String other, [String separator = " "]) {
-    if (this == null && other == null) return null;
-    if (this == null || other == null) return this ?? other;
-    return "${this}$separator$other";
-  }
-
-  String pluralize([int count = 2]) {
-    return pluralizeIf(count != 1);
-  }
-
-  String toTitle([String def = ""]) {
-    if (this == null) return def;
-    if (_titles.contains(this)) return this;
-    return tokenize(splitAll: true).map((_) => _.capitalize()).join(" ");
-  }
-
-  String article() {
-    if (this.isNullOrBlank) return "";
-    return this.first.isVowel ? "an $this" : "a $this";
-  }
-
-  bool get isVowel {
-    switch (this) {
-      case "a":
-      case "e":
-      case "i":
-      case "o":
-      case "u":
-        return true;
-      default:
-        return false;
-    }
-  }
-
-  List<String> get words {
-    if (this == null) return const [];
-    return [
-      for (final word in this.split(wordSeparator))
-        if (word.trim().isNotNullOrBlank) word,
-    ];
-  }
-
-  /// Whether the string contains only letters
-  bool get isLettersOnly {
-    if (this.isNullOrBlank) return false;
-    return isLetters.hasMatch(this);
-  }
-
-  bool get isNumeric => num.tryParse(this) != null;
-
-  bool get isNullOrEmpty => this?.isNotEmpty != true;
-
-  bool get isNotNullOrEmpty => !isNullOrEmpty;
-
-  bool get isNullOrBlank => this == null || this.trim().isEmpty == true;
-
-  bool get isNotNullOrBlank => !isNullOrBlank;
-
-  String repeat(int count) {
-    return buildString((str) {
-      for (var i = 0; i < count; i++) {
-        str += this;
-      }
-    });
-  }
-
-  String orEmpty() {
-    if (this == null) return "";
-    return this;
-  }
-
-  String pluralizeIf(bool condition) {
-    if (_pluralStopWords.any((s) => this?.toLowerCase()?.endsWith(s) == true)) {
-      return this;
-    }
-    return condition ? inflection.pluralize(this) : this;
-  }
-
   String truncate(int length) {
     if (this.length <= length) {
       return this;
@@ -410,9 +286,33 @@ extension StringExtensions on String {
     }
   }
 
-  String get first {
-    if (this?.isNotEmpty == true) return this[0];
-    return null;
+  String pluralizeIf(bool condition) {
+    if (_pluralStopWords.any((s) => this.toLowerCase().endsWith(s) == true)) {
+      return this;
+    }
+    return condition ? inflection.pluralize(this) : this;
+  }
+
+  String pluralize([int count = 2]) {
+    return pluralizeIf(count != 1);
+  }
+
+  String uncapitalize() {
+    final source = this;
+    if (source.isEmpty) {
+      return source;
+    } else {
+      return source[0].toLowerCase() + source.substring(1);
+    }
+  }
+
+  String capitalize() {
+    final source = this;
+    if (source.isEmpty) {
+      return source;
+    } else {
+      return source[0].toUpperCase() + source.substring(1);
+    }
   }
 
   String trimAround(dynamic characters,
@@ -426,7 +326,7 @@ extension StringExtensions on String {
     }
 
     final chars = characters is List<String> ? characters : ["$characters"];
-    chars?.forEach((c) {
+    chars.forEach((c) {
       if (trimEnd && manipulated.endsWith(c)) {
         manipulated = manipulated.substring(0, manipulated.length - c.length);
       }
@@ -447,65 +347,174 @@ extension StringExtensions on String {
     return removeAll(newLinesPattern);
   }
 
-  String ifBlank(String then) {
-    if (this.isNullOrBlank) return then;
-    return this;
-  }
-
-  int toInt() => int.parse(this);
-
-  int toIntOrNull() => int.tryParse(this);
-
-  double toDouble() => double.parse(this);
-
-  double toDoubleOrNull() => double.tryParse(this);
-
   String toSnakeCase() => ReCase(this).snakeCase.toLowerCase();
 
   String toCamelCase() => ReCase(this).camelCase.uncapitalize();
 
   String toTitleCase() {
     if (_titles.contains(this)) return this;
-    if (this == null) return null;
     return ReCase(this).titleCase;
   }
 
   ReCase get recase => ReCase(this);
 
   String removeAll(Pattern pattern) => this.replaceAll(pattern, "");
+}
 
-  String uncapitalize() {
-    final source = this;
-    if (source == null || source.isEmpty) {
-      return source;
+extension StringNullableExtensions on String? {
+  String? get firstWord {
+    if (this == null) return null;
+    return this == null ? null : this!.split(nameSeparator).firstOrNull();
+  }
+
+  String? charAt(int c) {
+    if (this == null) return null;
+    if (this!.length > c) return this![c];
+    return null;
+  }
+
+  String? toPathName() {
+    if (this == null) return null;
+    if (!this!.startsWith("/")) {
+      return "/$this";
     } else {
-      return source[0].toLowerCase() + source.substring(1);
+      return this;
     }
   }
 
-  String capitalize() {
-    final source = this;
-    if (source == null || source.isEmpty) {
-      return source;
+  List<String> toStringList() {
+    if (this.isNotNullOrBlank) {
+      return [this!];
     } else {
-      return source[0].toUpperCase() + source.substring(1);
+      return const [];
     }
   }
 
-  List<String> dotSplit() => this.split("\.");
-
-  List<String> tokenize({bool splitAll = false, Pattern splitOn}) {
-    return tokenizeString(this, splitAll: splitAll, splitOn: splitOn);
+  JsonPath toJsonPath() {
+    return JsonPath.of(this.toPathName());
   }
 
-  String get extension {
+  String ifThen(String ifString, String thenString) {
+    if (this == null || this == ifString) return thenString;
+    return this!;
+  }
+
+  String plus(String after) {
+    if (this.isNullOrBlank) return '';
+    return "${this}$after";
+  }
+
+  Uri? toUri() => this == null ? null : Uri.parse(this!);
+
+  String? nullIfBlank() {
+    if (isNullOrBlank) return null;
+    return this;
+  }
+
+  String? join(String? other, [String separator = " "]) {
+    if (this == null && other == null) return null;
+    if (this == null || other == null) return this ?? other;
+    return "${this}$separator$other";
+  }
+
+  String? toTitleCase() {
+    if (_titles.contains(this)) return this;
+    if (this == null) return null;
+    return ReCase(this!).titleCase;
+  }
+
+  String toTitle([String def = ""]) {
+    if (this == null) return def;
+    if (_titles.contains(this)) return this!;
+    return tokenize(splitAll: true).map((_) => _.capitalize()).join(" ");
+  }
+
+  String article() {
+    if (this.isNullOrBlank) return "";
+    return this.first!.isVowel ? "an $this" : "a $this";
+  }
+
+  bool get isVowel {
+    switch (this) {
+      case "a":
+      case "e":
+      case "i":
+      case "o":
+      case "u":
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  List<String> get words {
+    if (this == null) return const [];
+    return [
+      for (final word in this!.split(wordSeparator))
+        if (word.trim().isNotNullOrBlank) word,
+    ];
+  }
+
+  /// Whether the string contains only letters
+  bool get isLettersOnly {
+    if (this.isNullOrBlank) return false;
+    return isLetters.hasMatch(this!);
+  }
+
+  bool get isNumeric => this != null && (num.tryParse(this!) != null);
+
+  bool get isNullOrEmpty => this?.isNotEmpty != true;
+
+  bool get isNotNullOrEmpty => !isNullOrEmpty;
+
+  bool get isNullOrBlank => this == null || this!.trim().isEmpty == true;
+
+  bool get isNotNullOrBlank => !isNullOrBlank;
+
+  String repeat(int count) {
+    return buildString((str) {
+      for (var i = 0; i < count; i++) {
+        str += this;
+      }
+    });
+  }
+
+  String orEmpty() {
+    return this ?? "";
+  }
+
+  String? get first {
+    if (this?.isNotEmpty == true) return this![0];
+    return null;
+  }
+
+  String ifBlank(String then) {
+    if (this.isNullOrBlank) return then;
+    return this!;
+  }
+
+  int toInt() => int.parse(this!);
+
+  int? toIntOrNull() => this == null ? null : int.tryParse(this!);
+
+  double toDouble() => double.parse(this!);
+
+  double? toDoubleOrNull() => this == null ? null : double.tryParse(this!);
+
+  List<String> dotSplit() => this?.split("\.") ?? const [];
+
+  List<String> tokenize({bool splitAll = false, Pattern? splitOn}) {
+    return tokenizeString(this ?? '', splitAll: splitAll, splitOn: splitOn);
+  }
+
+  String? get extension {
     if (this == null) return null;
     return "$this".replaceAll(upToLastDot, '');
   }
 }
 
-List<String> tokenizeString(String input,
-    {bool splitAll = false, Pattern splitOn}) {
+List<String> tokenizeString(String? input,
+    {bool splitAll = false, Pattern? splitOn}) {
   if (input == null) return [];
   splitOn ??=
       (splitAll == true) ? aggresiveTokenizerPattern : spaceTokenizerPattern;
@@ -534,22 +543,22 @@ extension IterationPositionExtensions on IterationPosition {
       this == IterationPosition.first || this == IterationPosition.only;
 }
 
-extension IterableOfIntExtensions on Iterable<int> {
+extension IterableOfIntExtensions on Iterable<int>? {
   int sum() {
     if (this == null) return 0;
     var i = 0;
-    for (final x in this) {
+    for (final x in this!) {
       i += x;
     }
     return i;
   }
 }
 
-extension IterableOfDoubleExtensions on Iterable<double> {
+extension IterableOfDoubleExtensions on Iterable<double>? {
   double sum() {
     if (this == null) return 0;
     var i = 0.0;
-    for (final x in this) {
+    for (final x in this!) {
       i += x;
     }
     return i;
@@ -557,20 +566,20 @@ extension IterableOfDoubleExtensions on Iterable<double> {
 }
 
 extension ComparableIterableExtension<T extends Comparable> on Iterable<T> {
-  T max([T ifNull]) {
-    T _max;
+  T? max([T? ifNull]) {
+    T? _max;
     for (final t in this.orEmpty()) {
-      if (_max == null || t.compareTo(_max) > 0) {
+      if (_max == null || t!.compareTo(_max) > 0) {
         _max = t;
       }
     }
     return _max ?? ifNull;
   }
 
-  T min([T ifNull]) {
-    T _min;
+  T? min([T? ifNull]) {
+    T? _min;
     for (final t in this.orEmpty()) {
-      if (_min == null || t.compareTo(_min) < 0) {
+      if (_min == null || t!.compareTo(_min) < 0) {
         _min = t;
       }
     }
@@ -579,24 +588,24 @@ extension ComparableIterableExtension<T extends Comparable> on Iterable<T> {
 
   List<T> sorted() {
     final buffer = [...this];
-    buffer.sort((T a, T b) => a?.compareTo(b));
+    buffer.sort((T a, T b) => a.compareTo(b));
     return buffer;
   }
 }
 
-extension SetExtension<T> on Set<T> {
-  bool containsAny(Iterable<T> toCompare) {
+extension SetNullableExtension<T> on Set<T>? {
+  bool containsAny(Iterable<T>? toCompare) {
     return toCompare?.any((item) {
-          return this.contains(item);
+          return this?.contains(item) == true;
         }) ??
         false;
   }
 }
 
-extension SunnyIterableExtensionExt<T> on Iterable<T> {
+extension SunnyIterableExtensionExt<T> on Iterable<T?> {
   /// No way to override the + operator for an iterable, so I use a downcast to iterable
-  Iterable<T> operator +(item) {
-    final self = this as List<T>;
+  Iterable<T?> operator +(item) {
+    final self = this as List<T?>;
 
     if (item is List<T>) {
       self.addAll(item);
@@ -609,56 +618,108 @@ extension SunnyIterableExtensionExt<T> on Iterable<T> {
     }
     return this;
   }
+}
 
+extension SunnyIterableSafeExtensionExt<T> on Iterable<T> {
   Stream<List<T>> chunkedStream(int chunkSize) {
-    return asChunkedStream(chunkSize, Stream.fromIterable(this ?? <T>[]));
+    return asChunkedStream(chunkSize, Stream.fromIterable(this));
   }
 
-  T random() {
-    if (this == null || this.isEmpty) return null;
+  List<T> freeze() {
+    return List.unmodifiable(this).whereType<T>().toList();
+  }
+
+  T? random() {
+    if (this.isEmpty) return null;
     final randomIdx = _random.nextInt(this.length);
     return this.toList()[randomIdx];
   }
 
-  double sumBy(double toDouble(T t)) {
-    if (this == null) return 0.0;
+  double sumBy(double toDouble(T? t)) {
     return this.map(toDouble).sum();
   }
 
-  int sumByInt(int toDouble(T t)) {
-    if (this == null) return 0;
+  int sumByInt(int toDouble(T? t)) {
     return this.map(toDouble).sum();
-  }
-
-  // ignore: use_to_and_as_if_applicable
-  List<T> freeze() {
-    return List.unmodifiable(this);
   }
 
   List<R> mapIndexed<R>(R mapper(T item, int index)) {
     int i = 0;
-    return [...this.map((T item) => mapper(item, i++))];
+    return [...this.map((item) => mapper(item, i++))];
   }
 
   List<R> expandIndexed<R>(Iterable<R> mapper(T item, int index)) {
     int i = 0;
-    return [...this.expand((T item) => mapper(item, i++))];
+    return [...this.expand((item) => mapper(item, i++))];
   }
 
-  T maxBy<R extends Comparable<R>>(R by(T item), [T ifNull]) {
-    T _max;
-    for (final T t in (this ?? const [])) {
-      if (_max == null || (by(t)?.compareTo(by(_max)) ?? 0) > 0) {
+  T? maxBy<R extends Comparable<R>>(R by(T? item), [T? ifNull]) {
+    T? _max;
+    for (final t in this) {
+      if (_max == null || (by(t).compareTo(by(_max))) > 0) {
+        _max = t;
+      }
+    }
+    return _max ?? ifNull;
+  }
+}
+
+extension SunnyIterableNullableExtensionExt<T> on Iterable<T?>? {
+  Stream<List<T?>> chunkedStream(int chunkSize) {
+    return asChunkedStream(chunkSize, Stream.fromIterable(this ?? <T>[]));
+  }
+
+  List<T> whereNotNull() {
+    return this?.whereType<T>().toList() ?? [];
+  }
+
+  // ignore: use_to_and_as_if_applicable
+  List<T> freeze() {
+    return this == null
+        ? const []
+        : List.unmodifiable(this!).whereType<T>().toList();
+  }
+
+  T? random() {
+    if (this == null || this!.isEmpty) return null;
+    final randomIdx = _random.nextInt(this!.length);
+    return this!.toList()[randomIdx];
+  }
+
+  double sumBy(double toDouble(T? t)) {
+    if (this == null) return 0.0;
+    return this!.map(toDouble).sum();
+  }
+
+  int sumByInt(int toDouble(T? t)) {
+    if (this == null) return 0;
+    return this!.map(toDouble).sum();
+  }
+
+  List<R> mapIndexed<R>(R mapper(T? item, int index)) {
+    int i = 0;
+    return [...?this?.map((T? item) => mapper(item, i++))];
+  }
+
+  List<R> expandIndexed<R>(Iterable<R> mapper(T? item, int index)) {
+    int i = 0;
+    return [...?this?.expand((T? item) => mapper(item, i++))];
+  }
+
+  T? maxBy<R extends Comparable<R>>(R by(T? item), [T? ifNull]) {
+    T? _max;
+    for (final T? t in (this ?? const [])) {
+      if (_max == null || (by(t).compareTo(by(_max))) > 0) {
         _max = t;
       }
     }
     return _max ?? ifNull;
   }
 
-  T minBy<R extends Comparable<R>>(R by(T item), [T ifNull]) {
-    T _min;
-    for (final T t in (this ?? const [])) {
-      if (_min == null || (by(t)?.compareTo(by(_min)) ?? 0) < 0) {
+  T? minBy<R extends Comparable<R>>(R by(T? item), [T? ifNull]) {
+    T? _min;
+    for (final T? t in (this ?? const [])) {
+      if (_min == null || (by(t).compareTo(by(_min))) < 0) {
         _min = t;
       }
     }
@@ -666,27 +727,27 @@ extension SunnyIterableExtensionExt<T> on Iterable<T> {
   }
 
   @deprecated
-  List<T> sorted([Comparator<T> compare]) {
+  List<T?> sorted([Comparator<T?>? compare]) {
     return sortedBy(compare);
   }
 
-  List<T> sortedBy([Comparator<T> compare]) {
+  List<T?> sortedBy([Comparator<T?>? compare]) {
     final buffer = [...?this];
     buffer.sort(compare);
     return buffer;
   }
 
-  List<T> sortedUsing(Comparable getter(T item)) {
-    final List<T> ts = <T>[...?this];
+  List<T> sortedUsing(Comparable getter(T? item)) {
+    final List<T?> ts = <T?>[...?this];
     return ts.sortedBy((a, b) {
-      final f1 = getter(a as T);
-      final f2 = getter(b as T);
-      return f1?.compareTo(f2) ?? -1;
+      final f1 = getter(a as T?);
+      final f2 = getter(b as T?);
+      return f1.compareTo(f2);
     }).cast();
   }
 
-  Iterable<T> uniqueBy(dynamic uniqueProp(T item)) {
-    final mapping = <dynamic, T>{};
+  Iterable<T?> uniqueBy(dynamic uniqueProp(T? item)) {
+    final mapping = <dynamic, T?>{};
     for (final t in (this ?? <T>[])) {
       final unique = uniqueProp(t);
       mapping[unique] = t;
@@ -694,49 +755,50 @@ extension SunnyIterableExtensionExt<T> on Iterable<T> {
     return mapping.values;
   }
 
-  Stream<T> toStream() {
+  Stream<T?> toStream() {
     return Stream.fromIterable(this ?? []);
   }
 
-  Stream<T> forEachAsync(FutureOr onEach(T item)) async* {
+  Stream<T> forEachAsync(FutureOr onEach(T? item)) async* {
     for (final item in (this ?? <T>[])) {
       await onEach(item);
-      yield item;
+      yield item!;
     }
   }
 
-  void forEachIndexed<R>(R mapper(T item, int index)) {
+  void forEachIndexed<R>(R mapper(T? item, int index)) {
     if (this == null) return;
     int i = 0;
 
-    for (final x in this) {
+    for (final x in this!) {
       mapper(x, i++);
     }
   }
 
-  List<T> truncate([int length]) {
+  List<T?> truncate([int? length]) {
     if (this == null) return [];
-    if (length == null) return [...this];
-    return [...this.take(length)];
+    if (length == null) return [...this!];
+    return [...this!.take(length)];
   }
 
-  Iterable<T> orEmpty() => this ?? <T>[];
+  Iterable<T?> orEmpty() => this ?? <T>[];
 
-  List<T> orEmptyList() => this?.toList() ?? <T>[];
+  List<T?> orEmptyList() => this?.toList() ?? <T>[];
 
-  List<R> mapNotNull<R>(R mapper(T item)) {
+  List<R> mapNotNull<R>(R? mapper(T? item)) {
     return [
-      ...map(mapper).where(notNull()),
+      ...?this?.map(mapper).whereNotNull(),
     ];
   }
 
-  Iterable<R> mapPos<R>(R mapper(T item, IterationPosition pos)) {
+  Iterable<R> mapPos<R>(R mapper(T? item, IterationPosition pos)) {
     int i = 0;
 
-    final length = this.length;
+    if (this == null) return const [];
+    final length = this!.length;
     final isSingle = length == 1;
     return [
-      ...this.map((T item) {
+      ...this!.map((T? item) {
         final _i = i;
         i++;
         return mapper(
@@ -752,13 +814,14 @@ extension SunnyIterableExtensionExt<T> on Iterable<T> {
     ];
   }
 
-  String joinWithAnd([String formatter(T input)]) {
+  String joinWithAnd([String? formatter(T? input)?]) {
     formatter ??= (item) => item?.toString();
-    if (length < 3) {
-      return this.join(" and ");
+    if (this == null) return '';
+    if (this!.length < 3) {
+      return this!.join(" and ");
     } else {
       return mapPos((item, pos) {
-        String formatted = formatter(item);
+        String? formatted = formatter!(item);
         switch (pos) {
           case IterationPosition.first:
           case IterationPosition.only:
@@ -774,9 +837,10 @@ extension SunnyIterableExtensionExt<T> on Iterable<T> {
     }
   }
 
-  T lastOrNull() => this.lastWhere((_) => true, orElse: () => null);
+  T? lastOrNull() => this?.lastWhere((_) => true, orElse: () => null);
 
-  T firstOr([T ifEmpty]) => this.firstWhere((_) => true, orElse: () => ifEmpty);
+  T? firstOr([T? ifEmpty]) =>
+      this?.firstWhere((_) => true, orElse: () => ifEmpty);
 }
 
 extension SunnyIterableIterableExtension<T> on Iterable<Iterable<T>> {
@@ -785,27 +849,64 @@ extension SunnyIterableIterableExtension<T> on Iterable<Iterable<T>> {
   }
 }
 
+extension CoreListNullableExtension<T> on List<T>? {
+  bool removeLastWhere({bool removeIf(T item)?, T? removeItem}) {
+    assert(removeIf != null || removeItem != null);
+    assert(removeIf == null || removeItem == null);
+
+    if (this == null) return false;
+    int lastIndex = this!.lastIndexWhere((item) {
+      return removeItem != null ? removeItem == item : removeIf!(item);
+    });
+
+    if (lastIndex >= 0) {
+      this!.removeAt(lastIndex);
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  Iterable<ListIndex<T>> whereIndexed([bool filter(T item)?]) {
+    Iterable<ListIndex<T>> indexed = this != null
+        ? this!.indexed() as Iterable<ListIndex<T>>
+        : <ListIndex<T>>[];
+    if (filter != null) {
+      indexed = indexed.where((li) => filter(li.value));
+    }
+    return indexed;
+  }
+
+  T? lastOrNull({bool filter(T item)?}) {
+    Iterable<T>? list = this;
+    if (filter != null) {
+      list = list?.where(filter);
+    }
+    return list?.isNotEmpty == true ? list?.last : null;
+  }
+}
+
 extension CoreListExtension<T> on List<T> {
-  T get(int index) => Lists.getOrNull(this, index);
+  T? get(int index) => Lists.getOrNull(this, index);
 
   List<T> updateWhere(bool predicate(T check), dynamic mutate(T input)) {
-    return this.mapIndexed((item, idx) {
+    return this.mapIndexed((T item, idx) {
       if (!predicate(item)) {
         return item;
       } else {
         final res = mutate(item);
         return res is T ? res : item;
       }
-    });
+    } as T Function(T?, int));
   }
 
   Stream<List<T>> chunkedStream(int chunkSize) {
-    return asChunkedStream(chunkSize, Stream.fromIterable(this ?? <T>[]));
+    return asChunkedStream(chunkSize, Stream.fromIterable(this));
   }
 
   Iterable<T> get iterable => this as Iterable<T>;
 
-  T tryGet(int index) {
+  T? tryGet(int index) {
     if (length > index) {
       return this[index];
     } else {
@@ -822,7 +923,7 @@ extension CoreListExtension<T> on List<T> {
     return sublist(startIndex, _end);
   }
 
-  T tryRemove(int index) {
+  T? tryRemove(int index) {
     if (length > index) {
       return this.removeAt(index);
     } else {
@@ -832,57 +933,22 @@ extension CoreListExtension<T> on List<T> {
 
   int get lastIndex => length - 1;
 
-  bool removeLastWhere({bool removeIf(T item), T removeItem}) {
-    assert(removeIf != null || removeItem != null);
-    assert(removeIf == null || removeItem == null);
-
-    if (this == null) return false;
-    int lastIndex = this.lastIndexWhere((item) {
-      return removeItem != null ? removeItem == item : removeIf(item);
-    });
-
-    if (lastIndex >= 0) {
-      this.removeAt(lastIndex);
-      return true;
-    } else {
-      return false;
-    }
-  }
-
   List<T> compact() {
     return [
       ...where((item) => item != null),
     ];
   }
 
-  T firstOrNull([bool filter(T item)]) {
+  T? firstOrNull([bool filter(T item)?]) {
     Iterable<T> list = this;
     if (filter != null) {
-      list = list?.where(filter);
+      list = list.where(filter);
     }
-    return list?.isNotEmpty == true ? list.first : null;
+    return list.isNotEmpty == true ? list.first : null;
   }
 
   Iterable<ListIndex<T>> indexed() {
-    return this.mapIndexed((item, idx) => ListIndex<T>(idx, item));
-  }
-
-  Iterable<ListIndex<T>> whereIndexed([bool filter(T item)]) {
-    Iterable<ListIndex<T>> indexed = this != null
-        ? this.indexed() as Iterable<ListIndex<T>>
-        : <ListIndex<T>>[];
-    if (filter != null) {
-      indexed = indexed?.where((li) => filter(li.value));
-    }
-    return indexed;
-  }
-
-  T lastOrNull({bool filter(T item)}) {
-    Iterable<T> list = this;
-    if (filter != null) {
-      list = list?.where(filter);
-    }
-    return list?.isNotEmpty == true ? list.last : null;
+    return this.mapIndexed(((T item, int idx) => ListIndex<T>(idx, item)));
   }
 
   List<T> tail([int i = 1]) {
@@ -895,7 +961,7 @@ extension CoreListExtension<T> on List<T> {
     return list.sublist(0, min(num, list.length));
   }
 
-  T singleOrNull() {
+  T? singleOrNull() {
     if (length != 1) return null;
     return first;
   }
@@ -908,7 +974,7 @@ extension CoreListExtension<T> on List<T> {
   }
 
   @Deprecated("Use tryRemove")
-  T safeRemove(int index) {
+  T? safeRemove(int index) {
     return tryRemove(index);
   }
 
@@ -937,9 +1003,15 @@ class ListIndex<T> {
   const ListIndex(this.index, this.value);
 }
 
+extension BoolNullableExtension on bool? {
+  bool? negate() {
+    if (this == null) return null;
+    return !this!;
+  }
+}
+
 extension BoolExtension on bool {
   bool negate() {
-    if (this == null) return null;
     return !this;
   }
 }
@@ -949,7 +1021,6 @@ extension DateTimeExtensions on DateTime {
       DateTime(this.year, this.month, this.day, 0, 0, 0, 0, 0);
 
   Duration sinceNow() => -(this.difference(DateTime.now()));
-
   int get yearsAgo => daysAgo ~/ 365;
 
   int get monthsAgo => daysAgo ~/ 30.3;
@@ -957,14 +1028,6 @@ extension DateTimeExtensions on DateTime {
   int get daysAgo => max(sinceNow().inDays, 0);
 
   int get hoursAgo => max(sinceNow().inHours, 0);
-
-  /// Returns how much time has elapsed since this date.  If the date is null
-  /// or in the future, then [Duration.zero] will be returned
-  Duration get elapsed {
-    if (this == null) return Duration.zero;
-    if (this.isFuture) return Duration.zero;
-    return this.sinceNow();
-  }
 
   int get yearsApart => daysApart ~/ 365;
 
@@ -1002,17 +1065,37 @@ extension DateTimeExtensions on DateTime {
     return this.add(-duration);
   }
 
-  bool get isFuture => this != null && this.isAfter(DateTime.now());
-
-  bool get isPast => this != null && this.isBefore(DateTime.now());
-
   DateTime atStartOfDay() {
+    final t = this;
+    return DateTime(t.year, t.month, t.day);
+  }
+
+  DateTime atTime([int hour = 0, int minute = 0, int second = 0]) {
+    final t = this;
+    return DateTime(t.year, t.month, t.day, hour, minute, second);
+  }
+}
+
+extension DateTimeNullableExtensions on DateTime? {
+  /// Returns how much time has elapsed since this date.  If the date is null
+  /// or in the future, then [Duration.zero] will be returned
+  Duration get elapsed {
+    if (this == null) return Duration.zero;
+    if (this.isFuture) return Duration.zero;
+    return this!.sinceNow();
+  }
+
+  bool get isFuture => this != null && this!.isAfter(DateTime.now());
+
+  bool get isPast => this != null && this!.isBefore(DateTime.now());
+
+  DateTime? atStartOfDay() {
     final t = this;
     if (t == null) return null;
     return DateTime(t.year, t.month, t.day);
   }
 
-  DateTime atTime([int hour = 0, int minute = 0, int second = 0]) {
+  DateTime? atTime([int hour = 0, int minute = 0, int second = 0]) {
     final t = this;
     if (t == null) return null;
     return DateTime(t.year, t.month, t.day, hour, minute, second);
@@ -1026,13 +1109,19 @@ extension Multiples on int {
 }
 
 extension TimeSpanExtensions on TimeSpan {
+  TimeSpan abs() {
+    return this;
+  }
+}
+
+extension TimeSpanNullableExtensions on TimeSpan? {
   DateTime get fromNow {
     if (this == null) return DateTime.now();
     return DateTime.now().plusTimeSpan(this.abs());
   }
 
   TimeSpan abs() {
-    return this;
+    return this ?? TimeSpan.zero;
   }
 
   DateTime get ago {
@@ -1086,16 +1175,16 @@ extension DurationExt on Duration {
     return "${inMilliseconds}ms";
   }
 
-  Future<R> then<R>(R block()) async {
+  Future<R?> then<R>(R block()?) async {
     await Future.delayed(this);
     return block?.call();
   }
 
-  Future<R> delay<R>([R block()]) async {
+  Future<R?> delay<R>([R block()?]) async {
     return await then(block);
   }
 
-  Future<R> pause<R>([R block()]) async {
+  Future<R?> pause<R>([R block()?]) async {
     return await then(block);
   }
 
@@ -1133,12 +1222,12 @@ extension MapDebug on Map {
   }
 }
 
-extension MapListDebug<K, V> on Map<K, List<V>> {
+extension MapListDebug<K, V> on Map<K, List<V>>? {
   Map<K, int> counts() {
-    return {...?this.map((k, v) => MapEntry(k, v.length))};
+    return {...?this?.map((k, v) => MapEntry(k, v.length))};
   }
 
-  Map<K, List<V>> mergeWith(Map<K, List<V>> other) {
+  Map<K, List<V>> mergeWith(Map<K, List<V>?>? other) {
     final newMap = <K, List<V>>{...?this};
     other?.forEach((key, valueList) {
       newMap.putIfAbsent(key, () => <V>[]).addAll([...?valueList]);

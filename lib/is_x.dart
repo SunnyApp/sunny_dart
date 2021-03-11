@@ -1,5 +1,3 @@
-library is_x;
-
 import 'xfo/info_x.dart';
 import 'xfo/sunny_get.dart';
 export 'xfo/info_x.dart';

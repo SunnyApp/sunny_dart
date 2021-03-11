@@ -4,8 +4,8 @@ import '../xfo/sunny_get.dart';
 SunnyLocalization get sunnyLocalization => sunny.get();
 
 class SunnyLocalization {
-  TimeZone userTimeZone;
-  Location userLocation;
+  TimeZone? userTimeZone;
+  Location? userLocation;
 
   SunnyLocalization({this.userTimeZone, this.userLocation});
 

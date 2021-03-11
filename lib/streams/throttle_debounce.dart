@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:meta/meta.dart';
 
 abstract class Limiter {
   void limit([callback]);
@@ -8,20 +7,19 @@ abstract class Limiter {
 class Throttler implements Limiter {
   final Duration delay;
   final callback;
-  final List args;
+  final List? args;
   final bool noTrailing;
-  final Duration max;
+  final Duration? max;
 
   // ignore: always_require_non_null_named_parameters
   Throttler(
-      {@required this.delay,
+      {required this.delay,
       this.callback,
       this.max,
       this.args,
-      this.noTrailing = false})
-      : assert(delay != null);
+      this.noTrailing = false});
 
-  Timer timeoutId;
+  Timer? timeoutId;
 
   DateTime lastExec = DateTime.now();
 
@@ -42,12 +40,12 @@ class Throttler implements Limiter {
     }
 
     if (elapsed.compareTo(delay) >= 0 ||
-        (max != null && elapsed.compareTo(max) >= 0)) {
+        (max != null && elapsed.compareTo(max!) >= 0)) {
       exec();
     }
 
     ///cancel the timeout scheduled for trailing callback
-    if (timeoutId != null) timeoutId.cancel();
+    if (timeoutId != null) timeoutId!.cancel();
 
     if (noTrailing == false) {
       ///there should be a trailing callback, so schedule one
@@ -60,14 +58,14 @@ class Throttler implements Limiter {
 class Debouncer implements Limiter {
   final Duration delay;
   final callback;
-  final List args;
+  final List? args;
   final bool atBegin;
 
   // ignore: always_require_non_null_named_parameters
-  Debouncer({this.delay, this.callback, this.args, this.atBegin = false})
-      : assert(delay != null);
+  Debouncer(
+      {required this.delay, this.callback, this.args, this.atBegin = false});
 
-  Timer timer;
+  Timer? timer;
 
   @override
   void limit([callback]) => debounce(callback);

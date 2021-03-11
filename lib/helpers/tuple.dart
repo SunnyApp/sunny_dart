@@ -23,11 +23,11 @@ abstract class Tuple<A, B> extends Resolvable<Tuple<A, B>> {
     return _Tuple(first, second);
   }
 
-  factory Tuple.ofFuture(FutureOr<A> first, FutureOr<B> second) {
+  static Tuple<A, B> ofFuture<A, B>(FutureOr<A> first, FutureOr<B> second) {
     if (first is Future<A> || second is Future<B>) {
       return _FutureTuple(first, second);
     } else {
-      return _Tuple(first.resolve(), second.resolve());
+      return _Tuple(first.resolve()!, second.resolve()!);
     }
   }
 }
@@ -66,22 +66,22 @@ class _Tuple<A, B> implements Tuple<A, B> {
 }
 
 class _FutureTuple<A, B> implements Tuple<A, B> {
-  final FutureOr<A> _first;
+  final FutureOr<A>? _first;
   final FutureOr<B> _second;
 
-  A _firstResolved;
-  B _secondResolved;
+  A? _firstResolved;
+  B? _secondResolved;
 
-  final _completer = SafeCompleter<Tuple<A, B>>();
+  final SafeCompleter<Tuple<A, B>> _completer = SafeCompleter<Tuple<A, B>>();
 
   _FutureTuple(this._first, this._second) {
     _resolve();
   }
 
   @override
-  A get first => _firstResolved;
+  A get first => _firstResolved!;
   @override
-  B get second => _secondResolved;
+  B get second => _secondResolved!;
 
   @override
   Tuple<A, B> resolveOrNull() => this;

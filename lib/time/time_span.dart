@@ -33,7 +33,7 @@ class TimeSpan {
               .toDouble(),
         ], negated: negated);
 
-  factory TimeSpan.fromJson(value) {
+  static TimeSpan? fromJson(value) {
     if (value == null) return null;
     if (value is TimeSpan) return value;
     if (value is String) return TimeSpan.ofISOString(value);
@@ -47,14 +47,14 @@ class TimeSpan {
     return unit.toTimeSpan(value);
   }
 
-  TimeSpan.ofParts(List<num> parts, {this.negated = false})
+  TimeSpan.ofParts(List<num?> parts, {this.negated = false})
       : assert(parts.length == 7),
         _values = List.unmodifiable([
           for (var value in parts) value?.toDouble() ?? 0.0,
         ]);
 
   factory TimeSpan.ofISOString(String isoString) {
-    if (isoString?.isNotEmpty != true) return TimeSpan.zero;
+    if (isoString.isNotEmpty != true) return TimeSpan.zero;
     final match = durationRegex.firstMatch(isoString);
     if (match == null) return TimeSpan.zero;
     final parts = _newTimeSpanList();
@@ -123,7 +123,7 @@ class TimeSpan {
   String toString() => toIso8601String();
 
   String format({
-    Map<TimeSpanUnit, String> labels,
+    Map<TimeSpanUnit, String?>? labels,
     String separator = " ",
     bool pluralize = true,
     bool separateLabel = true,
@@ -131,7 +131,7 @@ class TimeSpan {
     labels ??= defaultLabels;
     return TimeSpanUnit.values.where((u) => u.get(this).isNotZero).map((unit) {
       final value = unit.get(this);
-      return "$value${separateLabel ? " " : ""}${labels[unit].pluralizeIf(value != 1 && pluralize)}";
+      return "$value${separateLabel ? " " : ""}${labels![unit]!.pluralizeIf(value != 1 && pluralize)}";
     }).join(" ");
   }
 
@@ -170,7 +170,7 @@ class TimeSpan {
 
   static final TimeSpan zero = TimeSpan(days: 0);
 
-  Duration toDuration([DateTime reference]) {
+  Duration toDuration([DateTime? reference]) {
     int days = (7 * this.weeks) + this.days;
     reference ??= DateTime.now();
 
@@ -199,13 +199,13 @@ class TimeSpan {
 
 typedef TimeSpanValue = num Function(TimeSpan span);
 
-num _secondsDecimal({num seconds, num millis, num micros}) {
+num _secondsDecimal({num? seconds, num? millis, num? micros}) {
   seconds ??= 0;
   millis ??= 0;
   micros ??= 0;
-  return (seconds ?? 0) +
-      ((millis ?? 0.0) / Duration.millisecondsPerSecond) +
-      ((micros ?? 0.0) / Duration.microsecondsPerSecond);
+  return (seconds) +
+      ((millis) / Duration.millisecondsPerSecond) +
+      ((micros) / Duration.microsecondsPerSecond);
 }
 
 enum TimeSpanUnit {
@@ -223,12 +223,12 @@ enum TimeSpanUnit {
 final dateUnits = [...TimeSpanUnit.values.where((u) => !u.isTimeField)];
 final timeUnits = [...TimeSpanUnit.values.where((u) => u.isTimeField)];
 
-TimeSpanUnit timeSpanUnitOf(input) {
+TimeSpanUnit? timeSpanUnitOf(input) {
   if (input is TimeSpanUnit) return input;
   final lc = "$input".toLowerCase().trimEnd("s");
   return TimeSpanUnit.values
       .where((unit) => unit.name == lc)
-      .firstWhere((element) => true, orElse: () => null);
+      .firstWhereOrNull((element) => true);
 }
 
 List<TimeSpanUnit> tryParseTimeSpanUnit(input) {
@@ -247,7 +247,7 @@ List<TimeSpanUnit> tryParseTimeSpanUnit(input) {
   return [
     ...TimeSpanUnit.values.where((unit) {
       return unit.index < 7 &&
-          (unit.label.startsWith(lc) || unit.shortLabel.startsWith(lc));
+          (unit.label.startsWith(lc) || unit.shortLabel!.startsWith(lc));
     })
   ];
 }
@@ -267,14 +267,14 @@ final knownSpanUnits = <String, TimeSpanUnit>{
 
 DateTime cloneDate(
   DateTime orig, {
-  int year,
-  int month,
-  int day,
-  int hour,
-  int minute,
-  int second,
-  int millisecond,
-  int microsecond,
+  int? year,
+  int? month,
+  int? day,
+  int? hour,
+  int? minute,
+  int? second,
+  int? millisecond,
+  int? microsecond,
 }) {
   return DateTime(
     year ?? orig.year,
@@ -290,10 +290,10 @@ DateTime cloneDate(
 
 final Map<TimeSpanUnit, String> defaultLabels =
     Map.fromEntries(TimeSpanUnit.values.map((v) => MapEntry(v, v.label)));
-final Map<TimeSpanUnit, String> shortLabels =
+final Map<TimeSpanUnit, String?> shortLabels =
     Map.fromEntries(TimeSpanUnit.values.map((v) => MapEntry(v, v.shortLabel)));
 
-extension TimeSpanUnitExt on TimeSpanUnit {
+extension TimeSpanUnitExt on TimeSpanUnit? {
   bool get isTimeField => index > 3;
 
   bool get isVirtual => index > 6;
@@ -307,21 +307,21 @@ extension TimeSpanUnitExt on TimeSpanUnit {
       case TimeSpanUnit.second:
         return span.seconds;
       default:
-        return span._values[this.index].toIntSafe();
+        return span._values[this!.index].toIntSafe();
     }
   }
 
   String append(TimeSpan self) {
     if (isVirtual) return "";
-    final value = self._values[this.index];
+    final value = self._values[this!.index];
     if (value.isZero || isVirtual) return "";
-    String numFormat = this == TimeSpanUnit.second
+    String? numFormat = this == TimeSpanUnit.second
         ? value.formatNumber(fixed: 6)
         : value.formatNumber();
     return "$numFormat$marker";
   }
 
-  String get marker => label.first.toUpperCase();
+  String get marker => label.first!.toUpperCase();
 
   String get name {
     final str = "$this";
@@ -330,7 +330,7 @@ extension TimeSpanUnitExt on TimeSpanUnit {
 
   String get label => name;
 
-  String get shortLabel {
+  String? get shortLabel {
     switch (this) {
       case TimeSpanUnit.millisecond:
         return "ms";
@@ -397,8 +397,8 @@ extension TimeSpanUnitExt on TimeSpanUnit {
   }
 }
 
-List<double> _newTimeSpanList([index, double value]) {
-  final list = List<double>(7);
+List<double?> _newTimeSpanList([index, double? value]) {
+  final list = List<double?>.filled(7, null);
   if (index != null && value != null) {
     final idx = index is TimeSpanUnit ? index.index : (index as int);
     list[idx] = value;

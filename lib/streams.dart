@@ -1,5 +1,3 @@
-library streams;
-
 export 'streams/async_value_stream.dart';
 export 'streams/stream_sort_sample.dart';
 export 'streams/throttle_debounce.dart';

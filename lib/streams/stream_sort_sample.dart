@@ -10,8 +10,8 @@ class _StreamSortSample<T extends Comparable<T>>
 
   @override
   Stream<List<T>> bind(Stream<T> stream) {
-    StreamSubscription<T> inbound;
-    StreamController<List<T>> output;
+    StreamSubscription<T>? inbound;
+    late StreamController<List<T>> output;
 
     List<T> sortedBuffer = [];
 
@@ -37,7 +37,8 @@ class _StreamSortSample<T extends Comparable<T>>
     void onListen() {
       inbound = stream.listen(
         onItem,
-        onError: (error, StackTrace stack) => output.addError(error, stack),
+        onError: (Object error, StackTrace stack) =>
+            output.addError(error, stack),
         onDone: onDone,
         cancelOnError: false,
       );

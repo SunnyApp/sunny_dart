@@ -7,7 +7,7 @@ mixin LoggingMixin {
 
   Logger get log => Logger(loggerName);
 
-  R logged<R>(R block(), {String debugLabel, bool propagate = false}) {
+  R? logged<R>(R block(), {String? debugLabel, bool propagate = false}) {
     try {
       final R r = block();
       if (r is Future) {
@@ -30,7 +30,7 @@ mixin LoggingMixin {
 /// Produces a logger using snake case naming conventions.  If [subscript] is provided, it will be
 /// appended to the name in square brackets, eg
 /// sunny_list[contact]
-Logger sunnyLogger(Type type, {Type subscript}) {
+Logger sunnyLogger(Type type, {Type? subscript}) {
   String typeName = loggerNameOf(type);
   if (subscript != null) typeName += "[${loggerNameOf(subscript)}]";
   return Logger(typeName);

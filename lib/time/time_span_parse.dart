@@ -3,7 +3,7 @@ import 'package:sunny_dart/time/time_span.dart';
 
 List<TimeSpan> parseTimeSpans(String query) {
   var q = query.orEmpty().toLowerCase();
-  Iterable<TimeSpan> results;
+  Iterable<TimeSpan>? results;
   if (q.isNumeric || q.contains(":")) {
     final parts = q
         .split(":")
@@ -40,7 +40,7 @@ List<TimeSpan> parseTimeSpans(String query) {
       final iterMatches = <TimeSpan>[];
       final knownUnits = knownSpans[iter.current];
       if (match != null) {
-        final amount = match.group(1).toDoubleOrNull();
+        final amount = match.group(1)!.toDoubleOrNull();
         if (amount != null) {
           final period = match.group(2);
           iterMatches.addAll(tryParseTimeSpanUnit(period).map((unit) {
