@@ -1,3 +1,6 @@
+## [0.8.0+8]
+ * Integration dartxx, etc
+
 ## [0.8.0+7]
  * Fixing compile errors
 
