@@ -7,6 +7,7 @@ import '../extensions/future_extensions.dart';
 import '../extensions/lang_extensions.dart';
 import '../extensions/map_extensions.dart';
 import '../helpers.dart';
+import '../helpers/resolvable.dart';
 import 'value_stream.dart';
 
 extension ValueStreamIterableMapEntryExtensions<K, V>
@@ -82,17 +83,17 @@ extension ValueStreamExtensions<T> on ValueStream<T> {
   }
 
   /// Combines another stream, passing unresolved Futures
-  ValueStream<R> combinedUnresolved<R, O>(ValueStream<O> other,
-      Resolvable<R> combiner(FutureOr<T?> self, FutureOr<O?> other)) {
-    final Resolvable<R> startCombined = combiner(this.get(), other.get());
-    Stream<R> startingStream = startCombined.isResolved
+  ValueStream<R?> combinedUnresolved<R, O>(ValueStream<O> other,
+      Resolvable<R?> combiner(FutureOr<T?> self, FutureOr<O?> other)) {
+    final Resolvable<R?> startCombined = combiner(this.get(), other.get());
+    final Stream<R?> startingStream = startCombined.isResolved
         ? Stream.empty()
         : startCombined.futureValue().asStream();
-    Stream<R> afterTxr = this.after.combineLatest(other.after, (T t, O o) {
-      final Resolvable<R> resolved = combiner(t, o);
+    final afterTxr = this.after.combineLatest(other.after, (T t, O o) {
+      final resolved = combiner(t, o);
       return resolved.resolveOrNull();
     });
-    return ValueStream<R>.of(
+    return ValueStream<R?>.of(
         startCombined.resolveOrNull(), startingStream.combine(afterTxr));
   }
 

@@ -2,6 +2,7 @@
 import 'dart:async';
 
 import 'package:stream_transform/stream_transform.dart';
+import 'package:dartxx/tuple.dart';
 
 import '../helpers.dart';
 import '../streams.dart';

@@ -1,4 +1,4 @@
-import 'package:sunny_dart/time/time_span.dart';
+import 'package:flexidate/flexidate.dart';
 
 DateTime? dateTimeOf(json) {
   if (json == null) return null;

@@ -4,25 +4,15 @@ import 'dart:math';
 
 import 'package:chunked_stream/chunked_stream.dart';
 import 'package:crypto/crypto.dart' as crypto;
-import 'package:inflection3/inflection3.dart' as inflection;
-import 'package:intl/intl.dart';
+import 'package:dartxx/dartxx.dart';
+import 'package:flexidate/flexidate.dart';
 import 'package:logging/logging.dart';
-import 'package:recase/recase.dart';
-import 'package:sunny_dart/json/json_path.dart';
-import 'package:sunny_dart/time/time_span.dart';
 
 import '../helpers.dart';
-import '../time.dart';
+
+export 'package:dartxx/dartxx.dart';
 
 final _random = Random();
-
-extension StringListExtension on List<String> {
-  List<String> whereNotBlank() {
-    return [
-      ...where((item) => item.isNotNullOrBlank == true),
-    ];
-  }
-}
 
 extension ObjectAsListExtension on Object? {
   List asIterable() {
@@ -57,11 +47,14 @@ extension ObjectExtension on dynamic {
     if (self == null) return 0;
     if (self is int) return self;
     if (self is num) return self.toInt();
-    if (self is String) return (self.ifBlank("0")).toInt();
+    if (self is String) return self.isBlank ? 0 : self.toInt();
     assert(false, "Can't convert to int");
     return null;
   }
 }
+
+final typeParameters = RegExp("<(.*)>");
+final newLinesPattern = RegExp("\\n");
 
 extension EnumValueExtensions on Object? {
   String? get enumValue {
@@ -78,9 +71,6 @@ extension EnumValueExtensions on Object? {
     }
   }
 }
-
-final typeParameters = RegExp("<(.*)>");
-final newLinesPattern = RegExp("\\n");
 
 extension IntList on List<int> {
   String sha256Hex() {
@@ -138,8 +128,6 @@ extension AnyFutureNullableExtensions<T> on Future<T>? {
   }
 }
 
-const _titles = {'dōTERRA'};
-
 extension TypeExtensions on Type {
   String get name => "$this"
       .trimAround("_")
@@ -161,102 +149,6 @@ extension DoubleExt on double {
 
 const digits = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
 
-extension NumExt on num {
-  void repeat(void forEach()) {
-    assert(this > -1);
-    for (int i = 0; i < this; i++) {
-      forEach();
-    }
-  }
-
-  int toIntSafe() {
-    final i = this;
-    if (i is int) {
-      return i;
-    } else if (i.isIntegral) {
-      return i.toInt();
-    } else {
-      throw "Number $i could not be safely truncated to an int";
-    }
-  }
-
-  double between(num low, num upper) {
-    return min(upper.toDouble(), max(low.toDouble(), this.toDouble()));
-  }
-
-  double normalize(double end, [double start = 0]) {
-    if (this <= start) return 0;
-    if (this >= end) return 1;
-    return (this - start) / (end - start);
-  }
-
-  double notZero([double alt = 0.00001]) {
-    if (this == 0) {
-      return alt;
-    } else {
-      return this.toDouble();
-    }
-  }
-
-  String formatBytes(
-      {String formatBytes(num v, int power) =
-          NumNullableExt._defaultFormatBytes}) {
-    var bytes = this;
-    if (bytes <= 0) return formatBytes(0, 0);
-    var i = (log(bytes) / log(1024)).floor();
-    var b = ((bytes / pow(1024, i)));
-    return formatBytes(b, i);
-  }
-}
-
-extension NumNullableExt on num? {
-  bool get isIntegral {
-    return this is int || this?.roundToDouble() == this;
-  }
-
-  n atLeast<n extends num>(n atLeast) {
-    if (this == null) return atLeast;
-    if (this! < atLeast) return atLeast;
-    return this as n;
-  }
-
-  bool get isZero => this == 0.0;
-
-  bool get isNotZero {
-    if (this == null) return false;
-    return this != 0.0;
-  }
-
-  String? formatNumber({int fixed = 3, NumberFormat? using}) {
-    if (this == null) return null;
-    if (using != null) return using.format(this);
-    return isIntegral ? "${toInt()}" : this!.toStringAsFixed(fixed);
-  }
-
-  static const suffixes = ["B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB"];
-
-  static String _defaultFormatBytes(num v, int power) {
-    return "${v.formatCompact()} ${suffixes[power]}";
-  }
-
-  String formatCurrency() => currencyFormat.format(this);
-
-  String formatCompact() => compactFormat.format(this);
-
-  double? times(num? other) {
-    if (this == null) return null;
-    if (other == null) return this!.toDouble();
-    return (this! * other).toDouble();
-  }
-
-  bool get isGreaterThan0 {
-    return this != null && this! > 0;
-  }
-}
-
-final currencyFormat = NumberFormat.simpleCurrency();
-final compactFormat = NumberFormat.compactLong();
-
 extension ModelMapExtensions on Map<String, dynamic> {
   Map<String, dynamic> orEmpty() => <String, dynamic>{};
 }
@@ -272,254 +164,9 @@ extension StringBufferExt on StringBuffer {
   }
 }
 
-const _pluralStopWords = {"info", "information"};
 final wordSeparator = RegExp('[\.\;\, ]');
 final nameSeparator = RegExp('[@\.\; ]');
 final isLetters = RegExp(r"^[A-Za-z]*$");
-
-extension StringExtensions on String {
-  String truncate(int length) {
-    if (this.length <= length) {
-      return this;
-    } else {
-      return this.substring(0, length);
-    }
-  }
-
-  String pluralizeIf(bool condition) {
-    if (_pluralStopWords.any((s) => this.toLowerCase().endsWith(s) == true)) {
-      return this;
-    }
-    return condition ? inflection.pluralize(this) : this;
-  }
-
-  String pluralize([int count = 2]) {
-    return pluralizeIf(count != 1);
-  }
-
-  String uncapitalize() {
-    final source = this;
-    if (source.isEmpty) {
-      return source;
-    } else {
-      return source[0].toLowerCase() + source.substring(1);
-    }
-  }
-
-  String capitalize() {
-    final source = this;
-    if (source.isEmpty) {
-      return source;
-    } else {
-      return source[0].toUpperCase() + source.substring(1);
-    }
-  }
-
-  String trimAround(dynamic characters,
-      {bool trimStart = true,
-      bool trimEnd = true,
-      bool trimWhitespace = true}) {
-    final target = this;
-    var manipulated = target;
-    if (trimWhitespace) {
-      manipulated = manipulated.trim();
-    }
-
-    final chars = characters is List<String> ? characters : ["$characters"];
-    chars.forEach((c) {
-      if (trimEnd && manipulated.endsWith(c)) {
-        manipulated = manipulated.substring(0, manipulated.length - c.length);
-      }
-      if (trimStart && manipulated.startsWith(c)) {
-        manipulated = manipulated.substring(1);
-      }
-    });
-    return manipulated;
-  }
-
-  String trimEnd(dynamic characters, {bool trimWhitespace = true}) =>
-      trimAround(characters, trimWhitespace: trimWhitespace, trimStart: false);
-
-  String trimStart(dynamic characters, {bool trimWhitespace = true}) =>
-      trimAround(characters, trimWhitespace: trimWhitespace, trimEnd: false);
-
-  String removeNewlines() {
-    return removeAll(newLinesPattern);
-  }
-
-  String toSnakeCase() => ReCase(this).snakeCase.toLowerCase();
-
-  String toCamelCase() => ReCase(this).camelCase.uncapitalize();
-
-  String toTitleCase() {
-    if (_titles.contains(this)) return this;
-    return ReCase(this).titleCase;
-  }
-
-  ReCase get recase => ReCase(this);
-
-  String removeAll(Pattern pattern) => this.replaceAll(pattern, "");
-}
-
-extension StringNullableExtensions on String? {
-  String? get firstWord {
-    if (this == null) return null;
-    return this == null ? null : this!.split(nameSeparator).firstOrNull();
-  }
-
-  String? charAt(int c) {
-    if (this == null) return null;
-    if (this!.length > c) return this![c];
-    return null;
-  }
-
-  String? toPathName() {
-    if (this == null) return null;
-    if (!this!.startsWith("/")) {
-      return "/$this";
-    } else {
-      return this;
-    }
-  }
-
-  List<String> toStringList() {
-    if (this.isNotNullOrBlank) {
-      return [this!];
-    } else {
-      return const [];
-    }
-  }
-
-  JsonPath toJsonPath() {
-    return JsonPath.of(this.toPathName());
-  }
-
-  String ifThen(String ifString, String thenString) {
-    if (this == null || this == ifString) return thenString;
-    return this!;
-  }
-
-  String plus(String after) {
-    if (this.isNullOrBlank) return '';
-    return "${this}$after";
-  }
-
-  Uri? toUri() => this == null ? null : Uri.parse(this!);
-
-  String? nullIfBlank() {
-    if (isNullOrBlank) return null;
-    return this;
-  }
-
-  String? join(String? other, [String separator = " "]) {
-    if (this == null && other == null) return null;
-    if (this == null || other == null) return this ?? other;
-    return "${this}$separator$other";
-  }
-
-  String? toTitleCase() {
-    if (_titles.contains(this)) return this;
-    if (this == null) return null;
-    return ReCase(this!).titleCase;
-  }
-
-  String toTitle([String def = ""]) {
-    if (this == null) return def;
-    if (_titles.contains(this)) return this!;
-    return tokenize(splitAll: true).map((_) => _.capitalize()).join(" ");
-  }
-
-  String article() {
-    if (this.isNullOrBlank) return "";
-    return this.first!.isVowel ? "an $this" : "a $this";
-  }
-
-  bool get isVowel {
-    switch (this) {
-      case "a":
-      case "e":
-      case "i":
-      case "o":
-      case "u":
-        return true;
-      default:
-        return false;
-    }
-  }
-
-  List<String> get words {
-    if (this == null) return const [];
-    return [
-      for (final word in this!.split(wordSeparator))
-        if (word.trim().isNotNullOrBlank) word,
-    ];
-  }
-
-  /// Whether the string contains only letters
-  bool get isLettersOnly {
-    if (this.isNullOrBlank) return false;
-    return isLetters.hasMatch(this!);
-  }
-
-  bool get isNumeric => this != null && (num.tryParse(this!) != null);
-
-  bool get isNullOrEmpty => this?.isNotEmpty != true;
-
-  bool get isNotNullOrEmpty => !isNullOrEmpty;
-
-  bool get isNullOrBlank => this == null || this!.trim().isEmpty == true;
-
-  bool get isNotNullOrBlank => !isNullOrBlank;
-
-  String repeat(int count) {
-    return buildString((str) {
-      for (var i = 0; i < count; i++) {
-        str += this;
-      }
-    });
-  }
-
-  String orEmpty() {
-    return this ?? "";
-  }
-
-  String? get first {
-    if (this?.isNotEmpty == true) return this![0];
-    return null;
-  }
-
-  String ifBlank(String then) {
-    if (this.isNullOrBlank) return then;
-    return this!;
-  }
-
-  int toInt() => int.parse(this!);
-
-  int? toIntOrNull() => this == null ? null : int.tryParse(this!);
-
-  double toDouble() => double.parse(this!);
-
-  double? toDoubleOrNull() => this == null ? null : double.tryParse(this!);
-
-  List<String> dotSplit() => this?.split("\.") ?? const [];
-
-  List<String> tokenize({bool splitAll = false, Pattern? splitOn}) {
-    return tokenizeString(this ?? '', splitAll: splitAll, splitOn: splitOn);
-  }
-
-  String? get extension {
-    if (this == null) return null;
-    return "$this".replaceAll(upToLastDot, '');
-  }
-}
-
-List<String> tokenizeString(String? input,
-    {bool splitAll = false, Pattern? splitOn}) {
-  if (input == null) return [];
-  splitOn ??=
-      (splitAll == true) ? aggresiveTokenizerPattern : spaceTokenizerPattern;
-  return input.toSnakeCase().split(splitOn).whereNotBlank();
-}
 
 final upToLastDot = RegExp('.*\\.');
 const aggresiveTokenizer = "(,|\\/|_|\\.|-|\\s)";
@@ -1016,78 +663,14 @@ extension BoolExtension on bool {
   }
 }
 
-extension DateTimeExtensions on DateTime {
-  DateTime withoutTime() =>
-      DateTime(this.year, this.month, this.day, 0, 0, 0, 0, 0);
-
-  Duration sinceNow() => -(this.difference(DateTime.now()));
-  int get yearsAgo => daysAgo ~/ 365;
-
-  int get monthsAgo => daysAgo ~/ 30.3;
-
-  int get daysAgo => max(sinceNow().inDays, 0);
-
-  int get hoursAgo => max(sinceNow().inHours, 0);
-
-  int get yearsApart => daysApart ~/ 365;
-
-  int get monthsApart => daysApart ~/ 30.3;
-
-  int get daysApart => sinceNow().inDays;
-
-  bool get hasTime =>
-      this.second != 0 ||
-      this.minute != 0 ||
-      this.hour != 0 ||
-      this.millisecond != 0;
-
-  DateTime plusTimeSpan(TimeSpan span) {
-    final duration = span.toDuration(this);
-    return this.add(duration);
-  }
-
-  bool isSameDay(final other) {
-    if (other is DateTime) {
-      return this.year == other.year &&
-          this.month == other.month &&
-          this.day == other.day;
-    } else if (other is DateComponents) {
-      return (other.year == null || this.year == other.year) &&
-          this.month == other.month &&
-          this.day == other.day;
-    }
-    assert(false, 'Shouldnt get here');
-    return false;
-  }
-
-  DateTime minusTimeSpan(TimeSpan span) {
-    final duration = span.toDuration(this);
-    return this.add(-duration);
-  }
-
-  DateTime atStartOfDay() {
-    final t = this;
-    return DateTime(t.year, t.month, t.day);
-  }
-
-  DateTime atTime([int hour = 0, int minute = 0, int second = 0]) {
-    final t = this;
-    return DateTime(t.year, t.month, t.day, hour, minute, second);
-  }
-}
-
 extension DateTimeNullableExtensions on DateTime? {
   /// Returns how much time has elapsed since this date.  If the date is null
   /// or in the future, then [Duration.zero] will be returned
   Duration get elapsed {
     if (this == null) return Duration.zero;
-    if (this.isFuture) return Duration.zero;
+    if (this!.isFuture) return Duration.zero;
     return this!.sinceNow();
   }
-
-  bool get isFuture => this != null && this!.isAfter(DateTime.now());
-
-  bool get isPast => this != null && this!.isBefore(DateTime.now());
 
   DateTime? atStartOfDay() {
     final t = this;
@@ -1117,7 +700,7 @@ extension TimeSpanExtensions on TimeSpan {
 extension TimeSpanNullableExtensions on TimeSpan? {
   DateTime get fromNow {
     if (this == null) return DateTime.now();
-    return DateTime.now().plusTimeSpan(this.abs());
+    return DateTime.now().plusTimeSpan(this!.abs());
   }
 
   TimeSpan abs() {
