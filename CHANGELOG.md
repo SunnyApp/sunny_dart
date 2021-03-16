@@ -1,3 +1,6 @@
+## [0.8.2+1]
+ * Updated to prerelease
+
 ## [0.8.0+8]
  * Integration dartxx, etc
 
