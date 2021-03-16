@@ -164,6 +164,13 @@ extension StringBufferExt on StringBuffer {
   }
 }
 
+extension StringTitleExt on String? {
+  String toTitle([String def = ""]) {
+    if (this == null) return def;
+    return tokenize(splitAll: true).map((_) => _.capitalize()).join(" ");
+  }
+}
+
 final wordSeparator = RegExp('[\.\;\, ]');
 final nameSeparator = RegExp('[@\.\; ]');
 final isLetters = RegExp(r"^[A-Za-z]*$");
