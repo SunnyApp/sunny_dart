@@ -63,7 +63,7 @@ packages:
       name: dartx
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.6.0"
+    version: "0.7.0"
   dartxx:
     dependency: "direct main"
     description:
@@ -91,7 +91,7 @@ packages:
       name: flexidate
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.4+5"
+    version: "0.4.5-nullsafety.1"
   flutter:
     dependency: transitive
     description: flutter
@@ -246,7 +246,7 @@ packages:
       name: time
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.5.0-nullsafety.1"
+    version: "2.0.0"
   timezone:
     dependency: "direct main"
     description:
