@@ -1,3 +1,6 @@
+## [0.8.2+2]
+ * Adding toTitle()
+
 ## [0.8.2+1]
  * Updated to prerelease
 
