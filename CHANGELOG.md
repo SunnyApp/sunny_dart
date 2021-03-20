@@ -1,3 +1,6 @@
+## [0.8.3+2]
+ * Removing info_x
+
 ## [0.8.3+1]
  * Migrating to dartxx
 
