@@ -71,7 +71,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T?> {
         _after = StreamController.broadcast() {
     /// Listen to requests stream but process requests in chunks
     _requests.stream.asyncMapBuffer((requests) async {
-      final latestRequest = (this._inflight = requests.max())!;
+      final latestRequest = (this._inflight = requests.max());
 
       /// Cancel any requests that aren't the latest
       await requests

@@ -12,8 +12,6 @@ import '../helpers.dart';
 
 export 'package:dartxx/dartxx.dart';
 
-final _random = Random();
-
 extension ObjectAsListExtension on Object? {
   List asIterable() {
     final self = this;
@@ -181,71 +179,6 @@ final aggresiveTokenizerPattern = RegExp(aggresiveTokenizer);
 
 const spaceTokenizer = "(\s)";
 final spaceTokenizerPattern = RegExp(spaceTokenizer);
-enum IterationPosition { only, first, middle, last }
-
-extension IterationPositionExtensions on IterationPosition {
-  bool get isLast =>
-      this == IterationPosition.last || this == IterationPosition.only;
-
-  bool get isNotLast =>
-      this != IterationPosition.last && this != IterationPosition.only;
-
-  bool get isNotFirst =>
-      this != IterationPosition.first && this != IterationPosition.only;
-
-  bool get isFirst =>
-      this == IterationPosition.first || this == IterationPosition.only;
-}
-
-extension IterableOfIntExtensions on Iterable<int>? {
-  int sum() {
-    if (this == null) return 0;
-    var i = 0;
-    for (final x in this!) {
-      i += x;
-    }
-    return i;
-  }
-}
-
-extension IterableOfDoubleExtensions on Iterable<double>? {
-  double sum() {
-    if (this == null) return 0;
-    var i = 0.0;
-    for (final x in this!) {
-      i += x;
-    }
-    return i;
-  }
-}
-
-extension ComparableIterableExtension<T extends Comparable> on Iterable<T> {
-  T? max([T? ifNull]) {
-    T? _max;
-    for (final t in this.orEmpty()) {
-      if (_max == null || t!.compareTo(_max) > 0) {
-        _max = t;
-      }
-    }
-    return _max ?? ifNull;
-  }
-
-  T? min([T? ifNull]) {
-    T? _min;
-    for (final t in this.orEmpty()) {
-      if (_min == null || t!.compareTo(_min) < 0) {
-        _min = t;
-      }
-    }
-    return _min ?? ifNull;
-  }
-
-  List<T> sorted() {
-    final buffer = [...this];
-    buffer.sort((T a, T b) => a.compareTo(b));
-    return buffer;
-  }
-}
 
 extension SetNullableExtension<T> on Set<T>? {
   bool containsAny(Iterable<T>? toCompare) {
@@ -274,234 +207,7 @@ extension SunnyIterableExtensionExt<T> on Iterable<T?> {
   }
 }
 
-extension SunnyIterableSafeExtensionExt<T> on Iterable<T> {
-  Stream<List<T>> chunkedStream(int chunkSize) {
-    return asChunkedStream(chunkSize, Stream.fromIterable(this));
-  }
-
-  List<T> freeze() {
-    return List.unmodifiable(this).whereType<T>().toList();
-  }
-
-  T? random() {
-    if (this.isEmpty) return null;
-    final randomIdx = _random.nextInt(this.length);
-    return this.toList()[randomIdx];
-  }
-
-  double sumBy(double toDouble(T? t)) {
-    return this.map(toDouble).sum();
-  }
-
-  int sumByInt(int toDouble(T? t)) {
-    return this.map(toDouble).sum();
-  }
-
-  List<R> mapIndexed<R>(R mapper(T item, int index)) {
-    int i = 0;
-    return [...this.map((item) => mapper(item, i++))];
-  }
-
-  List<R> expandIndexed<R>(Iterable<R> mapper(T item, int index)) {
-    int i = 0;
-    return [...this.expand((item) => mapper(item, i++))];
-  }
-
-  T? maxBy<R extends Comparable<R>>(R by(T? item), [T? ifNull]) {
-    T? _max;
-    for (final t in this) {
-      if (_max == null || (by(t).compareTo(by(_max))) > 0) {
-        _max = t;
-      }
-    }
-    return _max ?? ifNull;
-  }
-}
-
-extension SunnyIterableNullableExtensionExt<T> on Iterable<T?>? {
-  Stream<List<T?>> chunkedStream(int chunkSize) {
-    return asChunkedStream(chunkSize, Stream.fromIterable(this ?? <T>[]));
-  }
-
-  List<T> whereNotNull() {
-    return this?.whereType<T>().toList() ?? [];
-  }
-
-  // ignore: use_to_and_as_if_applicable
-  List<T> freeze() {
-    return this == null
-        ? const []
-        : List.unmodifiable(this!).whereType<T>().toList();
-  }
-
-  T? random() {
-    if (this == null || this!.isEmpty) return null;
-    final randomIdx = _random.nextInt(this!.length);
-    return this!.toList()[randomIdx];
-  }
-
-  double sumBy(double toDouble(T? t)) {
-    if (this == null) return 0.0;
-    return this!.map(toDouble).sum();
-  }
-
-  int sumByInt(int toDouble(T? t)) {
-    if (this == null) return 0;
-    return this!.map(toDouble).sum();
-  }
-
-  List<R> mapIndexed<R>(R mapper(T? item, int index)) {
-    int i = 0;
-    return [...?this?.map((T? item) => mapper(item, i++))];
-  }
-
-  List<R> expandIndexed<R>(Iterable<R> mapper(T? item, int index)) {
-    int i = 0;
-    return [...?this?.expand((T? item) => mapper(item, i++))];
-  }
-
-  T? maxBy<R extends Comparable<R>>(R by(T? item), [T? ifNull]) {
-    T? _max;
-    for (final T? t in (this ?? const [])) {
-      if (_max == null || (by(t).compareTo(by(_max))) > 0) {
-        _max = t;
-      }
-    }
-    return _max ?? ifNull;
-  }
-
-  T? minBy<R extends Comparable<R>>(R by(T? item), [T? ifNull]) {
-    T? _min;
-    for (final T? t in (this ?? const [])) {
-      if (_min == null || (by(t).compareTo(by(_min))) < 0) {
-        _min = t;
-      }
-    }
-    return _min ?? ifNull;
-  }
-
-  @deprecated
-  List<T?> sorted([Comparator<T?>? compare]) {
-    return sortedBy(compare);
-  }
-
-  List<T?> sortedBy([Comparator<T?>? compare]) {
-    final buffer = [...?this];
-    buffer.sort(compare);
-    return buffer;
-  }
-
-  List<T> sortedUsing(Comparable getter(T? item)) {
-    final List<T?> ts = <T?>[...?this];
-    return ts.sortedBy((a, b) {
-      final f1 = getter(a as T?);
-      final f2 = getter(b as T?);
-      return f1.compareTo(f2);
-    }).cast();
-  }
-
-  Iterable<T?> uniqueBy(dynamic uniqueProp(T? item)) {
-    final mapping = <dynamic, T?>{};
-    for (final t in (this ?? <T>[])) {
-      final unique = uniqueProp(t);
-      mapping[unique] = t;
-    }
-    return mapping.values;
-  }
-
-  Stream<T?> toStream() {
-    return Stream.fromIterable(this ?? []);
-  }
-
-  Stream<T> forEachAsync(FutureOr onEach(T? item)) async* {
-    for (final item in (this ?? <T>[])) {
-      await onEach(item);
-      yield item!;
-    }
-  }
-
-  void forEachIndexed<R>(R mapper(T? item, int index)) {
-    if (this == null) return;
-    int i = 0;
-
-    for (final x in this!) {
-      mapper(x, i++);
-    }
-  }
-
-  List<T?> truncate([int? length]) {
-    if (this == null) return [];
-    if (length == null) return [...this!];
-    return [...this!.take(length)];
-  }
-
-  Iterable<T?> orEmpty() => this ?? <T>[];
-
-  List<T?> orEmptyList() => this?.toList() ?? <T>[];
-
-  List<R> mapNotNull<R>(R? mapper(T? item)) {
-    return [
-      ...?this?.map(mapper).whereNotNull(),
-    ];
-  }
-
-  Iterable<R> mapPos<R>(R mapper(T? item, IterationPosition pos)) {
-    int i = 0;
-
-    if (this == null) return const [];
-    final length = this!.length;
-    final isSingle = length == 1;
-    return [
-      ...this!.map((T? item) {
-        final _i = i;
-        i++;
-        return mapper(
-            item,
-            isSingle
-                ? IterationPosition.only
-                : _i == 0
-                    ? IterationPosition.first
-                    : _i == length - 1
-                        ? IterationPosition.last
-                        : IterationPosition.middle);
-      })
-    ];
-  }
-
-  String joinWithAnd([String? formatter(T? input)?]) {
-    formatter ??= (item) => item?.toString();
-    if (this == null) return '';
-    if (this!.length < 3) {
-      return this!.join(" and ");
-    } else {
-      return mapPos((item, pos) {
-        String? formatted = formatter!(item);
-        switch (pos) {
-          case IterationPosition.first:
-          case IterationPosition.only:
-            return formatted;
-          case IterationPosition.middle:
-            return ", $formatted";
-          case IterationPosition.last:
-            return ", and $formatted";
-          default:
-            return ", $formatted";
-        }
-      }).join("");
-    }
-  }
-
-  T? lastOrNull() => this?.lastWhere((_) => true, orElse: () => null);
-
-  T? firstOr([T? ifEmpty]) =>
-      this?.firstWhere((_) => true, orElse: () => ifEmpty);
-}
-
-extension SunnyIterableIterableExtension<T> on Iterable<Iterable<T>> {
-  List<T> flatten() {
-    return [...this.expand((i) => i)];
-  }
-}
+extension SunnyIterableSafeExtensionExt<T> on Iterable<T> {}
 
 extension CoreListNullableExtension<T> on List<T>? {
   bool removeLastWhere({bool removeIf(T item)?, T? removeItem}) {
@@ -540,18 +246,18 @@ extension CoreListNullableExtension<T> on List<T>? {
   }
 }
 
-extension CoreListExtension<T> on List<T> {
+extension CoreListExtension<T extends Object> on List<T> {
   T? get(int index) => Lists.getOrNull(this, index);
 
   List<T> updateWhere(bool predicate(T check), dynamic mutate(T input)) {
-    return this.mapIndexed((T item, idx) {
-      if (!predicate(item)) {
-        return item;
-      } else {
-        final res = mutate(item);
-        return res is T ? res : item;
-      }
-    } as T Function(T?, int));
+    return this.notNull().mapIndexed((T item, idx) {
+          if (!predicate(item)) {
+            return item;
+          } else {
+            final res = mutate(item);
+            return res is T ? res : item;
+          }
+        } as T Function(T?, int));
   }
 
   Stream<List<T>> chunkedStream(int chunkSize) {
@@ -587,22 +293,12 @@ extension CoreListExtension<T> on List<T> {
 
   int get lastIndex => length - 1;
 
-  List<T> compact() {
-    return [
-      ...where((item) => item != null),
-    ];
-  }
-
   T? firstOrNull([bool filter(T item)?]) {
     Iterable<T> list = this;
     if (filter != null) {
       list = list.where(filter);
     }
     return list.isNotEmpty == true ? list.first : null;
-  }
-
-  Iterable<ListIndex<T>> indexed() {
-    return this.mapIndexed(((T item, int idx) => ListIndex<T>(idx, item)));
   }
 
   List<T> tail([int i = 1]) {
@@ -648,13 +344,6 @@ extension CoreListExtension<T> on List<T> {
     }
     return this;
   }
-}
-
-class ListIndex<T> {
-  final int index;
-  final T value;
-
-  const ListIndex(this.index, this.value);
 }
 
 extension BoolNullableExtension on bool? {

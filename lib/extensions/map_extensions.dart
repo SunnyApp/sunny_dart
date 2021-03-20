@@ -1,5 +1,6 @@
 import 'package:collection/collection.dart' show IterableExtension;
 import 'package:sunny_dart/json/json_path.dart';
+import 'package:dartxx/dartxx.dart';
 
 import '../helpers.dart';
 import '../typedefs.dart';
@@ -50,14 +51,6 @@ extension MapExtensions<K, V> on Map<K, V> {
 
   Map<K, V> whereKeys(bool predicate(K v)) {
     return Map.fromEntries(entries.where((e) => predicate(e.key)));
-  }
-
-  Map<K, V> whereKeysNotNull() {
-    return entries.where((entry) => entry.key != null).toMap();
-  }
-
-  Map<K, V> whereValuesNotNull() {
-    return entries.where((entry) => entry.value != null).toMap();
   }
 
   void setByPath(JsonPath path, value) {
@@ -119,7 +112,7 @@ extension SunnyIterableExtensions<V> on Iterable<V>? {
 
   Iterable<V> orEmpty() => this == null ? const [] : this!;
 
-  Map<K?, V?> keyed<K>(K keyOf(V value)) =>
+  Map<K, V> keyed<K>(K keyOf(V value)) =>
       this?.map((v) => MapEntry<K, V>(keyOf(v), v)).toMap() ?? <K, V>{};
 
   Map<Type, List<V>> groupByType() {
@@ -130,16 +123,6 @@ extension SunnyIterableExtensions<V> on Iterable<V>? {
 }
 
 extension IterableEntryExtensions<K, V> on Iterable<MapEntry<K, V>> {
-  Map<K, List<V>> groupByKey() {
-    Map<K, List<V>> results = {};
-    this.forEach((e) {
-      results.putIfAbsent(e.key, () => <V>[]).add(e.value);
-    });
-    return results;
-  }
-
-  Map<K, V> toMap() => Map.fromEntries(this);
-
   Iterable<MapEntry<K, V>> whereValuesNotNull() =>
       this.where((entry) => entry.value != null);
 }

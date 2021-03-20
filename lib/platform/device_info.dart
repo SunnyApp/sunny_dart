@@ -58,7 +58,7 @@ class DeviceInfo {
       'deviceBrand': this.deviceBrand,
       'deviceModel': this.deviceModel,
       'softwareVersion': this.softwareVersion,
-    }.whereValuesNotNull();
+    }.valuesNotNull();
   }
 
   dynamic toJson() => toMap();

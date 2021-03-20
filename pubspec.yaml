@@ -1,5 +1,5 @@
 name: sunny_dart
-version: 0.8.2+2
+version: 0.8.3-nullsafety.1
 homepage: https://github.com/SunnyApp/sunny_dart
 description: Core utilities used by sunny packages
 environment: 
@@ -9,7 +9,7 @@ dependencies:
   chunked_stream: ^1.4.0
   collection: ^1.15.0
   crypto: ^3.0.0
-  dartxx: ^0.4.4+6
+  dartxx: ^0.4.5-nullsafety.4
   equatable: ^2.0.0
   flexidate: ^0.4.5-nullsafety.1
   inflection3: ^0.5.3+1
@@ -24,6 +24,6 @@ dependencies:
   timezone: ^0.7.0-nullsafety.0
   uri: ^1.0.0
   uuid: ^3.0.1
-dev_dependencies: 
+dev_dependencies:
   flutter_test: 
     sdk: flutter
