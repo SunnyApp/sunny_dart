@@ -1,3 +1,6 @@
+## [0.8.3+1]
+ * Migrating to dartxx
+
 ## [0.8.2+2]
  * Adding toTitle()
 
