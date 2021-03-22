@@ -1,3 +1,5 @@
+export 'package:info_x/info_x.dart';
+
 export 'extensions.dart';
 export 'helpers.dart';
 export 'i18n.dart';
@@ -7,7 +9,6 @@ export 'json.dart';
 //     if (dart.library.js) 'platform/platform_web.dart';
 export 'streams.dart';
 export 'typedefs.dart';
-export 'package:info_x/info_x.dart';
 
 /// Makes it easier to import
 class SunnyDart {}

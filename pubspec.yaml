@@ -9,11 +9,11 @@ dependencies:
   chunked_stream: ^1.4.0
   collection: ^1.15.0
   crypto: ^3.0.0
-  dartxx: ^0.4.5-nullsafety.6
+  dartxx: ^0.5.0+2
   equatable: ^2.0.0
-  flexidate: ^0.4.5-nullsafety.1
+  flexidate: ^0.5.0+1
   inflection3: ^0.5.3+1
-  info_x: ^0.4.4-nullsafety.2
+  info_x: ^0.5.0+1
   intl: ^0.17.0
   libphonenumber2: ^2.0.2+2
   logging: ^1.0.0
