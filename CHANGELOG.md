@@ -1,3 +1,6 @@
+## [0.8.3+3]
+ * Moving throttle/debounce out
+
 ## [0.8.3+2]
  * Removing info_x
 
