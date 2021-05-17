@@ -2,9 +2,9 @@ import 'dart:async';
 
 import 'package:logging/logging.dart';
 import 'package:stream_transform/stream_transform.dart';
-import 'package:sunny_dart/extensions.dart';
-import 'package:sunny_dart/helpers/disposable.dart';
 
+import '../extensions/future_extensions.dart';
+import '../extensions/lang_extensions.dart';
 import '../helpers.dart';
 import '../typedefs.dart';
 
@@ -183,9 +183,9 @@ class SyncStream<T> with Disposable implements ValueStream<T?> {
         try {
           update(_);
         } catch (e, stack) {
-          print("Error with $debugName");
-          print(e);
-          print(stack);
+          log.info("Error with $debugName");
+          log.info(e);
+          log.info(stack);
         }
       }, cancelOnError: false).cancel);
     }

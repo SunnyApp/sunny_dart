@@ -8,7 +8,16 @@ import '../extensions/lang_extensions.dart';
 import '../extensions/map_extensions.dart';
 import '../helpers.dart';
 import '../helpers/resolvable.dart';
+import '../typedefs.dart';
 import 'value_stream.dart';
+
+extension StreamToVStreamExtensions<X> on Stream<X> {
+  ValueStream<X> toVStream([X? initial]) => ValueStream.of(initial, this);
+
+  SyncStream<X> toSyncStream(
+          [X? initial, Consumer<X>? onChange, String? name]) =>
+      SyncStream.fromStream(this, initial, onChange, name);
+}
 
 extension ValueStreamIterableMapEntryExtensions<K, V>
     on ValueStream<Iterable<MapEntry<K, V>>> {

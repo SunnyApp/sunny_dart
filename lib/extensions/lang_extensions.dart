@@ -34,6 +34,7 @@ extension ObjectToListExtension<T> on T {
     if (self == null) return null;
     if (self is int) return self;
     if (self is num) return self.toInt();
+    if (self is String) return int.tryParse(self.trimStart('0'));
     assert(false, "Can't convert to int");
     return null;
   }

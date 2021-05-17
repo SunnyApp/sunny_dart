@@ -159,7 +159,7 @@ extension AsyncValueStreamTestExt<T> on AsyncValueStream<T> {
     this.flatten().listen((input) {
       if (input != null) updates.add(input);
     }, onError: (err, stack) {
-      print(stack);
+      log.info(stack);
       fail("$err");
     });
 

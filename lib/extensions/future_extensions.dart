@@ -1,12 +1,8 @@
-//ignore_for_file: unnecessary_cast
 import 'dart:async';
 
 import 'package:stream_transform/stream_transform.dart';
 import 'package:dartxx/tuple.dart';
-
 import '../helpers.dart';
-import '../streams.dart';
-
 export 'package:stream_transform/stream_transform.dart';
 
 extension FutureIterableExt<T> on Iterable<Future<T>> {
@@ -16,36 +12,38 @@ extension FutureIterableExt<T> on Iterable<Future<T>> {
   }
 }
 
+//
 extension IterableFutureExt<T> on FutureOr<Iterable<T>> {
   FutureOr<Iterable<R>> thenMap<R>(R mapper(T input)) {
     return this.thenOr((_) {
       return _.map(mapper);
-    } as Iterable<R> Function(Iterable<T>?));
+    });
   }
 }
 
 extension FutureOrIterableNullExt<T> on Iterable<FutureOr<T>>? {
   List<T> completed() {
     if (this == null) return [];
-    return <T>[...this!.whereType()];
+    return <T>[...this!.whereType<T>()];
   }
 }
 
 extension FutureOrIterableExt<T> on Iterable<FutureOr<T>> {
   Future<List<T>> awaitAll({bool eagerError = true}) {
-    return Future.wait(
-        this.map(((v) => v.futureValue()!) as Future<T> Function(FutureOr<T>)),
-        eagerError: eagerError);
+    return Future.wait<T>([
+      for (var t in this) Future<T>.value(t),
+    ], eagerError: eagerError);
   }
 
-  FutureOr<List<T>> awaitOr() {
-    if (this.any((_) => _ is Future)) {
-      return Future.wait(this
-          .map(((v) => v.futureValue()!) as Future<T> Function(FutureOr<T>)));
-    } else {
-      return this.toList().cast<T>();
-    }
-  }
+  // FutureOr<List<T>> awaitOr() {
+  //   if (this.any((_) => _ is Future<T>)) {
+  //     return Future.wait<T>([
+  //       for (var t in this) Future<T>.value(t),
+  //     ]);
+  //   } else {
+  //     return this.toList().cast<T>();
+  //   }
+  // }
 }
 
 Future<Tuple<A, B>> awaitBoth<A, B>(FutureOr<A> a, FutureOr<B> b) async {
@@ -71,6 +69,7 @@ extension NestedFuture<T> on Future<Future<T>?> {
   }
 }
 
+//
 extension NestedNullableFutureOr<T> on FutureOr<FutureOr<T>?>? {
   /// Unboxes a Future/FutureOr
   FutureOr<T?> unbox() {
@@ -80,23 +79,25 @@ extension NestedNullableFutureOr<T> on FutureOr<FutureOr<T>?>? {
   }
 }
 
+//
 extension FutureNullableExtensions<T> on Future<T?> {
   void ignore() {}
 
   Future<Tuple<T, R>?> to<R>(FutureOr<R> mapper(T? input)) async {
-    final resolved = await this;
+    final T? resolved = await this;
     if (resolved == null) {
-      return null;
+      return Future.value(null);
     }
     final b = await mapper(resolved);
     if (b != null) {
       return Tuple(resolved, b);
     } else {
-      return null;
+      return Future.value(null);
     }
   }
 }
 
+//
 extension FutureExtensions<T> on Future<T> {
   FutureOr<Tuple<T, R>> to<R>(FutureOr<R> mapper(T input)) {
     final other = this.then((resolved) {
@@ -114,6 +115,7 @@ extension ObjectTupleExt<X> on X {
   }
 }
 
+//
 extension FutureOrExts<T> on FutureOr<T> {
   FutureOr<R> thenOr<R>(R after(T resolved)) => (this is Future<T>)
       ? futureValue().then(after) as FutureOr<R>
@@ -123,13 +125,14 @@ extension FutureOrExts<T> on FutureOr<T> {
       (this is Future<T>) ? this as Future<T> : Future.value(this as T);
 }
 
+//
 extension FutureOrNullableExts<T> on FutureOr<T?> {
   FutureOr<T> filterNotNull() {
     return this.thenOrNull((resolved) => resolved!);
   }
 
-  ValueStream<T> toVStream() =>
-      this == null ? ValueStream.empty() : ValueStream.of(this);
+  // ValueStream<T> toVStream() =>
+  //     this == null ? ValueStream.empty() : ValueStream.of(this);
 
   T? resolve([T? or]) =>
       resolveOrNull(or) ??
@@ -137,11 +140,7 @@ extension FutureOrNullableExts<T> on FutureOr<T?> {
           ? illegalState<T>("Attempting to resolve a future.")
           : null);
 
-  T? resolveOrNull([T? or]) => this is Future<T>
-      ? (or == null)
-          ? null
-          : or
-      : (this as T? ?? or);
+  T? resolveOrNull([T? or]) => this is Future<T?> ? or : ((this as T?) ?? or);
 
   FutureOr<R?> thenCast<R>() => thenOr((self) => self as R?);
 
@@ -188,6 +187,7 @@ extension FutureOrNullableExts<T> on FutureOr<T?> {
   }
 }
 
+//
 extension StreamTxrNullableExtensions<X> on Stream<X>? {
   Stream<X> orEmpty() {
     return this ?? Stream<X>.empty();

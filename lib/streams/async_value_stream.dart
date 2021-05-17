@@ -1,4 +1,3 @@
-//ignore_for_file: unnecessary_cast
 import 'dart:async';
 
 import 'package:async/async.dart';
@@ -8,7 +7,7 @@ import 'package:stream_transform/stream_transform.dart';
 import 'package:sunny_dart/extensions.dart';
 import 'package:sunny_dart/helpers.dart';
 import 'package:sunny_dart/helpers/disposable.dart';
-
+//
 import '../typedefs.dart';
 import 'value_stream.dart';
 
@@ -230,8 +229,7 @@ class AsyncValueStream<T> with Disposable implements ValueStream<T?> {
   T? resolve([T? ifAbsent]) => current ?? ifAbsent;
 
   @override
-  FutureOr<T>? get() =>
-      _isResolved ? current as FutureOr<T>? : nextUpdate as FutureOr<T>;
+  FutureOr<T?> get() => _isResolved ? current : nextUpdate as FutureOr<T?>;
 
   @override
   ValueStream<R> map<R>(R mapper(T? input)) {

@@ -2,9 +2,6 @@ import 'dart:async';
 
 import 'package:chunked_stream/chunked_stream.dart';
 import 'package:stream_transform/stream_transform.dart';
-import 'package:sunny_dart/typedefs.dart';
-
-import '../streams/value_stream.dart';
 
 extension StreamExt<T> on Stream<T> {
   Future<void> complete() {
@@ -118,14 +115,6 @@ extension FutureIterableStreamExtension<V> on Stream<Iterable<Future<V>>> {
       return await Future.wait(iterables, eagerError: true);
     });
   }
-}
-
-extension StreamToVStreamExtensions<X> on Stream<X> {
-  ValueStream<X> toVStream([X? initial]) => ValueStream.of(initial, this);
-
-  SyncStream<X> toSyncStream(
-          [X? initial, Consumer<X>? onChange, String? name]) =>
-      SyncStream.fromStream(this, initial, onChange, name);
 }
 
 extension SafeStreamController<X> on StreamController<X> {
