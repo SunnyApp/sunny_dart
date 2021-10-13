@@ -1,3 +1,7 @@
+## [0.10.0+3]
+ * updated dartxx
+Adding tests
+
 ## [0.10.0+2]
  * Updated dependencies
 
