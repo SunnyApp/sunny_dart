@@ -2,7 +2,11 @@ import 'package:flexidate/flexidate.dart';
 
 DateTime? dateTimeOf(json) {
   if (json == null) return null;
-  return DateTime.parse(json.toString());
+  if(json is num) {
+    new DateTime.fromMillisecondsSinceEpoch(json.toInt(), isUtc: true);
+  } else {
+    return DateTime.parse(json.toString());
+  }
 }
 
 Uri? uriOf(json) {

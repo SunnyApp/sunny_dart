@@ -258,7 +258,7 @@ extension CoreListExtension<T extends Object> on List<T> {
             final res = mutate(item);
             return res is T ? res : item;
           }
-        } as T Function(T?, int));
+        });
   }
 
   Stream<List<T>> chunkedStream(int chunkSize) {
@@ -268,11 +268,19 @@ extension CoreListExtension<T extends Object> on List<T> {
   Iterable<T> get iterable => this as Iterable<T>;
 
   T? tryGet(int index) {
-    if (length > index) {
+    if (length > index && index > 0) {
       return this[index];
     } else {
       return null;
     }
+  }
+
+  T? tryEnd(int index) {
+    return tryGet(length - 1 + index);
+  }
+
+  T end(int index) {
+    return this[length - 1 + index];
   }
 
   List<T> trySublist(int startIndex, int endIndex) {

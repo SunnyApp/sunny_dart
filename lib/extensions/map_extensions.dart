@@ -1,5 +1,5 @@
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:sunny_dart/json/json_path.dart';
+import 'package:dartxx/json_path.dart';
 import 'package:dartxx/dartxx.dart';
 
 import '../helpers.dart';
@@ -10,10 +10,7 @@ extension DynamicMapExtensionMap<K> on Map<K, dynamic> {
   Iterable<MapEntry<K, dynamic>> flatEntry() {
     return entries.expand((entry) {
       final viter = [
-        if (entry.value is Iterable)
-          ...entry.value
-        else if (entry.value != null)
-          entry.value,
+        if (entry.value is Iterable) ...entry.value else if (entry.value != null) entry.value,
       ];
       return viter.map((v) => MapEntry<K, dynamic>(entry.key, v));
     });
@@ -28,10 +25,7 @@ extension MapNullableExtensions<K, V> on Map<K, V>? {
 
 extension MapExtensions<K, V> on Map<K, V> {
   String join([String entrySeparator = "; ", String keyValueSeparator = "="]) {
-    return this
-        .entries
-        .map((e) => "${e.key}$keyValueSeparator${e.value}")
-        .join(entrySeparator);
+    return this.entries.map((e) => "${e.key}$keyValueSeparator${e.value}").join(entrySeparator);
   }
 
   Keyed<K, V> toKeyed() => Keyed(this);
@@ -95,8 +89,7 @@ extension SunnyIterableExtensions<V> on Iterable<V>? {
 
   Iterable<V> whereNotNull() => this?.where(notNull()) ?? <V>[];
 
-  Iterable<String> mapToString() =>
-      this?.map((_) => _?.toString()).whereType<String>() ?? <String>[];
+  Iterable<String> mapToString() => this?.map((_) => _?.toString()).whereType<String>() ?? <String>[];
 
   bool get isNullOrEmpty => this?.isNotEmpty != true;
 
@@ -112,8 +105,7 @@ extension SunnyIterableExtensions<V> on Iterable<V>? {
 
   Iterable<V> orEmpty() => this == null ? const [] : this!;
 
-  Map<K, V> keyed<K>(K keyOf(V value)) =>
-      this?.map((v) => MapEntry<K, V>(keyOf(v), v)).toMap() ?? <K, V>{};
+  Map<K, V> keyed<K>(K keyOf(V value)) => this?.map((v) => MapEntry<K, V>(keyOf(v), v)).toMap() ?? <K, V>{};
 
   Map<Type, List<V>> groupByType() {
     return groupBy((_) => _.runtimeType);
@@ -123,8 +115,7 @@ extension SunnyIterableExtensions<V> on Iterable<V>? {
 }
 
 extension IterableEntryExtensions<K, V> on Iterable<MapEntry<K, V>> {
-  Iterable<MapEntry<K, V>> whereValuesNotNull() =>
-      this.where((entry) => entry.value != null);
+  Iterable<MapEntry<K, V>> whereValuesNotNull() => this.where((entry) => entry.value != null);
 }
 
 class Keyed<K, V> {

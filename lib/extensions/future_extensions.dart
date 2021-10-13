@@ -117,12 +117,31 @@ extension ObjectTupleExt<X> on X {
 
 //
 extension FutureOrExts<T> on FutureOr<T> {
-  FutureOr<R> thenOr<R>(R after(T resolved)) => (this is Future<T>)
-      ? futureValue().then(after) as FutureOr<R>
-      : after(this as T);
+  FutureOr<R> thenOr<R>(R after(T resolved), {R onError(Object error, StackTrace stackTrace)?}) {
+    final self = this;
+    if (self is Future<T>) {
+      final withThen = self.then(after);
+      if (onError != null) {
+        return withThen.catchError(onError);
+      } else {
+        return withThen;
+      }
+    } else {
+      try {
+        final res = after(self as T);
+        return res;
+      } catch (e, stack) {
+        if (onError != null) {
+          return onError(e, stack);
+        } else {
+          rethrow;
+        }
+      }
+    }
+  }
 
   Future<T> futureValue() =>
-      (this is Future<T>) ? this as Future<T> : Future.value(this as T);
+        (this is Future<T>) ? this as Future<T> : Future.value(this as T);
 }
 
 //
