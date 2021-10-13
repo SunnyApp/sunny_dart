@@ -1,3 +1,7 @@
+## [0.11.0+5]
+ * Gem update
+Minor bump
+
 ## [0.10.0+4]
  * Removing exports for json_path
 
