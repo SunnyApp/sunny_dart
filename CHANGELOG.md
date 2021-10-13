@@ -1,3 +1,6 @@
+## [0.10.0+4]
+ * Removing exports for json_path
+
 ## [0.10.0+3]
  * updated dartxx
 Adding tests
