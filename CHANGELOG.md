@@ -1,3 +1,6 @@
+## [0.11.0+7]
+ * Prepare for publish
+
 ## [0.11.0+6]
  * Prepare for publish
 
