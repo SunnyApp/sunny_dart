@@ -1,6 +1,6 @@
 import 'package:collection/collection.dart' show IterableExtension;
-import 'package:dartxx/json_path.dart';
 import 'package:dartxx/dartxx.dart';
+import 'package:dartxx/json_path.dart';
 
 import '../helpers.dart';
 import '../typedefs.dart';

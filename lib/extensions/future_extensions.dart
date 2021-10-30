@@ -1,14 +1,15 @@
 import 'dart:async';
 
-import 'package:stream_transform/stream_transform.dart';
 import 'package:dartxx/tuple.dart';
+import 'package:stream_transform/stream_transform.dart';
+
 import '../helpers.dart';
+
 export 'package:stream_transform/stream_transform.dart';
 
 extension FutureIterableExt<T> on Iterable<Future<T>> {
   Future<List<T>> waitAll({bool eagerError = true}) async {
-    return await Future.wait(this.map((each) => Future.value(each)),
-        eagerError: eagerError);
+    return await Future.wait(this.map((each) => Future.value(each)), eagerError: eagerError);
   }
 }
 
@@ -35,15 +36,15 @@ extension FutureOrIterableExt<T> on Iterable<FutureOr<T>> {
     ], eagerError: eagerError);
   }
 
-  // FutureOr<List<T>> awaitOr() {
-  //   if (this.any((_) => _ is Future<T>)) {
-  //     return Future.wait<T>([
-  //       for (var t in this) Future<T>.value(t),
-  //     ]);
-  //   } else {
-  //     return this.toList().cast<T>();
-  //   }
-  // }
+// FutureOr<List<T>> awaitOr() {
+//   if (this.any((_) => _ is Future<T>)) {
+//     return Future.wait<T>([
+//       for (var t in this) Future<T>.value(t),
+//     ]);
+//   } else {
+//     return this.toList().cast<T>();
+//   }
+// }
 }
 
 Future<Tuple<A, B>> awaitBoth<A, B>(FutureOr<A> a, FutureOr<B> b) async {
@@ -128,6 +129,7 @@ extension FutureOrExts<T> on FutureOr<T> {
       }
     } else {
       try {
+        // ignore: unnecessary_cast
         final res = after(self as T);
         return res;
       } catch (e, stack) {
@@ -140,8 +142,7 @@ extension FutureOrExts<T> on FutureOr<T> {
     }
   }
 
-  Future<T> futureValue() =>
-        (this is Future<T>) ? this as Future<T> : Future.value(this as T);
+  Future<T> futureValue() => (this is Future<T>) ? this as Future<T> : Future.value(this as T);
 }
 
 //
@@ -153,11 +154,7 @@ extension FutureOrNullableExts<T> on FutureOr<T?> {
   // ValueStream<T> toVStream() =>
   //     this == null ? ValueStream.empty() : ValueStream.of(this);
 
-  T? resolve([T? or]) =>
-      resolveOrNull(or) ??
-      ((this is Future)
-          ? illegalState<T>("Attempting to resolve a future.")
-          : null);
+  T? resolve([T? or]) => resolveOrNull(or) ?? ((this is Future) ? illegalState<T>("Attempting to resolve a future.") : null);
 
   T? resolveOrNull([T? or]) => this is Future<T?> ? or : ((this as T?) ?? or);
 
@@ -186,12 +183,10 @@ extension FutureOrNullableExts<T> on FutureOr<T?> {
     }
   }
 
-  Future<T?> futureValueOrNull() =>
-      (this is Future<T?>) ? this as Future<T?> : Future.value(this as T?);
+  Future<T?> futureValueOrNull() => (this is Future<T?>) ? this as Future<T?> : Future.value(this as T?);
 
-  FutureOr<R> thenOrNull<R>(R after(T? resolved)) => (this is Future<T?>)
-      ? futureValue().then(after) as FutureOr<R>
-      : after(this as T);
+  FutureOr<R> thenOrNull<R>(R after(T? resolved)) =>
+      (this is Future<T?>) ? futureValue().then(after) as FutureOr<R> : after(this as T);
 
   FutureOr<R?> nonNull<R>(FutureOr<R> block(T nonNullValue)) {
     final self = this;

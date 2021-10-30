@@ -1,6 +1,6 @@
+import 'package:dartxx/dartxx.dart';
 import 'package:logging/logging.dart';
 import 'package:recase/recase.dart';
-import 'package:dartxx/dartxx.dart';
 
 mixin LoggingMixin {
   String get loggerName => runtimeType.name;

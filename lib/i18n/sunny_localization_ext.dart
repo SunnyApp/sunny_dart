@@ -1,5 +1,5 @@
-import 'package:timezone/timezone.dart';
 import 'package:info_x/info_x.dart';
+import 'package:timezone/timezone.dart';
 
 extension SunnyLocalizationExt on Future<SunnyLocalization> {
   Future<TimeZone> get userTimeZone => then((_) => _.userTimeZone!);
