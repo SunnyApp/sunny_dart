@@ -268,7 +268,7 @@ extension CoreListExtension<T extends Object> on List<T> {
   Iterable<T> get iterable => this as Iterable<T>;
 
   T? tryGet(int index) {
-    if (length > index && index > 0) {
+    if (length > index && index >= 0) {
       return this[index];
     } else {
       return null;
