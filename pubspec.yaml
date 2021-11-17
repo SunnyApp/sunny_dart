@@ -9,7 +9,7 @@ dependencies:
   chunked_stream: ^1.4.1
   collection: ^1.15.0
   crypto: ^3.0.1
-  dartxx: ^0.5.3+2
+  dartxx: ^0.5.4
   equatable: ^2.0.3
   flexidate: ^0.8.0+3
   inflection3: ^0.5.3+2

@@ -3,10 +3,8 @@ import 'dart:async';
 import 'package:async/async.dart';
 import 'package:equatable/equatable.dart';
 import 'package:logging/logging.dart';
-import 'package:stream_transform/stream_transform.dart';
 import 'package:sunny_dart/extensions.dart';
 import 'package:sunny_dart/helpers.dart';
-import 'package:sunny_dart/helpers/disposable.dart';
 //
 import '../typedefs.dart';
 import 'value_stream.dart';
