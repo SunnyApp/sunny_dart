@@ -7,6 +7,7 @@ DateTime? dateTimeOf(json) {
   } else {
     return DateTime.parse(json.toString());
   }
+  return null;
 }
 
 Uri? uriOf(json) {
