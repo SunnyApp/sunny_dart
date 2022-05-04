@@ -1,3 +1,35 @@
+## 0.11.1
+
+ - Graduate package to a stable release. See pre-releases prior to this version for changelog entries.
+
+## 0.11.1-dev.6
+
+ - **FEAT**: bumping version.
+
+## 0.11.1-dev.5
+
+ - **FEAT**: bumping version.
+
+## 0.11.1-dev.4
+
+ - **FEAT**: bumping version.
+
+## 0.11.1-dev.3
+
+ - **FEAT**: bumping version.
+
+## 0.11.1-dev.2
+
+ - **FEAT**: bumping version.
+
+## 0.11.1-dev.1
+
+ - **FEAT**: bumping version.
+
+## 0.11.1-dev.0
+
+ - **FEAT**: bumping version.
+
 ## [0.11.0+8]
  * Prepare for publish
 
