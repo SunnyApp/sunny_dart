@@ -1,4 +1,6 @@
-# melos_managed_dependency_overrides: dartxx
+# melos_managed_dependency_overrides: dartxx,flexidate
 dependency_overrides:
   dartxx:
     path: ../dartxx
+  flexidate:
+    path: ../flexidate
