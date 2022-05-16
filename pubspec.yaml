@@ -7,12 +7,10 @@ environment:
 dependencies: 
   async: ^2.8.2
   chunked_stream: ^1.4.1
-  collection: ^1.15.0
+  collection: ^1.16.0
   crypto: ^3.0.2
   equatable: ^2.0.3
-  flexidate: ^0.8.0+3
   inflection3: ^0.5.3+2
-  info_x: ^0.8.0+3
   intl: ^0.17.0
   libphonenumber2: ^2.0.2+2
   logging: ^1.0.2
@@ -24,7 +22,12 @@ dependencies:
   timezone: ^0.8.0
   uri: ^1.0.0
   uuid: ^3.0.5
-  dartxx: ^0.5.5
+  info_x: 
+    path: /Users/ericm/sunny/player_rank/packages/info_x
+  flexidate: 
+    path: /Users/ericm/sunny/player_rank/packages/flexidate
+  dartxx: 
+    path: /Users/ericm/sunny/player_rank/packages/dartxx
 dev_dependencies: 
   flutter_test: 
     sdk: flutter
