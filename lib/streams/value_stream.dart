@@ -32,7 +32,7 @@ abstract class ValueStream<T> {
     if (first is Future<T?>) {
       return FStream<T>.ofFuture(first, after, debugName);
     } else {
-      return HStream<T?>(first.resolveOrNull(), after, debugName) as ValueStream<T>;
+      return HStream<T>(first.resolveOrNull(), after, debugName);
     }
   }
 

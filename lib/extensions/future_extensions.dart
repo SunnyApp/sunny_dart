@@ -36,6 +36,12 @@ extension FutureOrIterableExt<T> on Iterable<FutureOr<T>> {
     ], eagerError: eagerError);
   }
 
+  Future<List<T>> awaitEach({bool eagerError = true}) {
+    return Future.wait<T>([
+      for (var t in this) Future<T>.value(t),
+    ], eagerError: eagerError);
+  }
+
 // FutureOr<List<T>> awaitOr() {
 //   if (this.any((_) => _ is Future<T>)) {
 //     return Future.wait<T>([
@@ -145,11 +151,18 @@ extension FutureOrExts<T> on FutureOr<T> {
   Future<T> futureValue() => (this is Future<T>) ? this as Future<T> : Future.value(this as T);
 }
 
+extension FutureNullOrNullableExts<T> on FutureOr<T?>? {
+  Future<T> nonNullFuture() {
+    if(this==null) return Future.error(StateError("Null value"));
+    return Future.value(this.thenOrNull((resolved) => resolved!));
+  }
+}
 //
 extension FutureOrNullableExts<T> on FutureOr<T?> {
   FutureOr<T> filterNotNull() {
     return this.thenOrNull((resolved) => resolved!);
   }
+
 
   // ValueStream<T> toVStream() =>
   //     this == null ? ValueStream.empty() : ValueStream.of(this);

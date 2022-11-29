@@ -89,6 +89,8 @@ Future<R> timedAsync<R>(FutureOr<R> block(),
   return handled is R ? handled : r;
 }
 
+void ignoreVoid<T>(T input) {}
+
 T nullPointer<T>(String? property) =>
     throw ArgumentError.notNull(property ?? "Null found");
 
