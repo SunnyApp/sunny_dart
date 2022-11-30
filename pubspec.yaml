@@ -22,13 +22,21 @@ dependencies:
   inflection3: ^0.5.3+2
   uri: ^1.0.0
   platform_detect2: 
-    path: /Users/ericm/sunny/trippi_plugins/platform_detect
+    git: 
+      url: git@github.com:ericmartineau/platform_detect
+      ref: trippi_app
   info_x: 
-    path: /Users/ericm/sunny/trippi_plugins/info_x
+    git: 
+      url: git@github.com:ericmartineau/info_x
+      ref: trippi_app
   flexidate: 
-    path: /Users/ericm/sunny/trippi_plugins/flexidate
+    git: 
+      url: git@github.com:TrippiApp/flexidate
+      ref: trippi_app
   dartxx: 
-    path: /Users/ericm/sunny/trippi_plugins/dartxx
+    git: 
+      url: git@github.com:ericmartineau/dartxx.git
+      ref: trippi_app
 dev_dependencies: 
   flutter_test: 
     sdk: flutter
