@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:dartxx/tuple.dart';
 
-import '../extensions.dart';
 import 'safe_completer.dart';
 
 abstract class Resolvable<T> {
@@ -26,9 +25,9 @@ class FutureTuple<A, B> implements Resolvable<Tuple<A, B>> {
     _resolve();
   }
 
-  A get first => _firstResolved!;
+  A get first => _firstResolved as A;
 
-  B get second => _secondResolved!;
+  B get second => _secondResolved as B;
 
   @override
   Tuple<A, B>? resolveOrNull() => isResolved ? Tuple(first, second) : null;

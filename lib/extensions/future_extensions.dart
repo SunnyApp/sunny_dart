@@ -36,6 +36,12 @@ extension FutureOrIterableExt<T> on Iterable<FutureOr<T>> {
     ], eagerError: eagerError);
   }
 
+  Future<List<T>> awaitEach({bool eagerError = true}) {
+    return Future.wait<T>([
+      for (var t in this) Future<T>.value(t),
+    ], eagerError: eagerError);
+  }
+
 // FutureOr<List<T>> awaitOr() {
 //   if (this.any((_) => _ is Future<T>)) {
 //     return Future.wait<T>([

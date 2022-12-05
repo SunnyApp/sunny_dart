@@ -7,7 +7,7 @@ extension SunnyLocalizationExt on Future<SunnyLocalization> {
 }
 
 extension LocalizationDateTimeExt on DateTime {
-  TZDateTime withTimeZone(Location? location) {
+  TZDateTime withTimeZone([Location? location]) {
     if (this is TZDateTime) return (this as TZDateTime);
     return TZDateTime.from(this, location ?? sunnyLocalization.userLocation!);
   }

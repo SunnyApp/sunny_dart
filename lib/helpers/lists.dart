@@ -115,7 +115,7 @@ List<T> mapExceptLast<T>(Iterable<T>? list, T map(T t)) {
   return items;
 }
 
-Map<K, V> mapOf<K, V>(Iterable<V> values, {required K keyOf(V item)}) {
+Map<K, V> mapOf<K, V>(Iterable<V> values, { required K Function(V item) keyOf }) {
   return Map.fromEntries(values.map((v) => MapEntry(keyOf(v), v)));
 }
 

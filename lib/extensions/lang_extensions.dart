@@ -127,16 +127,6 @@ extension AnyFutureNullableExtensions<T> on Future<T>? {
   }
 }
 
-extension TypeExtensions on Type {
-  String get name => "$this"
-      .trimAround("_")
-      .replaceAllMapped(
-          typeParameters, (match) => "[${match.group(1)!.uncapitalize()}]")
-      .uncapitalize();
-
-  String get simpleName => simpleNameOfType(this);
-}
-
 String simpleNameOfType(Type type) {
   return "$type".replaceAll(typeParameters, '').uncapitalize();
 }
@@ -461,6 +451,33 @@ extension DurationExt on Duration {
       return "${micro}ns";
     }
     return "${inMilliseconds}ms";
+  }
+
+  String clockFormat({bool showHours = true, bool showMinutes = true, bool showSeconds = true, bool showMillis =  true}) {
+    var microseconds = inMicroseconds;
+
+    var hours = microseconds ~/ Duration.microsecondsPerHour;
+    microseconds = microseconds.remainder(Duration.microsecondsPerHour);
+
+    if (microseconds < 0) microseconds = -microseconds;
+
+    var minutes = microseconds ~/ Duration.microsecondsPerMinute;
+    microseconds = microseconds.remainder(Duration.microsecondsPerMinute);
+
+    var minutesPadding = minutes < 10 ? "0" : "";
+
+    var seconds = microseconds ~/ Duration.microsecondsPerSecond;
+    microseconds = microseconds.remainder(Duration.microsecondsPerSecond);
+
+    var secondsPadding = seconds < 10 ? "0" : "";
+
+    var paddedMicroseconds = microseconds.toString().padLeft(6, "0").truncate(3);
+    return buildString((buffer) {
+      if(showHours) buffer += "$hours:";
+      if(showMinutes) buffer += "$minutesPadding$minutes:";
+      if(showSeconds) buffer +=  "$secondsPadding$seconds";
+      if(showMillis) buffer += ".$paddedMicroseconds";
+    });
   }
 
   Future<R?> then<R>(R block()?) async {
