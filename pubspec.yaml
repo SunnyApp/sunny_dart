@@ -5,26 +5,28 @@ description: Core utilities used by sunny packages
 environment: 
   sdk: '>=2.8.0 <3.0.0'
 dependencies: 
-  async: ^2.4.2
+  async: ^2.9.0
   chunked_stream: ^1.2.0
-  collection: ^1.14.13
-  crypto: ^2.1.5
-  equatable: ^1.2.5
+  collection: ^1.16.0
+  crypto: ^3.0.2
+  equatable: ^2.0.5
   inflection2: ^0.4.3
-  meta: ^1.2.4
-  intl: ^0.16.1
+  meta: ^1.8.0
+  intl: ^0.17.0
   libphonenumber: ^1.0.2
-  logging: ^0.11.4
-  pedantic: ^1.9.2
+  logging: ^1.0.2
+  pedantic: ^1.11.1
   platform_detect: ^1.4.0
-  recase: ^3.0.1
-  stream_transform: ^1.2.0
-  timezone: ^0.6.1
-  uri: ^0.11.3+1
-  uuid: ^2.2.2
+  recase: ^4.0.0
+  stream_transform: ^2.0.0
+  timezone: ^0.9.0
+  uuid: ^3.0.6
+  uri: 
+    path: /Users/ericm/sunny/local_plugins/uri.dart
   flutter: 
     sdk: flutter
 dev_dependencies: 
-  logging_config: any
+  logging_config: 
+    path: /Users/ericm/reliveit/checkout/SunnyApp/logging_config
   flutter_test: 
     sdk: flutter
