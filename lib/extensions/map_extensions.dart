@@ -1,30 +1,29 @@
-import 'package:sunny_dart/json/json_path.dart';
+import 'package:collection/collection.dart' show IterableExtension;
+import 'package:dartxx/dartxx.dart';
 
 import '../helpers.dart';
 import '../typedefs.dart';
-import 'lang_extensions.dart';
-import 'lang_extensions.dart';
 
 extension DynamicMapExtensionMap<K> on Map<K, dynamic> {
   Iterable<MapEntry<K, dynamic>> flatEntry() {
     return entries.expand((entry) {
       final viter = [
-        if (entry.value is Iterable)
-          ...entry.value
-        else if (entry.value != null)
-          entry.value,
+        if (entry.value is Iterable) ...entry.value else if (entry.value != null) entry.value,
       ];
       return viter.map((v) => MapEntry<K, dynamic>(entry.key, v));
     });
   }
 }
 
+extension MapNullableExtensions<K, V> on Map<K, V>? {
+  Map<K, V> orEmpty() {
+    return this ?? {};
+  }
+}
+
 extension MapExtensions<K, V> on Map<K, V> {
   String join([String entrySeparator = "; ", String keyValueSeparator = "="]) {
-    return this
-        .entries
-        .map((e) => "${e.key}$keyValueSeparator${e.value}")
-        .join(entrySeparator);
+    return this.entries.map((e) => "${e.key}$keyValueSeparator${e.value}").join(entrySeparator);
   }
 
   Keyed<K, V> toKeyed() => Keyed(this);
@@ -44,14 +43,6 @@ extension MapExtensions<K, V> on Map<K, V> {
 
   Map<K, V> whereKeys(bool predicate(K v)) {
     return Map.fromEntries(entries.where((e) => predicate(e.key)));
-  }
-
-  Map<K, V> whereKeysNotNull() {
-    return entries.where((entry) => entry.key != null).toMap();
-  }
-
-  Map<K, V> whereValuesNotNull() {
-    return entries.where((entry) => entry.value != null).toMap();
   }
 
   void setByPath(JsonPath path, value) {
@@ -83,25 +74,20 @@ extension MapExtensions<K, V> on Map<K, V> {
       return "${e.key}=${e.value.toString().removeNewlines().truncate(40)}";
     }).join("; ");
   }
-
-  Map<K, V> orEmpty() {
-    return this ?? {};
-  }
 }
 
-extension SunnyIterableExtensions<V> on Iterable<V> {
+extension SunnyIterableExtensions<V> on Iterable<V>? {
   Iterable<V> ifEmpty(Getter<Iterable<V>> other) {
     if (this.isNullOrEmpty) {
       return other();
     } else {
-      return this;
+      return this!;
     }
   }
 
   Iterable<V> whereNotNull() => this?.where(notNull()) ?? <V>[];
 
-  Iterable<String> mapToString() =>
-      this?.map((_) => _?.toString()) ?? <String>[];
+  Iterable<String> mapToString() => this?.map((_) => _?.toString()).whereType<String>() ?? <String>[];
 
   bool get isNullOrEmpty => this?.isNotEmpty != true;
 
@@ -109,35 +95,25 @@ extension SunnyIterableExtensions<V> on Iterable<V> {
 
   Map<K, List<V>> groupBy<K>(K keyOf(V value)) {
     final result = <K, List<V>>{};
-    for (final item in this) {
+    for (final item in this.orEmpty()) {
       result.putIfAbsent(keyOf(item), () => <V>[]).add(item);
     }
     return result;
   }
 
-  Map<K, V> keyed<K>(K keyOf(V value)) =>
-      this?.map((v) => MapEntry<K, V>(keyOf(v), v))?.toMap() ?? <K, V>{};
+  Iterable<V> orEmpty() => this == null ? const [] : this!;
+
+  Map<K, V> keyed<K>(K keyOf(V value)) => this?.map((v) => MapEntry<K, V>(keyOf(v), v)).toMap() ?? <K, V>{};
 
   Map<Type, List<V>> groupByType() {
     return groupBy((_) => _.runtimeType);
   }
 
-  V get firstOrNull => this.firstWhere((_) => true, orElse: () => null);
+  V? get firstOrNull => this?.firstWhereOrNull((_) => true);
 }
 
 extension IterableEntryExtensions<K, V> on Iterable<MapEntry<K, V>> {
-  Map<K, List<V>> groupByKey() {
-    Map<K, List<V>> results = {};
-    this.forEach((e) {
-      results.putIfAbsent(e.key, () => <V>[]).add(e.value);
-    });
-    return results;
-  }
-
-  Map<K, V> toMap() => Map.fromEntries(this);
-
-  Iterable<MapEntry<K, V>> whereValuesNotNull() =>
-      this.where((entry) => entry.value != null);
+  Iterable<MapEntry<K, V>> whereValuesNotNull() => this.where((entry) => entry.value != null);
 }
 
 class Keyed<K, V> {
@@ -145,7 +121,7 @@ class Keyed<K, V> {
 
   const Keyed([this._boxed = const {}]);
 
-  V operator [](K key) {
+  V? operator [](K key) {
     return _boxed[key];
   }
 }

@@ -1,8 +1,6 @@
-library is_x;
+// ignore_for_file: non_constant_identifier_names
 
-import 'xfo/info_x.dart';
-import 'xfo/sunny_get.dart';
-export 'xfo/info_x.dart';
+import 'package:info_x/info_x.dart';
 
 /// Makes it easier to import
 class IsX {}

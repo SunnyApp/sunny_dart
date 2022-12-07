@@ -28,7 +28,7 @@ packages:
       name: chunked_stream
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.0"
+    version: "1.4.1"
   clock:
     dependency: transitive
     description:
@@ -50,6 +50,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.2"
+  dart_countries:
+    dependency: transitive
+    description:
+      name: dart_countries
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "3.0.2"
+  dartx:
+    dependency: transitive
+    description:
+      name: dartx
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "1.1.0"
+  dartxx:
+    dependency: "direct main"
+    description:
+      path: "/Users/ericm/sunny/local_plugins/dartxx"
+      relative: false
+    source: path
+    version: "0.5.5"
   equatable:
     dependency: "direct main"
     description:
@@ -64,8 +85,15 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.3.1"
-  flutter:
+  flexidate:
     dependency: "direct main"
+    description:
+      path: "/Users/ericm/sunny/local_plugins/flexidate"
+      relative: false
+    source: path
+    version: "0.8.0+3"
+  flutter:
+    dependency: transitive
     description: flutter
     source: sdk
     version: "0.0.0"
@@ -74,13 +102,20 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  inflection2:
+  inflection3:
     dependency: "direct main"
     description:
-      name: inflection2
+      name: inflection3
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.4.3"
+    version: "0.5.3+2"
+  info_x:
+    dependency: "direct main"
+    description:
+      path: "/Users/ericm/sunny/local_plugins/info_x"
+      relative: false
+    source: path
+    version: "0.8.0+3"
   intl:
     dependency: "direct main"
     description:
@@ -88,41 +123,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.17.0"
-  isolate:
-    dependency: transitive
-    description:
-      name: isolate
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "2.0.3"
-  js:
-    dependency: transitive
-    description:
-      name: js
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.6.5"
-  libphonenumber:
-    dependency: "direct main"
-    description:
-      name: libphonenumber
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.2"
   logging:
     dependency: "direct main"
     description:
       name: logging
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.1.0"
-  logging_config:
-    dependency: "direct dev"
-    description:
-      path: "/Users/ericm/reliveit/checkout/SunnyApp/logging_config"
-      relative: false
-    source: path
-    version: "0.4.7"
+    version: "1.0.2"
   matcher:
     dependency: transitive
     description:
@@ -158,20 +165,34 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "1.11.1"
-  platform_detect:
-    dependency: "direct main"
+  phone_number_metadata:
+    dependency: transitive
     description:
-      name: platform_detect
+      name: phone_number_metadata
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.4.0"
+    version: "5.0.4"
+  phone_numbers_parser:
+    dependency: "direct main"
+    description:
+      name: phone_numbers_parser
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "7.0.0"
+  platform_detect2:
+    dependency: "direct main"
+    description:
+      path: "/Users/ericm/sunny/local_plugins/platform_detect"
+      relative: false
+    source: path
+    version: "1.5.0+2"
   pub_semver:
     dependency: transitive
     description:
       name: pub_semver
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.4.4"
+    version: "2.1.1"
   quiver:
     dependency: transitive
     description:
@@ -185,14 +206,7 @@ packages:
       name: recase
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.1.0"
-  service_worker:
-    dependency: transitive
-    description:
-      name: service_worker
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "0.2.4"
+    version: "4.0.0"
   sky_engine:
     dependency: transitive
     description: flutter
@@ -225,7 +239,7 @@ packages:
       name: stream_transform
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.2.0"
+    version: "2.0.0"
   string_scanner:
     dependency: transitive
     description:
@@ -247,20 +261,27 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "0.4.12"
+  time:
+    dependency: transitive
+    description:
+      name: time
+      url: "https://pub.dartlang.org"
+    source: hosted
+    version: "2.0.0"
   timezone:
     dependency: "direct main"
     description:
       name: timezone
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "0.9.0"
+    version: "0.8.0"
   typed_data:
     dependency: transitive
     description:
       name: typed_data
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "1.3.1"
+    version: "1.3.0"
   uri:
     dependency: "direct main"
     description:
@@ -274,7 +295,7 @@ packages:
       name: uuid
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "3.0.7"
+    version: "3.0.6"
   vector_math:
     dependency: transitive
     description:
@@ -282,13 +303,5 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "2.1.2"
-  worker_service:
-    dependency: transitive
-    description:
-      path: "/Users/ericm/reliveit/checkout/SunnyApp/worker_service"
-      relative: false
-    source: path
-    version: "0.5.2+3"
 sdks:
   dart: ">=2.17.0 <3.0.0"
-  flutter: ">=1.12.0"

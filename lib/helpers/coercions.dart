@@ -1,15 +1,21 @@
-import 'package:sunny_dart/time/time_span.dart';
+import 'package:flexidate/flexidate.dart';
 
-DateTime dateTimeOf(json) {
+DateTime? dateTimeOf(json) {
   if (json == null) return null;
-  return DateTime.parse(json.toString());
+  if (json is num) {
+    DateTime.fromMillisecondsSinceEpoch(json.toInt(), isUtc: true);
+  } else {
+    return DateTime.parse(json.toString());
+  }
+  return null;
 }
 
-Uri uriOf(json) {
+Uri? uriOf(json) {
+  if(json is Uri) return json;
   if (json == null) return null;
   return Uri.parse(json.toString());
 }
 
-TimeSpan timeSpanOf(String duration) {
+TimeSpan? timeSpanOf(String duration) {
   return TimeSpan.ofISOString(duration);
 }

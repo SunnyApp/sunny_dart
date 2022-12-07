@@ -1,15 +1,16 @@
 import 'dart:async';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:logging/logging.dart';
-import 'package:logging_config/logging_config.dart';
+
+// import 'package:logging_config/logging_config.dart';
 import 'package:sunny_dart/sunny_dart.dart';
 
 void main() {
   group("Async Value Stream", () {
-    configureLogging(LogConfig.root(Level.FINER));
+    // configureLogging(LogConfig.root(Level.FINER));
     test("Test initial value", () async {
-      final number = AsyncValueStream(debugName: "tester", initialValue: 23, isUnique: true);
+      final number = AsyncValueStream(
+          debugName: "tester", initialValue: 23, isUnique: true);
       expect(await number.nextUpdate.timeout(1.second), 23);
       final updates = await number.captureUpdates(() {});
 
@@ -27,7 +28,8 @@ void main() {
     });
 
     test("Test update wait", () async {
-      final number = AsyncValueStream(debugName: "tester", initialValue: 23, isUnique: true);
+      final number = AsyncValueStream(
+          debugName: "tester", initialValue: 23, isUnique: true);
 
       final updates = await number.captureUpdates(() async {
         await number.update(() async {
@@ -42,7 +44,8 @@ void main() {
     });
 
     test("Test update overlapping", () async {
-      final number = AsyncValueStream(debugName: "update overlapping", initialValue: 23, isUnique: true);
+      final number = AsyncValueStream(
+          debugName: "update overlapping", initialValue: 23, isUnique: true);
 
       final updates = await number.captureUpdates(() async {
         number.update(() async {
@@ -75,7 +78,8 @@ void main() {
     });
 
     test("Test stale request", () async {
-      final number = AsyncValueStream(debugName: "stale", initialValue: 23, isUnique: true);
+      final number = AsyncValueStream(
+          debugName: "stale", initialValue: 23, isUnique: true);
 
       final updates = await number.captureUpdates(() async {
         number.update(() async {
@@ -96,7 +100,8 @@ void main() {
     });
 
     test("Test sync update", () async {
-      final number = AsyncValueStream(debugName: "sync update", initialValue: 23, isUnique: false);
+      final number = AsyncValueStream(
+          debugName: "sync update", initialValue: 23, isUnique: false);
       expect(await number.nextUpdate, 23);
       final updates = await number.captureUpdates(() async {
         number.update(() async {
@@ -149,10 +154,12 @@ void main() {
 }
 
 extension AsyncValueStreamTestExt<T> on AsyncValueStream<T> {
-  Future<List<T>> captureUpdates([FutureOr block()]) async {
+  Future<List<T>> captureUpdates([FutureOr block()?]) async {
     final updates = <T>[];
-    this.flatten().listen(updates.add, onError: (err, stack) {
-      print(stack);
+    this.flatten().listen((input) {
+      if (input != null) updates.add(input);
+    }, onError: (err, stack) {
+      log.info(stack);
       fail("$err");
     });
 

@@ -9,7 +9,7 @@ Color colorFromHex(String hexString) {
 }
 
 /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
-String colorToHex(Color color, {bool leadingHashSign = true}) {
+String? colorToHex(Color? color, {bool leadingHashSign = true}) {
   if (color == null) return null;
   return '${leadingHashSign ? '#' : ''}'
       '${color.alpha.toRadixString(16)}'

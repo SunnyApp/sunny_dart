@@ -5,6 +5,7 @@ typedef Factory<T> = T Function();
 typedef Getter<T> = T Function();
 typedef Loader<K, T> = FutureOr<T> Function(K key);
 typedef Consumer<T> = dynamic Function(T input);
+typedef Consume<T> = void Function(T input);
 typedef Producer<T> = FutureOr<T> Function();
 typedef Mapping<F, T> = T Function(F from);
 typedef Formatter<T> = String Function(T from);
