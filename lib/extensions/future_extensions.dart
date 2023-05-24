@@ -135,8 +135,7 @@ extension FutureOrExts<T> on FutureOr<T> {
       }
     } else {
       try {
-        // ignore: unnecessary_cast
-        final res = after(self as T);
+        final res = after(self);
         return res;
       } catch (e, stack) {
         if (onError != null) {
