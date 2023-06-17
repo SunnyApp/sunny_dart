@@ -5,30 +5,30 @@ description: Core utilities used by sunny packages
 environment: 
   sdk: '>=2.14.0 <3.0.0'
 dependencies: 
-  async: ^2.10.0
+  async: ^2.11.0
   chunked_stream: ^1.4.1
-  collection: ^1.17.1
-  crypto: ^3.0.2
+  collection: ^1.17.2
+  crypto: ^3.0.3
   equatable: ^2.0.5
-  phone_numbers_parser: ^7.0.0+1
-  intl: ^0.18.0
-  logging: ^1.1.1
-  meta: ^1.9.0
+  phone_numbers_parser: ^7.0.2
+  intl: ^0.18.1
+  logging: 1.2.0
+  meta: ^1.9.1
   pedantic: ^1.11.1
   recase: ^4.1.0
   stream_transform: ^2.1.0
   timezone: ^0.9.1
-  uuid: ^3.0.0
+  uuid: ^3.0.7
   inflection3: ^0.5.3+2
   uri: ^1.0.0
   platform_detect2: 
-    path: /Users/ericm/reliveit/checkout/ericmartineau/platform_detect
+    path: /Users/ericm/aesthetika/checkout/ericmartineau/platform_detect
   info_x: 
-    path: /Users/ericm/reliveit/checkout/ericmartineau/info_x
+    path: /Users/ericm/aesthetika/checkout/ericmartineau/info_x
   flexidate: 
-    path: /Users/ericm/reliveit/checkout/ericmartineau/flexidate
+    path: /Users/ericm/aesthetika/checkout/ericmartineau/flexidate
   dartxx: 
-    path: /Users/ericm/reliveit/checkout/ericmartineau/dartxx
+    path: /Users/ericm/aesthetika/checkout/ericmartineau/dartxx
 dev_dependencies: 
   flutter_test: 
     sdk: flutter
